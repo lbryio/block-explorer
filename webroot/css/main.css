@@ -160,7 +160,8 @@ footer .content .page-time { position: absolute; right: 12px; bottom: 0px; paddi
 .recent-transactions h3 { font-weight: 300; margin: 0; margin-bottom: 12px }
 .recent-transactions { width: 1200px; margin: 48px auto 0 auto; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 36px; cursor: default }
 
-.tx-table .credit { color: #00e676 }
-.tx-table .debit { color: #ff0000 }
+.tx-table td { vertical-align: top }
+.tx-table td.credit, .tx-table td span.credit { color: #00e676 }
+.tx-table td.debit, .tx-table td span.debit { color: #ff0000 }
 
 .clear { clear: both }

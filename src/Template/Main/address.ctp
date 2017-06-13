@@ -176,8 +176,13 @@
                 <td class="right"><?php echo number_format($tx->Confirmations, 0, '', ',') ?></td>
                 <td class="right"><?php echo $tx->InputCount ?></td>
                 <td class="right"><?php echo $tx->OutputCount ?></td>
-                <td class="right<?php echo ' ' . (($tx->DebitAmount > 0) ? 'debit' : 'credit') ?>">
-                    <?php echo (($tx->DebitAmount > 0) ? '-' : '+'); ?><?php echo number_format((($tx->DebitAmount > 0) ? $tx->DebitAmount : $tx->CreditAmount), 8, '.', '') ?> LBC
+                <td class="right<?php echo ' ' . (($tx->DebitAmount > 0 && $tx->CreditAmount > 0) ? '' : (($tx->DebitAmount > 0) ? 'debit' : 'credit')) ?>">
+                    <?php if ($tx->DebitAmount > 0 && $tx->CreditAmount > 0): ?>
+                        <span class="credit"><?php echo number_format($tx->CreditAmount, 8, '.', '') ?></span>
+                        <span class="debit"><?php echo number_format($tx->DebitAmount, 8, '.', '') ?></span>
+                    <?php else: ?>
+                        <?php echo (($tx->DebitAmount > 0) ? '-' : '+'); ?><?php echo number_format((($tx->DebitAmount > 0) ? $tx->DebitAmount : $tx->CreditAmount), 8, '.', '') ?> LBC
+                    <?php endif; ?>
                 </td>
             </tr>
             <?php endforeach; ?>
