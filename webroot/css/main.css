@@ -1,0 +1,166 @@
+* { box-sizing: border-box; font-family: 'jaf-facitweb', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale }
+*:focus { outline: none }
+.home-container { display: table; width: 100%; height: 100% }
+.home-container-cell { display: table-cell; vertical-align: middle; min-height: 400px }
+.main { display: block; width: 1200px; margin: 0 auto }
+a:link, a:visited { color: #1e88e5; text-decoration: none }
+a:hover { text-decoration: underline; color: #1976d2 }
+
+.header { width: 1200px; margin: 0 auto 24px auto; padding: 12px 0 64px 0; border-bottom: 1px solid #ddd }
+.header a:link, .header a:visited { color: #333; text-decoration: none }
+.header .title { font-family: 'adelle-sans', sans-serif; font-weight: bold; font-size: 140%; float: left; position: relative; top: 4px }
+.header .search { float: right }
+.header .search .input-group { border: 2px solid #1e88e5; position: relative; width: 525px; height: 36px; border-radius: 8px }
+.header .search .input-group input { border: none; border-radius: 8px; padding: 8px 133px 8px 8px; width: 100%; height: 32px; width: 521px }
+.header .search .input-group .btn-inline-search { border: none; cursor: pointer; position: absolute; right: -4px; top: 0; height: 100%; background: #1e88e5; color: #fff; width: 125px;
+border-radius: 0 6px 8px 0 }
+.header .search .input-group .btn-inline-search:hover { background: #1976d2 }
+
+.home-container-cell > .main > .title { font-family: 'adelle-sans', sans-serif; font-weight: bold; font-size: 280%; margin: 24px auto 24px auto; width: 600px; text-align: center; color: #333; cursor: default }
+.home-container-cell .search-input { display: block; margin: 0 auto; padding: 8px; text-align: center; border: 3px solid #ddd; border-radius: 16px; width: 600px; font-size: 115%; font-weight: 300 }
+.home-container-cell .ctls { width: 600px; text-align: center; margin: 24px auto; position: relative }
+.home-container-cell .ctls .btn-search { font-size: 115%; display: inline-block; padding: 12px 48px; background: #1e88e5; color: #fff; border-radius: 8px; border: none; font-weight: 300; cursor: pointer }
+.home-container-cell .ctls .btn-search:hover { background: #1976d2 }
+.home-container-cell .ctls a { font-size: 115%; display: inline-block; font-weight: 300; position: absolute; right: 0; padding-top: 12px }
+.home-container-cell .ctls a:hover { text-decoration: none; color: #1976d2 }
+
+.home-container-cell .recent-blocks { width: 1000px; margin: 48px auto 0 auto; box-shadow: 0 6px 12px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px 36px 36px 36px; cursor: default }
+.home-container-cell .recent-blocks h3 { font-weight: normal; margin: 0 0 12px 0; font-weight: 300 }
+
+.table { width: 100%; cursor: default; border-collapse: collapse; font-size: 90% }
+.table thead tr th { border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 12px 4px }
+.table tbody tr td { padding: 8px; border-bottom: 1px solid #eee; font-weight: 300; white-space: nowrap }
+.table tbody tr td.nodata { text-align: center; font-style: italic; font-weight: 300 }
+.table .last-cell { padding-left: 48px }
+
+.left { text-align: left }
+.center { text-align: center }
+.right { text-align: right }
+
+.w80 { width: 80px }
+.w100 { width: 100px }
+.w125 { width: 125px }
+.w150 { width: 150px }
+.w225 { width: 225px }
+.w200, .w200 > div { width: 200px }
+.w250, .w250 > div { width: 250px }
+.w275, .w275 > div { width: 275px }
+.w300, .w300 > div { width: 300px }
+.w200 > div, .w250 > div, .w275 > div, .w300 > div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+
+footer { padding-top: 64px; font-size: 80%; cursor: default }
+footer .content { width: 1200px; margin: 0 auto; border-top: 1px solid #ddd; padding: 24px 12px 48px 12px; line-height: 25px; font-weight: 300; position: relative }
+footer .content .page-time { position: absolute; right: 12px; bottom: 0px; padding-bottom: 52px; font-size: 85%; color: #ccc }
+
+.block-head { width: 1200px; margin: 0 auto 24px auto; cursor: default }
+.block-head h3, h4 { font-weight: 300; margin: 0 }
+.block-head h3 { font-size: 200%; margin-bottom: 3px }
+.block-head h4 { font-size: 125% }
+
+.block-info { width: 1200px; margin: 0 auto }
+.block-info h3 { font-weight: normal; margin: 0 0 12px 0; font-weight: 300 }
+
+.block-nav { width: 1200px; margin: 0 auto 24px auto }
+.block-nav .btn { display: block; padding: 8px; width: 150px; text-align: center; border-radius: 3px; border: 1px solid #ddd; font-size: 80% }
+.block-nav .btn:link, .block-nav .btn:visited { text-decoration: none; color: #333 }
+.block-nav .btn:hover { background: #f1f1f1 }
+
+.block-nav .btn-prev { float: left }
+.block-nav .btn-next { float: right }
+
+.block-summary { width: 460px; margin: 0; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 36px; cursor: default; float: left }
+.block-summary .label { font-size: 80%; color: #1e88e5 }
+.block-summary .value { font-weight: 300; word-break: break-word; word-wrap: break-word; font-size: 95% }
+.block-summary .half-width { width: 50%; float: left }
+.block-summary .spacer { height: 16px }
+
+.block-transactions { width: 690px; margin: 0 0 0 50px; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 36px; cursor: default; float: left; overflow: auto; overflow-x: hidden }
+
+.tx-head { width: 1200px; margin: 0 auto 24px auto; cursor: default }
+.tx-head h3, h4 { font-weight: 300; margin: 0 }
+.tx-head h3 { font-size: 200%; margin-bottom: 3px }
+.tx-head h4 { font-size: 125% }
+
+.realtime-head { width: 1200px; margin: 0 auto 36px auto; cursor: default }
+.realtime-head h3 { font-weight: 300; margin: 0; font-size: 200% }
+.realtime-main { width: 1200px; margin: 0 auto 0 auto }
+.realtime-main h3 { font-weight: 300; margin: 0 0 12px 0 }
+.realtime-main .realtime-blocks { width: 350px; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px; cursor: default; float: left }
+.realtime-main .realtime-tx { width: 800px; margin-left: 50px; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px; cursor: default; float: left }
+
+.stats { width: 1000px; margin: 0 auto 48px auto; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px; cursor: default }
+.stats .box { padding: 24px 0; border-right: 1px solid #ccc; float: left; text-align: center; width: 25% }
+.stats .box .title { color: #1e88e5; font-size: 90% }
+.stats .box .value { font-size: 180%; font-weight: 300; margin-top: 8px }
+.stats .box.last { border-color: transparent }
+
+.tx-summary { width: 1200px; margin: 0 auto; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 16px 0; cursor: default }
+.tx-summary .box { padding: 24px 0; border-right: 1px solid #ccc; float: left; text-align: center; width: 20% }
+.tx-summary .box.p15 { width: 15% }
+.tx-summary .box.p25 { width: 25% }
+.tx-summary .box .title { color: #1e88e5; font-size: 90% }
+.tx-summary .box .value { font-size: 180%; font-weight: 300; margin-top: 8px }
+.tx-summary .box.last { border-color: transparent }
+
+.tx-details { width: 1200px; margin: 48px auto 0 auto; cursor: default }
+.tx-details h3 { font-weight: 300; margin: 0 0 8px 0 }
+.tx-details-layout { display: table; width: 100%; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px; background: #f9f9f9 }
+
+.tx-details-layout .divider { width: 20%; display: table-cell; text-align: center; vertical-align: top; padding-top: 40px }
+.tx-details-layout .divider img { width: 72px }
+.tx-details-layout .inputs, .tx-details-layout .outputs { width: 40%; display: table-cell; vertical-align: top }
+.tx-details-layout .inputs .subtitle, .tx-details-layout .outputs .subtitle { margin-bottom: 16px; position: relative; line-height: 24px }
+.tx-details-layout .outputs .subtitle .fee { position: absolute; display: block; right: 0; bottom: 0 }
+.tx-details-layout .outputs .subtitle .fee .value { font-weight: 300; display: inline-block; margin-left: 16px }
+.tx-details-layout .inputs .input, .tx-details-layout .outputs .output { border: 1px solid #ddd; padding: 16px; border-radius: 18px; font-size: 95%; font-weight: 300; margin-bottom: 16px; background: #fff; position: relative }
+.tx-details-layout .tag { font-weight: normal; margin-top: 1px; font-size: 80%; color: #333 }
+.tx-details-layout .tag a:link, .tx-details-layout .tag a:visited { color: #333 }
+.tx-details-layout .tag a:hover { text-decoration: none }
+
+.tx-details-layout .outputs .output .labels { position: absolute; right: 16px; top: 8px }
+.tx-details-layout .outputs .output .labels > div { padding: 4px 12px; font-size: 70%; display: inline-block; margin-left: 4px }
+.tx-details-layout .outputs .output .labels .support { background: #ffeb3b }
+.tx-details-layout .outputs .output .labels .update { background: #ea80fc }
+.tx-details-layout .outputs .output .labels .claim { background: #76ff03 }
+.tx-details-layout .inputs .input .value, .tx-details-layout .outputs .output .value  { font-weight: normal }
+.tx-details-layout .inputs .input.is-source, .tx-details-layout .outputs .output.is-source  { border-right-width: 18px; border-right-color: #1e88e5; background: #e3f2fd }
+.tx-details-layout .inputs .input.highlighted, .tx-details-layout .outputs .output.highlighted { background: #f1f8e9 }
+.tx-details-layout .outputs .output.is-source .labels { right: 8px }
+
+.address-head { width: 1200px; margin: 0 auto 48px auto; cursor: default }
+.address-head h3, h4 { font-weight: 300; margin: 0 }
+.address-head h3 { font-size: 200%; margin-bottom: 3px }
+.address-head h4 { font-size: 125%; display: inline-block }
+.address-head .tag { display: inline-block; font-size: 80%; color: #1e88e5; margin-left: 8px }
+.address-head .tag a:link, .address-head .tag a:visited { color: #1e88e5 }
+.address-head .tag a:hover { text-decoration: none }
+
+.address-head .tag-address-container { margin: 24px 0; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px; cursor: default; font-size: 80%; display: none }
+.address-head .tag-address-container h4 { margin-bottom: 6px }
+.address-head .tag-address-container .desc { line-height: 22px; font-weight: 300 }
+.address-head .tag-address-container .form-group { margin-top: 12px }
+.address-head .tag-address-container .form-group .error-message { margin-bottom: 6px; color: #ff0000; font-style: italic; font-size: 105%; height: 24px; line-height: 24px }
+.address-head .tag-address-container .form-group .col { float: left; width: 300px; margin-right: 12px }
+.address-head .tag-address-container .form-group .col input { display: block; border: 2px solid #ccc; padding: 6px; margin-bottom: 12px; border-radius: 4px; width: 300px; line-height: 24px }
+.address-head .tag-address-container .form-group .col input:last-child { margin-bottom: 0 }
+.address-head .tag-address-container .form-group .col textarea { display: block; border: 2px solid #ccc; width: 300px; padding: 6px; line-height: 24px; height: 92px; border-radius: 4px; resize: none; position: relative; top: -1px; font-size: 100% }
+.address-head .tag-address-container .btn { display: inline-block; padding: 6px 36px; height: 39px; line-height: 24px; color: #fff; border-radius: 4px; font-weight: 300; cursor: pointer; border: none }
+.address-head .tag-address-container .btn-tag { background: #1e88e5 }
+.address-head .tag-address-container .btn-close { background: #ff0000; margin-left: 12px }
+
+.address-subhead { width: 1200px; margin: 0 auto }
+.address-qr { width: 170px; height: 170px; float: left }
+.address-qr img { width: 170px; height: 170px; border: 1px solid rgba(0,0,0,.15); padding: 3px }
+.address-summary { width: 982px; float: left; margin-left: 48px; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 25px 0 26px 0; cursor: default }
+.address-summary .box { padding: 24px 0; border-right: 1px solid #ccc; float: left; text-align: center; width: 33% }
+.address-summary .box .title { color: #1e88e5; font-size: 90% }
+.address-summary .box .value { font-size: 180%; font-weight: 300; margin-top: 8px }
+.address-summary .box.last { border-color: transparent }
+
+.recent-transactions h3 { font-weight: 300; margin: 0; margin-bottom: 12px }
+.recent-transactions { width: 1200px; margin: 48px auto 0 auto; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 36px; cursor: default }
+
+.tx-table .credit { color: #00e676 }
+.tx-table .debit { color: #ff0000 }
+
+.clear { clear: both }
