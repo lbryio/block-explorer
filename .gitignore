@@ -3,4 +3,5 @@
 /tmp/*
 /logs/*
 lbryexplorer.zip
-
+lbryexplorer.komodoproject
+.komodotools
