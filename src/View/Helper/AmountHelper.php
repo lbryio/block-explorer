@@ -5,7 +5,7 @@ namespace App\View\Helper;
 use Cake\View\Helper;
 
 class AmountHelper extends Helper {
-    public function format($value, $thousandsSeparator = '') {
+    public function format($value, $thousandsSeparator = ',') {
         $value = number_format($value, 8, '.', $thousandsSeparator);
         $dotIdx = strpos($value, '.');
         if ($dotIdx !== false) {
@@ -21,7 +21,7 @@ class AmountHelper extends Helper {
         return $value;
     }
 
-    public function formatCurrency($value, $thousandsSeparator = '') {
+    public function formatCurrency($value, $thousandsSeparator = ',') {
         $dotIdx = strpos($value, '.');
         if ($dotIdx !== false) {
             $left = substr($value, 0, $dotIdx);
