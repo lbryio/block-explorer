@@ -63,7 +63,7 @@
             <div class="label half-width">Difficulty</div>
             <div class="label half-width">Nonce</div>
 
-            <div class="value half-width"><?php echo $this->Amount->format($block->Difficulty) ?></div>
+            <div class="value half-width"><?php echo $this->Amount->format($block->Difficulty, '') ?></div>
             <div class="value half-width"><?php echo $block->Nonce ?></div>
 
             <div class="clear spacer"></div>
