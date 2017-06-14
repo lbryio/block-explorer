@@ -1,4 +1,4 @@
---DROP DATABASE IF EXISTS lbry;
+l--DROP DATABASE IF EXISTS lbry;
 CREATE DATABASE lbry DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE lbry;
 
@@ -7,22 +7,22 @@ CREATE TABLE `Blocks`
     `Id` SERIAL,
 
     `Bits` VARCHAR(20) NOT NULL,
-    `Chainwork` VARCHAR(70) NOT NULL,
+    `Chainwork` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
     `Confirmations` INTEGER UNSIGNED NOT NULL,
     `Difficulty` DECIMAL(18,8) NOT NULL,
-    `Hash` VARCHAR(70) NOT NULL,
+    `Hash` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL ,
     `Height` BIGINT UNSIGNED NOT NULL,
     `MedianTime` BIGINT UNSIGNED NOT NULL,
-    `MerkleRoot` VARCHAR(70) NOT NULL,
-    `NameClaimRoot` VARCHAR(70) NOT NULL,
+    `MerkleRoot` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
+    `NameClaimRoot` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
     `Nonce` BIGINT UNSIGNED NOT NULL,
-    `PreviousBlockHash` VARCHAR(70),
-    `NextBlockHash` VARCHAR(70),
+    `PreviousBlockHash` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci,
+    `NextBlockHash` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci,
     `BlockSize` BIGINT UNSIGNED NOT NULL,
-    `Target` VARCHAR(70) NOT NULL,
+    `Target` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
     `BlockTime` BIGINT UNSIGNED NOT NULL,
     `Version` BIGINT UNSIGNED NOT NULL,
-    `VersionHex` VARCHAR(10) NOT NULL,
+    `VersionHex` VARCHAR(10) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
     `TransactionHashes` TEXT,
     `TransactionsProcessed` TINYINT(1) DEFAULT 0 NOT NULL,
 
@@ -43,14 +43,14 @@ CREATE TABLE `Blocks`
 CREATE TABLE `Transactions`
 (
     `Id` SERIAL,
-    `BlockHash` VARCHAR(70),
+    `BlockHash` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci,
     `InputCount` INTEGER UNSIGNED NOT NULL,
     `OutputCount` INTEGER UNSIGNED NOT NULL,
     `Value` DECIMAL(18,8) NOT NULL,
     `Fee` DECIMAL(18,8) DEFAULT 0 NOT NULL,
     `TransactionTime` BIGINT UNSIGNED,
     `TransactionSize` BIGINT UNSIGNED NOT NULL,
-    `Hash` VARCHAR(70) NOT NULL,
+    `Hash` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
     `Version` INTEGER NOT NULL,
     `LockTime` INTEGER UNSIGNED NOT NULL,
     `Raw` TEXT,
@@ -69,7 +69,7 @@ CREATE TABLE `Transactions`
 CREATE TABLE `Addresses`
 (
     `Id` SERIAL,
-    `Address` VARCHAR(40) NOT NULL,
+    `Address` VARCHAR(40) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
     `FirstSeen` DATETIME,
     `TotalReceived` DECIMAL(18,8) DEFAULT 0 NOT NULL,
     `TotalSent` DECIMAL(18,8) DEFAULT 0 NOT NULL,
@@ -90,17 +90,17 @@ CREATE TABLE `Inputs`
 (
     `Id` SERIAL,
     `TransactionId` BIGINT UNSIGNED NOT NULL,
-    `TransactionHash` VARCHAR(70) NOT NULL,
+    `TransactionHash` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
     `AddressId` BIGINT UNSIGNED,
     `IsCoinbase` TINYINT(1) DEFAULT 0 NOT NULL,
-    `Coinbase` VARCHAR(70),
-    `PrevoutHash` VARCHAR(70),
+    `Coinbase` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci,
+    `PrevoutHash` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci,
     `PrevoutN` INTEGER UNSIGNED,
     `PrevoutSpendUpdated` TINYINT(1) DEFAULT 0 NOT NULL,
     `Sequence` INTEGER UNSIGNED,
     `Value` DECIMAL(18,8),
-    `ScriptSigAsm` TEXT,
-    `ScriptSigHex` TEXT,
+    `ScriptSigAsm` TEXT CHARACTER SET latin1 COLLATE latin1_general_ci,
+    `ScriptSigHex` TEXT CHARACTER SET latin1 COLLATE latin1_general_ci,
     `Created` DATETIME NOT NULL,
     `Modified` DATETIME NOT NULL,
     PRIMARY KEY `PK_Input` (`Id`),
@@ -127,12 +127,12 @@ CREATE TABLE `Outputs`
     `TransactionId` BIGINT UNSIGNED NOT NULL,
     `Value` DECIMAL(18,8),
     `Vout` INTEGER UNSIGNED,
-    `Type` VARCHAR(20),
-    `ScriptPubKeyAsm` TEXT,
-    `ScriptPubKeyHex` TEXT,
+    `Type` VARCHAR(20) CHARACTER SET latin1 COLLATE latin1_general_ci,
+    `ScriptPubKeyAsm` TEXT CHARACTER SET latin1 COLLATE latin1_general_ci,
+    `ScriptPubKeyHex` TEXT CHARACTER SET latin1 COLLATE latin1_general_ci,
     `RequiredSignatures` INTEGER UNSIGNED,
-    `Hash160` VARCHAR(50),
-    `Addresses` TEXT,
+    `Hash160` VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_ci,
+    `Addresses` TEXT CHARACTER SET latin1 COLLATE latin1_general_ci,
     `IsSpent` TINYINT(1) DEFAULT 0 NOT NULL,
     `SpentByInputId` BIGINT UNSIGNED,
     `Created` DATETIME NOT NULL,
@@ -170,17 +170,28 @@ CREATE TABLE `TransactionsAddresses`
     INDEX `Idx_TransactionsAddressesCredit` (`CreditAmount`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
 
-ALTER TABLE TransactionsAddresses ADD COLUMN TransactionTime DATETIME DEFAULT UTC_TIMESTAMP() NOT NULL AFTER CreditAmount;
-ALTER TABLE TransactionsAddresses ADD INDEX `Idx_TransactionsAddressesTransactionTime` (`TransactionTime`);
-
-ALTER TABLE Addresses ADD COLUMN TotalReceived DECIMAL(18,8) DEFAULT 0 NOT NULL AFTER FirstSeen;
-ALTER TABLE Addresses ADD COLUMN TotalSent DECIMAL(18,8) DEFAULT 0 NOT NULL AFTER TotalReceived;
-ALTER TABLE Addresses ADD INDEX Idx_AddressTotalReceived (TotalReceived);
-ALTER TABLE Addresses ADD INDEX Idx_AddressTotalSent (TotalSent);
-
-ALTER TABLE Addresses ADD COLUMN `Tag` VARCHAR(30) AFTER TotalSent;
-ALTER TABLE Addresses ADD COLUMN `TagUrl` VARCHAR(200) AFTER Tag;
-ALTER TABLE Addresses ADD UNIQUE KEY `Idx_AddressTag` (`Tag`);
-
-
-ALTER TABLE Transactions ADD INDEX `Idx_TransactionSize` (`TransactionSize`);
+CREATE TABLE `Claims`
+(
+    `Id` SERIAL,
+    `TransactionHash` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci,
+    `Name` VARCHAR(200) NOT NULL,
+    `ClaimId` CHAR(40) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
+    `ClaimType` TINYINT(1) NOT NULL, -- 1 - CertificateType, 2 - StreamType
+    `PublisherId` CHAR(40) CHARACTER SET latin1 COLLATE latin1_general_ci COMMENT 'references a ClaimId with CertificateType',
+    `PublisherSig` VARCHAR(200) CHARACTER SET latin1 COLLATE latin1_general_ci,
+    `Certificate` TEXT,
+    `Stream` TEXT,
+    `TransactionTime` INTEGER UNSIGNED,
+    `Version` VARCHAR(10) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
+    `Created` DATETIME NOT NULL,
+    `Modified` DATETIME NOT NULL,
+    PRIMARY KEY `PK_Claim` (`Id`),
+    FOREIGN KEY `FK_ClaimTransaction` (`TransactionHash`) REFERENCES `Transactions` (`Hash`),
+    FOREIGN KEY `FK_ClaimPublisher` (`PublisherId`) REFERENCES `Claims` (`ClaimId`),
+    CHECK((`ClaimType` = 1 AND JSON_VALID(`Certificate`)) -- certificate type
+          OR (`ClaimType` = 2 AND JSON_VALID(`Stream`))), -- stream type
+    INDEX `Idx_Claim` (`ClaimId`),
+    INDEX `Idx_ClaimTransactionTime` (`TransactionTime`),
+    INDEX `Idx_ClaimCreated` (`Created`),
+    INDEX `Idx_ClaimModified` (`Modified`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;

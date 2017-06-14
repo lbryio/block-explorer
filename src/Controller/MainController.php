@@ -29,8 +29,12 @@ class MainController extends AppController {
 
     public function initialize() {
         parent::initialize();
-
         $this->redis = new \Predis\Client('tcp://127.0.0.1:6379');
+        try {
+            $this->redis->info('mem');
+        } catch (\Predis\Connection\ConnectionException $e) {
+            $this->redis = null;
+        }
     }
 
     protected function _getLatestPrice() {
@@ -39,16 +43,26 @@ class MainController extends AppController {
         $priceInfo->time = $now->format('c');
 
         $shouldRefreshPrice = false;
-        if (!$this->redis->exists(self::lbcPriceKey)) {
+        if (!$this->redis) {
             $shouldRefreshPrice = true;
         } else {
-            $priceInfo = json_decode($this->redis->get(self::lbcPriceKey));
-            $lastPriceDt = new \DateTime($priceInfo->time);
-            $diff = $now->diff($lastPriceDt);
-            $diffHours = $diff->h;
-            $diffHours = $diffHours + ($diff->days * 24);
-            if ($diffHours >= 3) {
+            if (!$this->redis->exists(self::lbcPriceKey)) {
                 $shouldRefreshPrice = true;
+            } else {
+                $priceInfo = json_decode($this->redis->get(self::lbcPriceKey));
+                $lastPriceDt = new \DateTime($priceInfo->time);
+                $diff = $now->diff($lastPriceDt);
+                $diffMinutes = $diff->i;
+                if ($diffMinutes >= 15) { // 15 minutes
+                    $shouldRefreshPrice = true;
+                }
+
+                /*
+                $diffHours = $diff->h;
+                $diffHours = $diffHours + ($diff->days * 24);
+                if ($diffHours >= 3) {
+                    $shouldRefreshPrice = true;
+                }*/
             }
         }
 
@@ -57,13 +71,15 @@ class MainController extends AppController {
             $blckjson = json_decode(self::curl_get(self::blockchainTickerUrl));
 
             if ($btrxjson->success) {
-                $onelbc = $btrxjson->result->Ask;
+                $onelbc = $btrxjson->result->Bid;
                 $lbcPrice = 0;
                 if (isset($blckjson->USD)) {
                     $lbcPrice = $onelbc * $blckjson->USD->buy;
                     $priceInfo->price = number_format($lbcPrice, 2, '.', '');
                     $priceInfo->time = $now->format('c');
-                    $this->redis->set(self::lbcPriceKey, json_encode($priceInfo));
+                    if ($this->redis) {
+                        $this->redis->set(self::lbcPriceKey, json_encode($priceInfo));
+                    }
                 }
             }
         }

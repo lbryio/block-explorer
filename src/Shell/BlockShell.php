@@ -41,7 +41,7 @@ class BlockShell extends Shell {
     public function fixzerooutputs() {
         self::lock('zerooutputs');
 
-        $redis = new \Predis\Client(self::redisurl);
+        $redis = self::_init_redis();
         $conn = ConnectionManager::get('default');
 
         /** 2017-06-12 21:38:07 **/
@@ -520,13 +520,7 @@ class BlockShell extends Shell {
         //$conn->execute('SET foreign_key_checks = 0');
         //$conn->execute('SET unique_checks = 0');
 
-        $redis = null;
-        try {
-            $redis = new \Predis\Client(self::redisurl);
-        } catch (\Exception $e) {
-            // redis unavailable
-        }
-
+        $redis = self::_init_redis();
         try {
             $unproc_blocks = $this->Blocks->find()->select(['Id', 'Height', 'Hash', 'TransactionHashes', 'BlockTime'])->where(['TransactionsProcessed' => 0])->order(['Height' => 'asc'])->toArray();
             foreach ($unproc_blocks as $min_block) {
@@ -630,14 +624,8 @@ class BlockShell extends Shell {
         self::lock('parsenewblocks');
 
         echo "Parsing new blocks...\n";
-        $redis = null;
+        $redis = self::_init_redis();
         try {
-            try {
-                $redis = new \Predis\Client();
-            } catch (\Exception $e) {
-                // redis not available
-            }
-
             // Get the best block hash
             $req = ['method' => 'getbestblockhash', 'params' => []];
             $response = self::curl_json_post(self::rpcurl, json_encode($req));
@@ -803,12 +791,7 @@ class BlockShell extends Shell {
         self::lock('forevermempool');
 
         $conn = ConnectionManager::get('default');
-        $redis = null;
-        try {
-            $redis = new \Predis\Client(self::redisurl);
-        } catch (\Exception $e) {
-            // redis not available
-        }
+        $redis = self::_init_redis();
 
         while (true) {
             try {
@@ -1606,6 +1589,18 @@ class BlockShell extends Shell {
 
     public static function _flip_byte_order($bytes) {
         return implode('', array_reverse(str_split($bytes, 2)));
+    }
+
+    public static function _init_redis() {
+        $redis = new \Predis\Client(self::redisurl);
+        try {
+            $redis->info('mem');
+        } catch (\Predis\Connection\ConnectionException $e) {
+            // redis not available
+            $redis = null;
+        }
+
+        return $redis;
     }
 
     /*public function parsehistoryblocks() {
