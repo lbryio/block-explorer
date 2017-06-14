@@ -35,6 +35,8 @@ class AmountHelper extends Helper {
                     $value .= '.' . substr($right, 0, 2);
                 }
             }
+        } else {
+            $value = number_format($value, 2, '', $thousandsSeparator);
         }
 
         return $value;
