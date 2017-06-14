@@ -87,20 +87,7 @@ class MainController extends AppController {
 
         // try to calculate the hashrate based on the last 12 blocks found
         $diffBlocks = $this->Blocks->find()->select(['Chainwork', 'BlockTime', 'Difficulty'])->order(['Height' => 'desc'])->limit(12)->toArray();
-        $hashRate = 'N/A';
-        if (count($diffBlocks) > 1) {
-            $highestBlock = $diffBlocks[0];
-            $lowestBlock = $diffBlocks[count($diffBlocks) - 1];
-
-            $maxTime = max($highestBlock->BlockTime, $lowestBlock->BlockTime);
-            $minTime = min($highestBlock->BlockTime, $lowestBlock->BlockTime);
-            $timeDiff = $maxTime - $minTime;
-            $math = EccFactory::getAdapter();
-            $workDiff = bcsub($math->hexDec($highestBlock->Chainwork), $math->hexDec($lowestBlock->Chainwork));
-            if ($timeDiff > 0) {
-                $hashRate = $this->_formatHashRate(bcdiv($workDiff, $timeDiff)) . '/s';
-            }
-        }
+        $hashRate = $this->_formatHashRate($this->_gethashrate()) . '/s';
 
         $this->set('recentBlocks', $blocks);
         $this->set('hashRate', $hashRate);
@@ -415,6 +402,15 @@ class MainController extends AppController {
         return $response;
     }
 
+    private function _gethashrate() {
+        $req = ['method' => 'getnetworkhashps', 'params' => []];
+        $res = json_decode(self::curl_json_post(self::rpcurl, json_encode($req)));
+        if (!isset($res->result)) {
+            return 0;
+        }
+        return $res->result;
+    }
+
     public function apistatus() {
         $this->autoRender = false;
         $this->loadModel('Blocks');
@@ -429,20 +425,7 @@ class MainController extends AppController {
 
         // Calculate hash rate
         $diffBlocks = $this->Blocks->find()->select(['Chainwork', 'BlockTime', 'Difficulty'])->order(['Height' => 'desc'])->limit(12)->toArray();
-        $hashRate = 'N/A';
-        if (count($diffBlocks) > 1) {
-            $highestBlock = $diffBlocks[0];
-            $lowestBlock = $diffBlocks[count($diffBlocks) - 1];
-
-            $maxTime = max($highestBlock->BlockTime, $lowestBlock->BlockTime);
-            $minTime = min($highestBlock->BlockTime, $lowestBlock->BlockTime);
-            $timeDiff = $maxTime - $minTime;
-            $math = EccFactory::getAdapter();
-            $workDiff = bcsub($math->hexDec($highestBlock->Chainwork), $math->hexDec($lowestBlock->Chainwork));
-            if ($timeDiff > 0) {
-                $hashRate = $this->_formatHashRate(bcdiv($workDiff, $timeDiff)) . '/s';
-            }
-        }
+        $hashRate = $this->_formatHashRate($this->_gethashrate()) . '/s';
 
         return $this->_jsonResponse(['success' => true, 'status' => [
             'height' => $height,
