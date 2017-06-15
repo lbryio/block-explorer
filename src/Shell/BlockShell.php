@@ -356,7 +356,7 @@ class BlockShell extends Shell {
                         // Create the output
                         $conn->execute('INSERT INTO Outputs (TransactionId, Vout, Value, Type, ScriptPubKeyAsm, ScriptPubKeyHex, RequiredSignatures, Hash160, Addresses, Created, Modified) '.
                                         'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())',
-                                        [$out['TransactionId'],
+                                        [$txid,
                                          $out['Vout'],
                                          $out['Value'],
                                          $out['Type'],
@@ -435,7 +435,7 @@ class BlockShell extends Shell {
                                 $in_entity = $this->Inputs->newEntity($in);
                                 $conn->execute('INSERT INTO Inputs (TransactionId, TransactionHash, AddressId, PrevoutHash, PrevoutN, Sequence, Value, ScriptSigAsm, ScriptSigHex, Created, Modified) ' .
                                                'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())',
-                                               [$in['TransactionId'],
+                                               [$txid,
                                                 $in['TransactionHash'],
                                                 isset($in['AddressId']) ? $in['AddressId'] : null,
                                                 $in['PrevoutHash'],
