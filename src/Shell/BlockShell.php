@@ -741,6 +741,11 @@ class BlockShell extends Shell {
                     $all_claim_data = $this->_getclaimfortxout($out['ScriptPubKeyAsm'], $tx_hash, $out['Vout'], $block_ts);
                     $claim = $all_claim_data['claim_data'];
                     $claim_stream_data = $all_claim_data['claim_stream_data'];
+
+                    if (!$claim) {
+                        break;
+                    }
+
                     if ($claim['ClaimType'] == 2 && !$claim_stream_data) {
                         echo "***claim stream data missing for streamType claim\n";
                         $data_error = true;
@@ -749,6 +754,7 @@ class BlockShell extends Shell {
 
                     $claim_entity = $this->Claims->newEntity($claim);
                     $res = $this->Claims->save($claim_entity);
+
                     if (!$res) {
                         echo "***claim could not be saved.\n";
                         $data_error = true;
