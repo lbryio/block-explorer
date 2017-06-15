@@ -343,6 +343,7 @@ class BlockShell extends Shell {
 
                 // Create / update addresses
                 $addr_id_map = [];
+                $new_addr_map = [];
                 foreach($all_tx_data['addresses'] as $address => $addro) {
                     $prev_addr = $this->Addresses->find()->select(['Id'])->where(['Address' => $address])->first();
                     if (!$prev_addr) {
@@ -357,6 +358,7 @@ class BlockShell extends Shell {
                         } else {
                             $addr_id_map[$address] = $entity->Id;
                         }
+                        $new_addr_map[$address] = 1;
                     } else {
                         $addr_id_map[$address] = $prev_addr->Id;
                     }
@@ -393,7 +395,7 @@ class BlockShell extends Shell {
                             $conn->execute('INSERT INTO TransactionsAddresses (TransactionId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE TransactionId = TransactionId', [$txid, $addr_id]);
                         }
 
-                        if ($addr_id > -1) {
+                        if ($addr_id > -1 && isset($new_addr_map[$address])) {
                             if (!isset($addr_id_drcr[$addr_id])) {
                                 $addr_id_drcr[$addr_id] = ['debit' => 0, 'credit' => 0];
                             }
@@ -449,11 +451,11 @@ class BlockShell extends Shell {
                                 }
 
                                 if ($addr_id > -1) {
-                                    $conn->execute('INSERT INTO InputsAddresses (InputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE InputId = InputId', [$exist_output, $addr_id]);
+                                    $conn->execute('INSERT INTO InputsAddresses (InputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE InputId = InputId', [$exist_input->Id, $addr_id]);
                                     $conn->execute('INSERT INTO TransactionsAddresses (TransactionId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE TransactionId = TransactionId', [$txid, $addr_id]);
                                 }
 
-                                if ($addr_id > -1) {
+                                if ($addr_id > -1 && isset($new_addr_map[$address])) {
                                     if (!isset($addr_id_drcr[$addr_id])) {
                                         $addr_id_drcr[$addr_id] = ['debit' => 0, 'credit' => 0];
                                     }
