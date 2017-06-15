@@ -348,7 +348,7 @@ class BlockShell extends Shell {
                     $total_tx_value = bcadd($total_tx_value, $out['Value'], 8);
 
                     // check if the output exists
-                    $stmt = $conn->execute('SELECT FROM Outputs WHERE TransactionId = ? AND Vout = ?', [$txid, $vout]);
+                    $stmt = $conn->execute('SELECT Id FROM Outputs WHERE TransactionId = ? AND Vout = ?', [$txid, $vout]);
                     $exist_output = $stmt->fetch(\PDO::FETCH_OBJ);
 
                     if (!$exist_output) {
