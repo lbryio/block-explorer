@@ -341,6 +341,27 @@ class BlockShell extends Shell {
                 $total_diff += $diff_ms;
                 echo "decodetx took {$diff_ms}ms. ";
 
+                // Create / update addresses
+                $addr_id_map = [];
+                foreach($all_tx_data['addresses'] as $address => $addro) {
+                    $prev_addr = $this->Addresses->find()->select(['Id'])->where(['Address' => $address])->first();
+                    if (!$prev_addr) {
+                        $new_addr = [
+                            'Address' => $address,
+                            'FirstSeen' => $block_ts->format('Y-m-d H:i:s')
+                        ];
+                        $entity = $this->Addresses->newEntity($new_addr);
+                        $res = $this->Addresses->save($entity);
+                        if (!$res) {
+                            $data_error = true;
+                        } else {
+                            $addr_id_map[$address] = $entity->Id;
+                        }
+                    } else {
+                        $addr_id_map[$address] = $prev_addr->Id;
+                    }
+                }
+
                 $start_ms = round(microtime(true) * 1000);
                 $num_outputs = count($outputs);
                 foreach ($outputs as $out) {
@@ -351,32 +372,7 @@ class BlockShell extends Shell {
                     $stmt = $conn->execute('SELECT Id FROM Outputs WHERE TransactionId = ? AND Vout = ?', [$txid, $vout]);
                     $exist_output = $stmt->fetch(\PDO::FETCH_OBJ);
 
-                    if (!$exist_output) {
-                        $out_entity = $this->Outputs->newEntity($out);
-                        // Create the output
-                        $conn->execute('INSERT INTO Outputs (TransactionId, Vout, Value, Type, ScriptPubKeyAsm, ScriptPubKeyHex, RequiredSignatures, Hash160, Addresses, Created, Modified) '.
-                                        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())',
-                                        [$txid,
-                                         $out['Vout'],
-                                         $out['Value'],
-                                         $out['Type'],
-                                         $out['ScriptPubKeyAsm'],
-                                         $out['ScriptPubKeyHex'],
-                                         $out['RequiredSignatures'],
-                                         $out['Hash160'],
-                                         $out['Addresses']
-                                        ]);
-
-                        // get the last insert id
-                        $stmt = $conn->execute('SELECT LAST_INSERT_ID() AS outputId');
-                        $linsert = $stmt->fetch(\PDO::FETCH_OBJ);
-                        $out_entity->Id = $linsert->outputId;
-
-                        if ($out_entity->Id === 0) {
-                            $data_error = true;
-                            break;
-                        }
-
+                    if ($exist_output) {
                         $json_addr = json_decode($out['Addresses']);
                         $address = $json_addr[0];
 
@@ -390,6 +386,11 @@ class BlockShell extends Shell {
                                 $addr_id = $src_addr->Id;
                                 $addr_id_map[$address] = $addr_id;
                             }
+                        }
+
+                        if ($addr_id > -1) {
+                            $conn->execute('INSERT INTO OutputsAddresses (OutputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE OutputId = OutputId', [$exist_output->Id, $addr_id]);
+                            $conn->execute('INSERT INTO TransactionsAddresses (TransactionId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE TransactionId = TransactionId', [$txid, $addr_id]);
                         }
 
                         if ($addr_id > -1) {
@@ -431,31 +432,7 @@ class BlockShell extends Shell {
                             $stmt = $conn->execute('SELECT Id FROM Inputs WHERE TransactionId = ? AND PrevoutHash = ? AND PrevoutN = ?', [$txid, $prevout_hash, $in_prevout]);
                             $exist_input = $stmt->fetch(\PDO::FETCH_OBJ);
 
-                            if (!$exist_input) {
-                                $in_entity = $this->Inputs->newEntity($in);
-                                $conn->execute('INSERT INTO Inputs (TransactionId, TransactionHash, AddressId, PrevoutHash, PrevoutN, Sequence, Value, ScriptSigAsm, ScriptSigHex, Created, Modified) ' .
-                                               'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())',
-                                               [$txid,
-                                                $in['TransactionHash'],
-                                                isset($in['AddressId']) ? $in['AddressId'] : null,
-                                                $in['PrevoutHash'],
-                                                $in['PrevoutN'],
-                                                $in['Sequence'],
-                                                isset($in['Value']) ? $in['Value'] : 0,
-                                                $in['ScriptSigAsm'],
-                                                $in['ScriptSigHex']
-                                                ]);
-
-                                // get last insert id
-                                $stmt = $conn->execute('SELECT LAST_INSERT_ID() AS inputId');
-                                $linsert = $stmt->fetch(\PDO::FETCH_OBJ);
-                                $in_entity->Id = $linsert->inputId;
-
-                                if ($in_entity->Id === 0) {
-                                    $data_error = true;
-                                    break;
-                                }
-
+                            if ($exist_input) {
                                 $json_addr = json_decode($src_output->Addresses);
                                 $address = $json_addr[0];
 
@@ -469,6 +446,11 @@ class BlockShell extends Shell {
                                         $addr_id = $src_addr->Id;
                                         $addr_id_map[$address] = $addr_id;
                                     }
+                                }
+
+                                if ($addr_id > -1) {
+                                    $conn->execute('INSERT INTO InputsAddresses (InputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE InputId = InputId', [$exist_output, $addr_id]);
+                                    $conn->execute('INSERT INTO TransactionsAddresses (TransactionId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE TransactionId = TransactionId', [$txid, $addr_id]);
                                 }
 
                                 if ($addr_id > -1) {
@@ -489,22 +471,19 @@ class BlockShell extends Shell {
                 echo "$num_inputs input(s) took {$diff_ms}ms. ";
 
                 // update tx time
-                /*$start_ms = round(microtime(true) * 1000);
+                $start_ms = round(microtime(true) * 1000);
                 $upd_addr_ids = [];
-                $conn->execute('UPDATE Transactions SET Value = ? WHERE Id = ?', [$total_tx_value, $txid]);
+                //$conn->execute('UPDATE Transactions SET Value = ? WHERE Id = ?', [$total_tx_value, $txid]);
                 foreach ($addr_id_drcr as $addr_id => $drcr) {
                     try {
-                        if (!isset($upd_addr_ids[$addr_id])) {
-                            $upd_addr_ids[$addr_id] = 1;
-                            $conn->execute('UPDATE TransactionsAddresses SET TransactionTime = (SELECT FROM_UNIXTIME(TransactionTime) FROM Transactions WHERE Id = ? AND TransactionTime IS NOT NULL)', [$txid]);
-                        }
-
+                        $conn->execute('UPDATE TransactionsAddresses SET DebitAmount = ?, CreditAmount = ? WHERE TransactionId = ? AND AddressId = ?',
+                                       [$drcr['debit'], $drcr['credit'], $txid, $addr_id]);
                     } catch (Exception $e) {
                         print_r($e);
                         $data_error = true;
                         break;
                     }
-                }*/
+                }
 
                 //$redis->set('fix.txid', $txid);
                 $diff_ms = (round(microtime(true) * 1000)) - $start_ms;
@@ -574,7 +553,7 @@ class BlockShell extends Shell {
 
         // Create / update addresses
         $addr_id_map = [];
-        foreach($all_tx_data['addresses'] as $address => $address) {
+        foreach($all_tx_data['addresses'] as $address => $addrss) {
             $prev_addr = $this->Addresses->find()->select(['Id'])->where(['Address' => $address])->first();
             if (!$prev_addr) {
                 $new_addr = [
