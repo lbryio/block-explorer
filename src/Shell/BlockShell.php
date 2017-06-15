@@ -290,9 +290,9 @@ class BlockShell extends Shell {
         $conn = ConnectionManager::get('default');
 
         /** 2017-06-12 21:38:07 **/
-        $last_fixed_txid = $redis->exists('fix.txid') ? $redis->get('fix.txid') : 0;
+        //$last_fixed_txid = $redis->exists('fix.txid') ? $redis->get('fix.txid') : 0;
         try {
-            $stmt = $conn->execute('SELECT Id FROM Transactions WHERE Id > ? AND Created <= ? LIMIT 1000000', [$last_fixed_txid, '2017-06-12 21:38:07']);
+            $stmt = $conn->execute('SELECT Id FROM Transactions WHERE Created >= ? AND Created <= ? LIMIT 1000000', ['2017-06-15 15:44:50', '2017-06-15 22:48:16']);
             $txids = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
             $count = count($txids);
@@ -347,32 +347,60 @@ class BlockShell extends Shell {
                     $vout = $out['Vout'];
                     $total_tx_value = bcadd($total_tx_value, $out['Value'], 8);
 
-                    // Update the output
-                    //$conn->execute('UPDATE Outputs SET Value = ? WHERE TransactionId = ? AND Vout = ?', [$out['Value'], $txid, $vout]);
+                    // check if the output exists
+                    $stmt = $conn->execute('SELECT FROM Outputs WHERE TransactionId = ? AND Vout = ?', [$txid, $vout]);
+                    $exist_output = $stmt->fetch(\PDO::FETCH_OBJ);
 
-                    $json_addr = json_decode($out['Addresses']);
-                    $address = $json_addr[0];
+                    if (!$exist_output) {
+                        $out_entity = $this->Outputs->newEntity($out);
+                        // Create the output
+                        $conn->execute('INSERT INTO Outputs (TransactionId, Vout, Value, Type, ScriptPubKeyAsm, ScriptPubKeyHex, RequiredSignatures, Hash160, Addresses, Created, Modified) '.
+                                        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())',
+                                        [$out['TransactionId'],
+                                         $out['Vout'],
+                                         $out['Value'],
+                                         $out['Type'],
+                                         $out['ScriptPubKeyAsm'],
+                                         $out['ScriptPubKeyHex'],
+                                         $out['RequiredSignatures'],
+                                         $out['Hash160'],
+                                         $out['Addresses']
+                                        ]);
 
-                    // Get the address ID
-                    $addr_id = -1;
-                    if (isset($addr_id_map[$address])) {
-                        $addr_id = $addr_id_map[$address];
-                    } else {
-                        $src_addr = $this->Addresses->find()->select(['Id'])->where(['Address' => $address])->first();
-                        if ($src_addr) {
-                            $addr_id = $src_addr->Id;
-                            $addr_id_map[$address] = $addr_id;
+                        // get the last insert id
+                        $stmt = $conn->execute('SELECT LAST_INSERT_ID() AS outputId');
+                        $linsert = $stmt->fetch(\PDO::FETCH_OBJ);
+                        $out_entity->Id = $linsert->outputId;
+
+                        if ($out_entity->Id === 0) {
+                            $data_error = true;
+                            break;
                         }
-                    }
 
-                    if ($addr_id > -1) {
-                        if (!isset($addr_id_drcr[$addr_id])) {
-                            $addr_id_drcr[$addr_id] = ['debit' => 0, 'credit' => 0];
+                        $json_addr = json_decode($out['Addresses']);
+                        $address = $json_addr[0];
+
+                        // Get the address ID
+                        $addr_id = -1;
+                        if (isset($addr_id_map[$address])) {
+                            $addr_id = $addr_id_map[$address];
+                        } else {
+                            $src_addr = $this->Addresses->find()->select(['Id'])->where(['Address' => $address])->first();
+                            if ($src_addr) {
+                                $addr_id = $src_addr->Id;
+                                $addr_id_map[$address] = $addr_id;
+                            }
                         }
-                        $addr_id_drcr[$addr_id]['credit'] = bcadd($addr_id_drcr[$addr_id]['credit'], $out['Value'], 8);
 
-                        // Update the Received amount for the address based on the output
-                        $conn->execute('UPDATE Addresses SET TotalReceived = TotalReceived + ? WHERE Id = ?', [$out['Value'], $addr_id]);
+                        if ($addr_id > -1) {
+                            if (!isset($addr_id_drcr[$addr_id])) {
+                                $addr_id_drcr[$addr_id] = ['debit' => 0, 'credit' => 0];
+                            }
+                            $addr_id_drcr[$addr_id]['credit'] = bcadd($addr_id_drcr[$addr_id]['credit'], $out['Value'], 8);
+
+                            // Update the Received amount for the address based on the output
+                            $conn->execute('UPDATE Addresses SET TotalReceived = TotalReceived + ? WHERE Id = ?', [$out['Value'], $addr_id]);
+                        }
                     }
                 }
                 $diff_ms = (round(microtime(true) * 1000)) - $start_ms;
@@ -398,29 +426,60 @@ class BlockShell extends Shell {
                         if ($src_output) {
                             $in['Value'] = $src_output->Value;
                             //$conn->execute('UPDATE Inputs SET Value = ? WHERE TransactionId = ? AND PrevoutHash = ? AND PrevoutN = ?', [$in['Value'], $txid, $prevout_hash, $in_prevout]);
-                            $json_addr = json_decode($src_output->Addresses);
-                            $address = $json_addr[0];
 
-                            // Get the address ID
-                            $addr_id = -1;
-                            if (isset($addr_id_map[$address])) {
-                                $addr_id = $addr_id_map[$address];
-                            } else {
-                                $src_addr = $this->Addresses->find()->select(['Id'])->where(['Address' => $address])->first();
-                                if ($src_addr) {
-                                    $addr_id = $src_addr->Id;
-                                    $addr_id_map[$address] = $addr_id;
+                            // Check if the input exists
+                            $stmt = $conn->execute('SELECT Id FROM Inputs WHERE TransactionId = ? AND PrevoutHash = ? AND PrevoutN = ?', [$txid, $prevout_hash, $in_prevout]);
+                            $exist_input = $stmt->fetch(\PDO::FETCH_OBJ);
+
+                            if (!$exist_input) {
+                                $in_entity = $this->Inputs->newEntity($in);
+                                $conn->execute('INSERT INTO Inputs (TransactionId, TransactionHash, AddressId, PrevoutHash, PrevoutN, Sequence, Value, ScriptSigAsm, ScriptSigHex, Created, Modified) ' .
+                                               'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())',
+                                               [$in['TransactionId'],
+                                                $in['TransactionHash'],
+                                                isset($in['AddressId']) ? $in['AddressId'] : null,
+                                                $in['PrevoutHash'],
+                                                $in['PrevoutN'],
+                                                $in['Sequence'],
+                                                isset($in['Value']) ? $in['Value'] : 0,
+                                                $in['ScriptSigAsm'],
+                                                $in['ScriptSigHex']
+                                                ]);
+
+                                // get last insert id
+                                $stmt = $conn->execute('SELECT LAST_INSERT_ID() AS inputId');
+                                $linsert = $stmt->fetch(\PDO::FETCH_OBJ);
+                                $in_entity->Id = $linsert->inputId;
+
+                                if ($in_entity->Id === 0) {
+                                    $data_error = true;
+                                    break;
                                 }
-                            }
 
-                            if ($addr_id > -1) {
-                                if (!isset($addr_id_drcr[$addr_id])) {
-                                    $addr_id_drcr[$addr_id] = ['debit' => 0, 'credit' => 0];
+                                $json_addr = json_decode($src_output->Addresses);
+                                $address = $json_addr[0];
+
+                                // Get the address ID
+                                $addr_id = -1;
+                                if (isset($addr_id_map[$address])) {
+                                    $addr_id = $addr_id_map[$address];
+                                } else {
+                                    $src_addr = $this->Addresses->find()->select(['Id'])->where(['Address' => $address])->first();
+                                    if ($src_addr) {
+                                        $addr_id = $src_addr->Id;
+                                        $addr_id_map[$address] = $addr_id;
+                                    }
                                 }
-                                $addr_id_drcr[$addr_id]['debit'] = bcadd($addr_id_drcr[$addr_id]['debit'], $in['Value'], 8);
 
-                                // Update total sent
-                                $conn->execute('UPDATE Addresses SET TotalSent = TotalSent + ? WHERE Id = ?', [$in['Value'], $addr_id]);
+                                if ($addr_id > -1) {
+                                    if (!isset($addr_id_drcr[$addr_id])) {
+                                        $addr_id_drcr[$addr_id] = ['debit' => 0, 'credit' => 0];
+                                    }
+                                    $addr_id_drcr[$addr_id]['debit'] = bcadd($addr_id_drcr[$addr_id]['debit'], $in['Value'], 8);
+
+                                    // Update total sent
+                                    $conn->execute('UPDATE Addresses SET TotalSent = TotalSent + ? WHERE Id = ?', [$in['Value'], $addr_id]);
+                                }
                             }
                         }
                     }
@@ -447,7 +506,7 @@ class BlockShell extends Shell {
                     }
                 }*/
 
-                $redis->set('fix.txid', $txid);
+                //$redis->set('fix.txid', $txid);
                 $diff_ms = (round(microtime(true) * 1000)) - $start_ms;
                 $total_diff += $diff_ms;
                 echo "update took {$diff_ms}ms. Total {$total_diff} ms.\n";
