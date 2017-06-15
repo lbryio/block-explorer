@@ -20,6 +20,14 @@ class ClaimsTable extends Table {
                     'bindingKey' => 'ClaimId',
                     'propertyName' => 'Publisher'
                 ]
+            ],
+            'hasOne' => [
+                'Stream' => [
+                    'className' => 'App\Model\Table\ClaimStreamsTable',
+                    'foreignKey' => 'Id',
+                    'bindingKey' => 'Id',
+                    'propertyName' => 'Stream'
+                ]
             ]
         ]);
     }

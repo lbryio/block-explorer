@@ -47,6 +47,7 @@ Router::scope('/', function (RouteBuilder $routes) {
     $routes->connect('/', ['controller' => 'Main', 'action' => 'index']);
     $routes->connect('/address/*', ['controller' => 'Main', 'action' => 'address']);
     $routes->connect('/blocks/*', ['controller' => 'Main', 'action' => 'blocks']);
+    $routes->connect('/claims/*', ['controller' => 'Main', 'action' => 'claims']);
     $routes->connect('/find', ['controller' => 'Main', 'action' => 'find']);
     $routes->connect('/realtime', ['controller' => 'Main', 'action' => 'realtime']);
     $routes->connect('/tx/*', ['controller' => 'Main', 'action' => 'tx']);
@@ -69,4 +70,3 @@ Router::scope('/', function (RouteBuilder $routes) {
  * how to customize the loading of plugin routes.
  */
 Plugin::routes();
-

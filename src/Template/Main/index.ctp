@@ -95,7 +95,7 @@
         <div class="main">
             <div class="title">LBRY Block Explorer</div>
             <form method="get" action="/find">
-                <input class="search-input" name="q" type="text" placeholder="Enter a block height or hash, transaction hash or address" />
+                <input class="search-input" name="q" type="text" placeholder="Enter a block height or hash, claim id or name, transaction hash or address" />
                 <div class="ctls"><button class="btn btn-search">Search</button> <a href="/realtime">Realtime</a></div>
             </form>
         </div>
@@ -155,8 +155,9 @@
 
         <div class="recent-claims">
             <h3>Recent Claims</h3>
-            <?php $idx = 0; foreach ($recentClaims as $claim):
-                $idx++; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow'];
+            <a class="claim-explorer-link" href="/claims">Claim Explorer</a>
+            <?php $idx = 0; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow']; foreach ($recentClaims as $claim):
+                $idx++;
                 $autoThumbText = '';
                 $link = $claim->Name;
                 if (isset($claim->Publisher->Name)) {

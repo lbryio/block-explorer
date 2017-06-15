@@ -56,13 +56,6 @@ class MainController extends AppController {
                 if ($diffMinutes >= 15) { // 15 minutes
                     $shouldRefreshPrice = true;
                 }
-
-                /*
-                $diffHours = $diff->h;
-                $diffHours = $diffHours + ($diff->days * 24);
-                if ($diffHours >= 3) {
-                    $shouldRefreshPrice = true;
-                }*/
             }
         }
 
@@ -112,6 +105,62 @@ class MainController extends AppController {
         $this->set('recentBlocks', $blocks);
         $this->set('recentClaims', $claims);
         $this->set('hashRate', $hashRate);
+    }
+
+    public function claims($id = null) {
+        $this->loadModel('Claims');
+        $this->loadModel('Transactions');
+
+        if (!$id) {
+            $claims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->order(['Claims.Created' => 'DESC'])->limit(96)->toArray();
+            for ($i = 0; $i < count($claims); $i++) {
+                if (isset($claims[$i]->Stream)) {
+                    $json = json_decode($claims[$i]->Stream->Stream);
+                    if (isset($json->metadata->license)) {
+                        $claims[$i]->License = $json->metadata->license;
+                    }
+                    if (isset($json->metadata->licenseUrl)) {
+                        $claims[$i]->LicenseUrl = $json->metadata->licenseUrl;
+                    }
+                }
+            }
+            $this->set('claims', $claims);
+        } else {
+            $claim = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['ClaimId', 'Name']]])->where(['Claims.ClaimId' => $id])->first();
+            if (!$claim) {
+                return $this->redirect('/');
+            }
+
+            $json = json_decode($claim->Stream->Stream);
+            if (isset($json->metadata->license)) {
+                $claim->License = $json->metadata->license;
+            }
+            if (isset($json->metadata->licenseUrl)) {
+                $claim->LicenseUrl = $json->metadata->licenseUrl;
+            }
+
+            $moreClaims = [];
+            if (isset($claim->Publisher)) {
+                // find more claims for the publisher
+                $moreClaims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->
+                    where(['Claims.ClaimType' => 2, 'Claims.Id <>' => $claim->Id, 'Claims.PublisherId' => $claim->Publisher->ClaimId])->
+                    limit(9)->order(['RAND()' => 'DESC'])->toArray();
+                for ($i = 0; $i < count($moreClaims); $i++) {
+                    if (isset($moreClaims[$i]->Stream)) {
+                        $json = json_decode($moreClaims[$i]->Stream->Stream);
+                        if (isset($json->metadata->license)) {
+                            $moreClaims[$i]->License = $json->metadata->license;
+                        }
+                        if (isset($json->metadata->licenseUrl)) {
+                            $moreClaims[$i]->LicenseUrl = $json->metadata->licenseUrl;
+                        }
+                    }
+                }
+            }
+
+            $this->set('claim', $claim);
+            $this->set('moreClaims', $moreClaims);
+        }
     }
 
     public function realtime() {
@@ -187,6 +236,7 @@ class MainController extends AppController {
         }
 
         $this->loadModel('Blocks');
+        $this->loadModel('Claims');
         $this->loadModel('Addresses');
         $this->loadModel('Transactions');
 
@@ -196,13 +246,19 @@ class MainController extends AppController {
             if ($block) {
                 return $this->redirect('/blocks/' . $height);
             }
-        } else if (strlen(trim($criteria)) <= 40) {
+        } else if (strlen(trim($criteria)) === 34) {
             // Address
             $address = $this->Addresses->find()->select(['Id', 'Address'])->where(['Address' => $criteria])->first();
             if ($address) {
                 return $this->redirect('/address/' . $address->Address);
             }
-        } else {
+        } else if (strlen(trim($criteria)) === 40) {
+            // Claim ID
+            $claim = $this->Claims->find()->select(['ClaimId'])->where(['ClaimId' => $criteria])->first();
+            if ($claim) {
+                return $this->redirect('/claim/' . $claim->ClaimId);
+            }
+        } else if (strlen(trim($criteria)) === 64) { // block or tx hash
             // Try block hash first
             $block = $this->Blocks->find()->select(['Height'])->where(['Hash' => $criteria])->first();
             if ($block) {
@@ -212,6 +268,12 @@ class MainController extends AppController {
                 if ($tx) {
                     return $this->redirect('/tx/' . $tx->Hash);
                 }
+            }
+        } else {
+            // finally, try exact claim name match
+            $claim = $this->Claims->find()->select(['ClaimId'])->where(['Name' => $criteria])->first();
+            if ($claim) {
+                return $this->redirect('/claims/' . $claim->ClaimId);
             }
         }
 
