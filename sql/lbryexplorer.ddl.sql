@@ -174,24 +174,46 @@ CREATE TABLE `Claims`
 (
     `Id` SERIAL,
     `TransactionHash` VARCHAR(70) CHARACTER SET latin1 COLLATE latin1_general_ci,
-    `Name` VARCHAR(200) NOT NULL,
+    `Vout` INTEGER UNSIGNED NOT NULL,
+    `Name` VARCHAR(1024) NOT NULL,
     `ClaimId` CHAR(40) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
     `ClaimType` TINYINT(1) NOT NULL, -- 1 - CertificateType, 2 - StreamType
     `PublisherId` CHAR(40) CHARACTER SET latin1 COLLATE latin1_general_ci COMMENT 'references a ClaimId with CertificateType',
     `PublisherSig` VARCHAR(200) CHARACTER SET latin1 COLLATE latin1_general_ci,
     `Certificate` TEXT,
-    `Stream` TEXT,
     `TransactionTime` INTEGER UNSIGNED,
     `Version` VARCHAR(10) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
+
+    -- Additional fields for easy indexing of stream types
+    `Author` VARCHAR(512),
+    `Description` MEDIUMTEXT,
+    `ContentType` VARCHAR(162) CHARACTER SET latin1 COLLATE latin1_general_ci,
+    `IsNSFW` TINYINT(1) DEFAULT 0 NOT NULL,
+    `Language` VARCHAR(20) CHARACTER SET latin1 COLLATE latin1_general_ci,
+    `ThumbnailUrl` TEXT,
+    `Title` TEXT,
+
     `Created` DATETIME NOT NULL,
     `Modified` DATETIME NOT NULL,
     PRIMARY KEY `PK_Claim` (`Id`),
     FOREIGN KEY `FK_ClaimTransaction` (`TransactionHash`) REFERENCES `Transactions` (`Hash`),
     FOREIGN KEY `FK_ClaimPublisher` (`PublisherId`) REFERENCES `Claims` (`ClaimId`),
-    CHECK((`ClaimType` = 1 AND JSON_VALID(`Certificate`)) -- certificate type
-          OR (`ClaimType` = 2 AND JSON_VALID(`Stream`))), -- stream type
+    CONSTRAINT `Cnt_ClaimCertificate` CHECK(`Certificate` IS NULL OR JSON_VALID(`Certificate`)), -- certificate type
     INDEX `Idx_Claim` (`ClaimId`),
     INDEX `Idx_ClaimTransactionTime` (`TransactionTime`),
     INDEX `Idx_ClaimCreated` (`Created`),
-    INDEX `Idx_ClaimModified` (`Modified`)
+    INDEX `Idx_ClaimModified` (`Modified`),
+
+    INDEX `Idx_ClaimAuthor` (`Author`(191)),
+    INDEX `Idx_ClaimContentType` (`ContentType`),
+    INDEX `Idx_ClaimLanguage` (`Language`),
+    INDEX `Idx_ClaimTitle` (`Title`(191))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
+
+CREATE TABLE ClaimStreams
+(
+    `Id` BIGINT UNSIGNED NOT NULL,
+    `Stream` MEDIUMTEXT NOT NULL,
+    PRIMARY KEY `PK_ClaimStream` (`Id`),
+    FOREIGN KEY `PK_ClaimStreamClaim` (`Id`) REFERENCES `Claims` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;

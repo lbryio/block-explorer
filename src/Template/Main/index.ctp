@@ -76,6 +76,16 @@
     $(document).ready(function() {
         setInterval(updateStatus, updateInterval);
         setInterval(updateRecentBlocks, updateInterval);
+
+        $('.claim-box img').on('error', function() {
+            var img = $(this);
+            var parent = img.parent();
+            var text = parent.attr('data-autothumb');
+            img.remove();
+            parent.append(
+                $('<div></div>').attr({'class': 'autothumb' }).text(text)
+            );
+        });
     });
 </script>
 <?php $this->end(); ?>
@@ -141,6 +151,67 @@
                     <?php endforeach; ?>
                 </tbody>
             </table>
+        </div>
+
+        <div class="recent-claims">
+            <h3>Recent Claims</h3>
+            <?php $idx = 0; foreach ($recentClaims as $claim):
+                $idx++; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow'];
+                $autoThumbText = '';
+                $link = $claim->Name;
+                if (isset($claim->Publisher->Name)) {
+                    $link = $claim->Publisher->Name . '/' . $link;
+                }
+                $link = 'lbry://' . $link;
+
+                // content type
+                $ctTag = null;
+                if (substr($claim->ContentType, 0, 5) === 'audio') {
+                    $ctTag = 'audio';
+                } else if (substr($claim->ContentType, 0, 5) === 'video') {
+                    $ctTag = 'video';
+                } else if (substr($claim->ContentType, 0, 5) === 'image') {
+                    $ctTag = 'image';
+                }
+
+                if ($claim->ClaimType == 1) { $autoThumbText = strtoupper(substr($claim->Name, 1, min( strlen($claim->Name), 3 ))); } else {
+                    $str = (strlen(trim($claim->Title)) > 0) ? $claim->Title : $claim->Name;
+                    $autoThumbText = strtoupper(substr($str, 0, min (strlen($str), 2 )));
+                }
+            ?>
+            <div class="claim-box<?php if ($idx == 5): ?> last<?php endif; ?>">
+                <div class="tags">
+                    <?php if ($ctTag): ?>
+                    <div class="content-type"><?php echo strtoupper($ctTag) ?></div>
+                    <?php endif; ?>
+                    <?php if ($claim->IsNSFW): ?>
+                    <div class="nsfw">NSFW</div>
+                    <?php endif; ?>
+                </div>
+
+                <div data-autothumb="<?php echo $autoThumbText ?>" class="thumbnail <?php echo $a[mt_rand(0, count($a) - 1)] ?>">
+                    <?php if (!$claim->IsNSFW && strlen(trim($claim->ThumbnailUrl)) > 0): ?>
+                        <img src="<?php echo $claim->ThumbnailUrl ?>" alt="" />
+                    <?php else: ?>
+                        <div class="autothumb"><?php echo $autoThumbText ?></div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="metadata">
+                    <div class="title"><?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '<em>No Title</em>') ?></div>
+                    <div class="link"><a href="<?php echo $link ?>"><?php echo $link ?></a></div>
+
+                    <div class="clear"></div>
+                    <?php if ($claim->ClaimType == 2 && strlen(trim($claim->Description)) > 0): ?>
+                    <div class="desc"><?php echo $claim->Description ?></div>
+                    <?php endif; ?>
+                </div>
+
+                <a class="tx-link" href="/tx/<?php echo $claim->TransactionHash ?>#output-<?php echo $claim->Vout ?>" target="_blank">Transaction</a>
+            </div>
+            <?php endforeach; ?>
+
+            <div class="clear"></div>
         </div>
     </div>
 

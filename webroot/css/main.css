@@ -24,8 +24,32 @@ border-radius: 0 6px 8px 0 }
 .home-container-cell .ctls a { font-size: 115%; display: inline-block; font-weight: 300; position: absolute; right: 0; padding-top: 12px }
 .home-container-cell .ctls a:hover { text-decoration: none; color: #1976d2 }
 
-.home-container-cell .recent-blocks { width: 1000px; margin: 48px auto 0 auto; box-shadow: 0 6px 12px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px 36px 36px 36px; cursor: default }
+.home-container-cell .recent-blocks { width: 1000px; margin: 48px auto 0 auto; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px 24px 36px 24px; cursor: default }
 .home-container-cell .recent-blocks h3 { font-weight: normal; margin: 0 0 12px 0; font-weight: 300 }
+
+.home-container-cell .recent-claims { width: 1000px; margin: 48px auto 0 auto; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px 24px 36px 24px; cursor: default  }
+.home-container-cell .recent-claims h3 { font-weight: normal; margin: 0 0 12px 0; font-weight: 300 }
+.home-container-cell .recent-claims .claim-box { width: 184px; height: 330px; margin-right: 7px; float: left; box-shadow: 0 2px 4px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); cursor: default; overflow: hidden; position: relative }
+.home-container-cell .recent-claims .claim-box.last { margin-right: 0 }
+.home-container-cell .recent-claims .claim-box .tags { font-size: 65%; position: absolute; right: 0; top: 0; z-index: 505 }
+.home-container-cell .recent-claims .claim-box .thumbnail { width: 100%; height: 120px; background: #f0f0f0; display: block; position: relative; overflow: hidden;}
+.home-container-cell .recent-claims .claim-box .thumbnail img { width: 100%; position: absolute; left: 0; top: 0; border-bottom: 1px solid #eee }
+.home-container-cell .recent-claims .claim-box .thumbnail.purple { background: #ab47bc }
+.home-container-cell .recent-claims .claim-box .thumbnail.orange { background: #e91e63 }
+.home-container-cell .recent-claims .claim-box .thumbnail.blue { background: #42a5f5 }
+.home-container-cell .recent-claims .claim-box .thumbnail.teal { background: #4db6ac }
+.home-container-cell .recent-claims .claim-box .thumbnail.green { background: #66bb6a }
+.home-container-cell .recent-claims .claim-box .thumbnail.yellow { background: #fdd835 }
+.home-container-cell .recent-claims .claim-box .thumbnail .autothumb { display: block; margin: 33px auto 0 auto; text-align: center; font-size: 240%; color: #fff; line-height: 54px }
+.home-container-cell .recent-claims .claim-box .tags > div { display: inline-block; padding: 4px 12px; margin-left: 2px }
+.home-container-cell .recent-claims .claim-box .tags .nsfw { background: #e53935; text-align: center; color: #fff; position: relative; left: 1px }
+.home-container-cell .recent-claims .claim-box .tags .content-type { background: #880e4f; text-align: center; color: #fff; }
+.home-container-cell .recent-claims .claim-box .metadata { padding: 12px; font-size: 90% }
+.home-container-cell .recent-claims .claim-box .title { font-size: 120%; height: 25px; line-height: 25px; overflow: hidden; text-overflow: ellipsis }
+.home-container-cell .recent-claims .claim-box .desc { font-size: 80%; font-weight: 300; height: 100px; overflow: hidden; text-overflow: ellipsis; margin: 3px 0; line-height: 20px }
+.home-container-cell .recent-claims .claim-box .link { font-size: 80%; font-weight: 300; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; line-height: 20px; height: 20px }
+.home-container-cell .recent-claims .claim-box .tx-link { font-size: 80%; font-weight: 300; color: #fff; background: #1e88e5; position: absolute; bottom: 0; width: 100%; display: block; line-height: 20px; height: 32px; padding: 6px 0; text-align: center; cursor: pointer  }
+.home-container-cell .recent-claims .claim-box .tx-link:hover { text-decoration: none; background: #1976d2 }
 
 .table { width: 100%; cursor: default; border-collapse: collapse; font-size: 90% }
 .table thead tr th { border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 12px 4px }

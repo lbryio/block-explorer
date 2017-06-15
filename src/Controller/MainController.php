@@ -90,6 +90,7 @@ class MainController extends AppController {
 
     public function index() {
         $this->loadModel('Blocks');
+        $this->loadModel('Claims');
 
         $lbcUsdPrice = $this->_getLatestPrice();
         $this->set('lbcUsdPrice', $lbcUsdPrice);
@@ -101,11 +102,15 @@ class MainController extends AppController {
             $blocks[$i]->TransactionCount = count($tx_hashes);
         }
 
-        // try to calculate the hashrate based on the last 12 blocks found
-        $diffBlocks = $this->Blocks->find()->select(['Chainwork', 'BlockTime', 'Difficulty'])->order(['Height' => 'desc'])->limit(12)->toArray();
-        $hashRate = $this->_formatHashRate($this->_gethashrate()) . '/s';
+        // hash rate
+        $hashRate = $this->_formatHashRate($this->_gethashrate());
+
+        // recent claims
+        $claims = $this->Claims->find()->select(['TransactionHash', 'Name', 'Vout', 'ClaimId', 'ClaimType', 'Author', 'Title', 'Description', 'ContentType',
+                                                 'IsNSFW', 'Language', 'ThumbnailUrl', 'Created'])->contain(['Publisher' => ['fields' => ['Name']]])->order(['Claims.Created' => 'DESC'])->limit(5)->toArray();
 
         $this->set('recentBlocks', $blocks);
+        $this->set('recentClaims', $claims);
         $this->set('hashRate', $hashRate);
     }
 
@@ -155,20 +160,24 @@ class MainController extends AppController {
     }
 
     protected function _formatHashRate($value) {
+        if ($value === 'N/A') {
+            return $value;
+        }
+
         /*if ($value > 1000000000000) {
             return number_format( $value / 1000000000000, 2, '.', '' ) . ' TH';
         }*/
         if ($value > 1000000000) {
-            return number_format( $value / 1000000000, 2, '.', '' ) . ' GH';
+            return number_format( $value / 1000000000, 2, '.', '' ) . ' GH/s';
         }
         if ($value > 1000000) {
-            return number_format( $value / 1000000, 2, '.', '' ) . ' MH';
+            return number_format( $value / 1000000, 2, '.', '' ) . ' MH/s';
         }
         if ($value > 1000) {
-            return number_format( $value / 1000, 2, '.', '' ) . ' KH';
+            return number_format( $value / 1000, 2, '.', '' ) . ' KH/s';
         }
 
-        return number_format($value) . ' H';
+        return number_format($value) . ' H/s';
     }
 
     public function find() {
@@ -420,11 +429,15 @@ class MainController extends AppController {
 
     private function _gethashrate() {
         $req = ['method' => 'getnetworkhashps', 'params' => []];
-        $res = json_decode(self::curl_json_post(self::rpcurl, json_encode($req)));
-        if (!isset($res->result)) {
-            return 0;
+        try {
+            $res = json_decode(self::curl_json_post(self::rpcurl, json_encode($req)));
+            if (!isset($res->result)) {
+                return 0;
+            }
+            return $res->result;
+        } catch (\Exception $e) {
+            return 'N/A';
         }
-        return $res->result;
     }
 
     public function apistatus() {
@@ -440,8 +453,7 @@ class MainController extends AppController {
         $lbcUsdPrice = $this->_getLatestPrice();
 
         // Calculate hash rate
-        $diffBlocks = $this->Blocks->find()->select(['Chainwork', 'BlockTime', 'Difficulty'])->order(['Height' => 'desc'])->limit(12)->toArray();
-        $hashRate = $this->_formatHashRate($this->_gethashrate()) . '/s';
+        $hashRate = $this->_formatHashRate($this->_gethashrate());
 
         return $this->_jsonResponse(['success' => true, 'status' => [
             'height' => $height,

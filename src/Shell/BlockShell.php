@@ -24,6 +24,8 @@ class BlockShell extends Shell {
         parent::initialize();
         $this->loadModel('Blocks');
         $this->loadModel('Addresses');
+        $this->loadModel('Claims');
+        $this->loadModel('ClaimStreams');
         $this->loadModel('Inputs');
         $this->loadModel('Outputs');
         $this->loadModel('Transactions');
@@ -36,6 +38,249 @@ class BlockShell extends Shell {
     public function testtx() {
         $raw = '0100000001e4801fa8c9621753410e6c576c73168cc551624e08e4cc56e9a9189e8ebabcc3010000006b483045022100dcc5ae5564353e05cd8415936cdb534a26049a80a9866dbcab5dbb6ab16abbc702203af681fb5fbba5c78af887778aa32f27bc653312322b44c2a78e883e322921790121031c38def6b103b58481818d7d8aba39f9f51798f686ec3332bac23726a23366adffffffff0200e1f50500000000fd3a01b512626c6f636b6578706c6f7265722d686f6d654d0801080110011aa3010801125c080410011a1c4c42525920426c6f636b204578706c6f72657220486f6d6570616765222c574950204c42525920426c6f636b204578706c6f72657220686f6d6520706167652073637265656e73686f742a00320038004a0052005a001a41080110011a3038c6bf4a310d5b172aaae03cffb93e5a27c47f3946f58af0a4b9f99d7be42998f7dcec9b0fb0c124a6477bdb4c5311db2209696d6167652f706e672a5c080110031a401eb69f65768ba2cc347067dfb1317131137f7d685a5e804a4aeedd2385332c70f3ec7632fcebfbc073e37a58dbfbf4e6641853bbfc188b0d8bf27435b540801d22146b2a1d378efcdb7db7a03baa7dfedb86b976bc4a6d7576a914b7182b0f7c896ab240d233f81cb891e3f25e739988ac8085e811000000001976a9146fde27b4dac0b79a9ea06756562a52b019da7a8e88ac00000000';
         $decoded = self::decode_tx($raw);
+    }
+
+    public static function hex2str($hex){
+        $string = '';
+        for ($i = 0; $i < strlen($hex)-1; $i+=2){
+            $string .= chr(hexdec($hex[$i].$hex[$i+1]));
+        }
+        return $string;
+    }
+
+    public function buildclaimindex() {
+        self::lock('buildindex');
+
+        // start with all txs
+        $decoder_url = 'http://127.0.0.1:5000';
+        $redis = self::_init_redis();
+        $conn = ConnectionManager::get('default');
+        $redis_key = 'claim.oid';
+        $last_claim_oid = $redis->exists($redis_key) ? $redis->get($redis_key) : 0;
+        try {
+            $stmt = $conn->execute('SELECT COUNT(Id) AS RecordCount FROM Outputs WHERE Id > ?', [$last_claim_oid]);
+            $count = min(500000, $stmt->fetch(\PDO::FETCH_OBJ)->RecordCount);
+
+            $idx = 0;
+            $stmt = $conn->execute('SELECT O.Id, O.TransactionId, O.Vout, O.ScriptPubKeyAsm, T.Hash, IFNULL(T.TransactionTime, T.CreatedTime) AS TxTime FROM Outputs O JOIN Transactions T ON T.Id = O.TransactionId WHERE O.Id > ? ORDER BY O.Id ASC LIMIT 500000', [$last_claim_oid]);
+            while ($out = $stmt->fetch(\PDO::FETCH_OBJ)) {
+                $idx++;
+                $idx_str = str_pad($idx, strlen($count), '0', STR_PAD_LEFT);
+
+                $txid = $out->TransactionId;
+                $vout = $out->Vout;
+
+                if (strpos($out->ScriptPubKeyAsm, 'OP_CLAIM_NAME') !== false) {
+                    $asm_parts = explode(' ', $out->ScriptPubKeyAsm, 4);
+                    $name_hex = $asm_parts[1];
+                    $claim_name = @pack('H*', $name_hex);
+
+                    // decode claim
+                    $url = sprintf("%s/claim_decode/%s", $decoder_url, $claim_name);
+                    $json = null;
+                    try {
+                        $json = self::curl_json_get($url);
+                    } catch (\Exception $e) {
+                        echo "[$idx_str/$count] claimdecode failed for [$out->Hash:$vout]. Skipping.\n";
+                        continue;
+                    }
+                    $claim = json_decode($json);
+
+                    if ($claim) {
+                        $req = ['method' => 'getvalueforname', 'params' => [$claim_name]];
+                        $json = null;
+                        try {
+                            $json = json_decode(self::curl_json_post(self::rpcurl, json_encode($req)));
+                            if (!$json) {
+                                echo "[$idx_str/$count] getvalueforname failed for [$out->Hash:$vout]. Skipping.\n";
+                                continue;
+                            }
+                        } catch (\Exception $e) {
+                            echo "[$idx_str/$count] getvalueforname failed for [$out->Hash:$vout]. Skipping.\n";
+                            continue;
+                        }
+
+                        echo "[$idx_str/$count] claim found for [$out->Hash:$vout]. Processing claim... \n";
+                        $claim_data = [];
+
+                        $claim_id = $json->result->claimId;
+                        $tx_dt = \DateTime::createFromFormat('U', $out->TxTime);
+
+                        $claim_stream_data = null;
+                        if ($claim->claimType === 'streamType') {
+                            // Build claim object to save
+                            $claim_data = [
+                                'ClaimId' => $claim_id,
+                                'TransactionHash' => $out->Hash,
+                                'Vout' => $out->Vout,
+                                'Name' => $claim_name,
+                                'Version' => $claim->version,
+                                'ClaimType' => 2, // streamType
+                                'ContentType' => isset($claim->stream->source->contentType) ? $claim->stream->source->contentType : null,
+                                'Title' => isset($claim->stream->metadata->title) ? $claim->stream->metadata->title : null,
+                                'Description' => isset($claim->stream->metadata->description) ? $claim->stream->metadata->description : null,
+                                'Language' => isset($claim->stream->metadata->language) ? $claim->stream->metadata->language : null,
+                                'Author' => isset($claim->stream->metadata->author) ? $claim->stream->metadata->author : null,
+                                'ThumbnailUrl' => isset($claim->stream->metadata->thumbnail) ? $claim->stream->metadata->thumbnail : null,
+                                'IsNSFW' => isset($claim->stream->metadata->nsfw) ? $claim->stream->metadata->nsfw : 0,
+                                'Created' => $tx_dt->format('Y-m-d H:i:s'),
+                                'Modified' => $tx_dt->format('Y-m-d H:i:s')
+                            ];
+
+                            $claim_stream_data = [
+                                'Stream' => json_encode($claim->stream)
+                            ];
+
+                            if (isset($claim->publisherSignature)) {
+                                $sig_claim = $this->Claims->find()->select(['Id', 'ClaimId', 'Name'])->where(['ClaimId' => $claim->publisherSignature->certificateId])->first();
+                                if ($sig_claim) {
+                                    $claim_data['PublisherId'] = $sig_claim->ClaimId;
+                                    $claim_data['PublisherName'] = $sig_claim->Name;
+                                }
+                            }
+                        } else {
+                            $claim_data = [
+                                'ClaimId' => $claim_id,
+                                'TransactionHash' => $out->Hash,
+                                'Vout' => $out->Vout,
+                                'Name' => $claim_name,
+                                'Version' => $claim->version,
+                                'ClaimType' => 1,
+                                'Certificate' => json_encode($claim->certificate),
+                                'Created' => $tx_dt->format('Y-m-d H:i:s'),
+                                'Modified' => $tx_dt->format('Y-m-d H:i:s')
+                            ];
+                        }
+
+                        $conn->begin();
+                        $data_error = false;
+
+                        $claim_entity = $this->Claims->newEntity($claim_data);
+                        $res = $this->Claims->save($claim_entity);
+
+                        if (!$res) {
+                            $data_error = true;
+                            echo "[$idx_str/$count] claim for [$out->Hash:$vout] FAILED to save.\n";
+                        }
+
+                        if (!$data_error) {
+                            if ($claim_stream_data) {
+                                $claim_stream_data['Id'] = $claim_entity->Id;
+                                $claim_stream_entity = $this->ClaimStreams->newEntity($claim_stream_data);
+
+                                $res = $this->ClaimStreams->save($claim_stream_entity);
+                                if (!$res) {
+                                    $data_error = true;
+                                }
+                            }
+                        }
+
+                        if (!$data_error) {
+                            $conn->commit();
+                            echo "[$idx_str/$count] claim for [$out->Hash:$vout] indexed.\n";
+                        } else {
+                            $conn->rollback();
+                            echo "[$idx_str/$count] claim for [$out->Hash:$vout] NOT indexed. Rolled back.\n";
+                        }
+                    } else {
+                        echo "[$idx_str/$count] claim for [$out->Hash:$vout] could not be decoded. Skipping.\n";
+                    }
+                } else {
+                    echo "[$idx_str/$count] no claim found for [$out->Hash:$vout]. Skipping.\n";
+                }
+
+                $redis->set($redis_key, $out->Id);
+            }
+        } catch (\Exception $e) {
+            // continue
+            print_r($e);
+        }
+
+        self::unlock('buildindex');
+    }
+
+    protected function _getclaimfortxout($pubkeyasm, $tx_hash, $vout, $tx_time = null) {
+        $claim_data = null;
+        $claim_stream_data = null;
+
+        $asm_parts = explode(' ', $pubkeyasm, 4);
+        $name_hex = $asm_parts[1];
+        $claim_name = @pack('H*', $name_hex);
+
+        // decode claim
+        $decoder_url = 'http://127.0.0.1:5000';
+        $url = sprintf("%s/claim_decode/%s", $decoder_url, $claim_name);
+        $json = null;
+        try {
+            $json = self::curl_json_get($url);
+        } catch (\Exception $e) {
+            echo "***claimdecode failed for [$tx_hash:$vout]. Skipping.\n";
+        }
+
+        if ($json) {
+            $claim = json_decode($json);
+            if ($claim) {
+                $req = ['method' => 'getvalueforname', 'params' => [$claim_name]];
+                $json = null;
+                try {
+                    $json = json_decode(self::curl_json_post(self::rpcurl, json_encode($req)));
+                    if ($json) {
+                        $claim_data = [];
+                        $claim_id = $json->result->claimId;
+                        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+                        $tx_dt = ($tx_time != null) ? $tx_time : $now;
+                        if ($claim->claimType === 'streamType') {
+                            // Build claim object to save
+                            $claim_data = [
+                                'ClaimId' => $claim_id,
+                                'TransactionHash' => $tx_hash,
+                                'Vout' => $vout,
+                                'Name' => $claim_name,
+                                'Version' => $claim->version,
+                                'ClaimType' => 2, // streamType
+                                'ContentType' => isset($claim->stream->source->contentType) ? $claim->stream->source->contentType : null,
+                                'Title' => isset($claim->stream->metadata->title) ? $claim->stream->metadata->title : null,
+                                'Description' => isset($claim->stream->metadata->description) ? $claim->stream->metadata->description : null,
+                                'Language' => isset($claim->stream->metadata->language) ? $claim->stream->metadata->language : null,
+                                'Author' => isset($claim->stream->metadata->author) ? $claim->stream->metadata->author : null,
+                                'ThumbnailUrl' => isset($claim->stream->metadata->thumbnail) ? $claim->stream->metadata->thumbnail : null,
+                                'IsNSFW' => isset($claim->stream->metadata->nsfw) ? $claim->stream->metadata->nsfw : 0,
+                                'Created' => $tx_dt->format('Y-m-d H:i:s'),
+                                'Modified' => $tx_dt->format('Y-m-d H:i:s')
+                            ];
+
+                            $claim_stream_data = [
+                                'Stream' => json_encode($claim->stream)
+                            ];
+
+                            if (isset($claim->publisherSignature)) {
+                                $sig_claim = $this->Claims->find()->select(['Id', 'ClaimId', 'Name'])->where(['ClaimId' => $claim->publisherSignature->certificateId])->first();
+                                if ($sig_claim) {
+                                    $claim_data['PublisherId'] = $sig_claim->ClaimId;
+                                    $claim_data['PublisherName'] = $sig_claim->Name;
+                                }
+                            }
+                        } else {
+                            $claim_data = [
+                                'ClaimId' => $claim_id,
+                                'TransactionHash' => $tx_hash,
+                                'Vout' => $vout,
+                                'Name' => $claim_name,
+                                'Version' => $claim->version,
+                                'ClaimType' => 1,
+                                'Certificate' => json_encode($claim->certificate),
+                                'Created' => $tx_dt->format('Y-m-d H:i:s'),
+                                'Modified' => $tx_dt->format('Y-m-d H:i:s')
+                            ];
+                        }
+                    }
+                } catch (\Exception $e) {
+                    echo "***getvalueforname failed for [$out->Hash:$vout]. Skipping.\n";
+                }
+            }
+        }
+
+        return ['claim_data' => $claim_data, 'claim_stream_data' => $claim_stream_data];
     }
 
     public function fixzerooutputs() {
@@ -422,7 +667,7 @@ class BlockShell extends Shell {
                         $addr_id_drcr[$addr_id]['debit'] = bcadd($addr_id_drcr[$addr_id]['debit'], $in['Value'], 8);
 
                         try {
-                            $conn->execute('REPLACE INTO InputsAddresses (InputId, AddressId) VALUES (?, ?)', [$in_entity->Id, $in['AddressId']]);
+                            $conn->execute('INSERT INTO InputsAddresses (InputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE InputId = InputId', [$in_entity->Id, $in['AddressId']]);
                             $conn->execute('UPDATE Addresses SET TotalSent = TotalSent + ? WHERE Id = ?', [$in['Value'], $in['AddressId']]);
                             $conn->execute('INSERT INTO TransactionsAddresses (TransactionId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE TransactionId = TransactionId', [$numeric_tx_id, $in['AddressId']]);
                         } catch (\Exception $e) {
@@ -481,13 +726,43 @@ class BlockShell extends Shell {
                     $addr_id_drcr[$addr_id]['credit'] = bcadd($addr_id_drcr[$addr_id]['credit'], $out['Value'], 8);
 
                     try {
-                        $conn->execute('REPLACE INTO OutputsAddresses (OutputId, AddressId) VALUES (?, ?)', [$out_entity->Id, $out_addr_id]);
+                        $conn->execute('INSERT INTO OutputsAddresses (OutputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE OutputId = OutputId', [$out_entity->Id, $out_addr_id]);
                         $conn->execute('UPDATE Addresses SET TotalReceived = TotalReceived + ? WHERE Id = ?', [$out['Value'], $out_addr_id]);
                         $conn->execute('INSERT INTO TransactionsAddresses (TransactionId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE TransactionId = TransactionId', [$numeric_tx_id, $out_addr_id]);
                     } catch (\Exception $e) {
                         print_r($e);
                         $data_error = true;
                         break;
+                    }
+                }
+
+                // create the claim if the asm pub key starts with OP_CLAIM_NAME
+                if (strpos($out['ScriptPubKeyAsm'], 'OP_CLAIM_NAME') !== false) {
+                    $all_claim_data = $this->_getclaimfortxout($out['ScriptPubKeyAsm'], $tx_hash, $out['Vout'], $block_ts);
+                    $claim = $all_claim_data['claim_data'];
+                    $claim_stream_data = $all_claim_data['claim_stream_data'];
+                    if ($claim['ClaimType'] == 2 && !$claim_stream_data) {
+                        echo "***claim stream data missing for streamType claim\n";
+                        $data_error = true;
+                        break;
+                    }
+
+                    $claim_entity = $this->Claims->newEntity($claim);
+                    $res = $this->Claims->save($claim_entity);
+                    if (!$res) {
+                        echo "***claim could not be saved.\n";
+                        $data_error = true;
+                        break;
+                    }
+
+                    if (!$data_error && $claim_stream_data) {
+                        $claim_stream_data['Id'] = $claim_entity->Id;
+                        $claim_stream_entity = $this->ClaimStreams->newEntity($claim_stream_data);
+                        $res = $this->ClaimStreams->save($claim_stream_entity);
+                        if (!$res) {
+                            echo "***claim stream could not be saved.\n";
+                            $data_error = true;
+                        }
                     }
                 }
             }
@@ -956,6 +1231,28 @@ class BlockShell extends Shell {
         return $response;
     }
 
+    private static function curl_json_get($url, $headers = []) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($ch);
+        //Log::debug('Request execution completed.');
+        if ($response === false) {
+            $error = curl_error($ch);
+            $errno = curl_errno($ch);
+            curl_close($ch);
+
+            throw new \Exception(sprintf('The request failed: %s', $error), $errno);
+        } else {
+            curl_close($ch);
+        }
+
+        // Close any open file handle
+        return $response;
+    }
+
     private static $base58chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
     public static $op_codes = [
@@ -1315,7 +1612,7 @@ class BlockShell extends Shell {
                 }
 
                 if ($addr_id > -1) {
-                    $conn->execute('REPLACE INTO OutputsAddresses (OutputId, AddressId) VALUES (?, ?)', [$out->Id, $addr_id]);
+                    $conn->execute('INSERT INTO OutputsAddresses (OutputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE OutputId = OutputId', [$out->Id, $addr_id]);
                 }
             }
 
@@ -1350,7 +1647,7 @@ class BlockShell extends Shell {
 
                 $in_entity = $this->Inputs->newEntity($in_data);
                 if ($this->Inputs->save($in_entity)) {
-                    $conn->execute('REPLACE INTO InputsAddresses (InputId, AddressId) VALUES (?, ?)', [$in->Id, $in_data['AddressId']]);
+                    $conn->execute('INSERT INTO InputsAddresses (InputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE InputId = InputId', [$in->Id, $in_data['AddressId']]);
                 }
             }
 
@@ -1420,7 +1717,7 @@ class BlockShell extends Shell {
             '6' => '/^OP_HASH160/',
             '7' => '/^[0-9a-f]{40}$/i', // pos 8
             '8' => '/^OP_EQUALVERIFY/',
-            '9' => '/^OP_CHECKSIG/',
+            '9' => '/^OP_CHECKSIG/'
         ];
 
         // update_claim
@@ -1438,7 +1735,7 @@ class BlockShell extends Shell {
             '7' => '/^OP_HASH160/',
             '8' => '/^[0-9a-f]{40}$/i', // pos 8
             '9' => '/^OP_EQUALVERIFY/',
-            '10' => '/^OP_CHECKSIG/',
+            '10' => '/^OP_CHECKSIG/'
         ];
 
         // Standard: pay to pubkey hash
