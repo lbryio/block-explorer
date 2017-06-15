@@ -174,6 +174,10 @@
                     $ctTag = 'image';
                 }
 
+                if (!$ctTag && $claim->ClaimType == 1) {
+                    $ctTag = 'identity';
+                }
+
                 if ($claim->ClaimType == 1) { $autoThumbText = strtoupper(substr($claim->Name, 1, min( strlen($claim->Name), 3 ))); } else {
                     $str = (strlen(trim($claim->Title)) > 0) ? $claim->Title : $claim->Name;
                     $autoThumbText = strtoupper(substr($str, 0, min (strlen($str), 2 )));
