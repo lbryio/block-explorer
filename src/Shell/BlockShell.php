@@ -748,7 +748,6 @@ class BlockShell extends Shell {
 
                     if ($claim['ClaimType'] == 2 && !$claim_stream_data) {
                         echo "***claim stream data missing for streamType claim\n";
-                        $data_error = true;
                         break;
                     }
 
@@ -757,7 +756,6 @@ class BlockShell extends Shell {
 
                     if (!$res) {
                         echo "***claim could not be saved.\n";
-                        $data_error = true;
                         break;
                     }
 
@@ -767,7 +765,6 @@ class BlockShell extends Shell {
                         $res = $this->ClaimStreams->save($claim_stream_entity);
                         if (!$res) {
                             echo "***claim stream could not be saved.\n";
-                            $data_error = true;
                         }
                     }
                 }
