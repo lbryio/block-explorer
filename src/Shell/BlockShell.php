@@ -871,7 +871,7 @@ class BlockShell extends Shell {
                 $idx_str = ($count > 10 && $idx < 10) ? '0' . $idx : $idx;
                 echo "[$idx_str/$count] Processing tx hash: $tx_hash... ";
 
-                $stmt = $conn->execute("SELECT Hash, BlockTime FROM Blocks WHERE TransactionHashes LIKE CONCAT('%', ?, '%') AND Height > ((SELECT MAX(Height) FROM Blocks) - 2000) ORDER BY Height ASC LIMIT 1", [$tx_hash]);
+                $stmt = $conn->execute("SELECT Hash, BlockTime FROM Blocks WHERE TransactionHashes LIKE CONCAT('%', ?, '%') AND Height > ((SELECT MAX(Height) FROM Blocks) - 10000) ORDER BY Height ASC LIMIT 1", [$tx_hash]);
                 $block = $stmt->fetch(\PDO::FETCH_OBJ);
                 if ($block) {
                     $upd_tx = ['Id' => $tx->Id, 'BlockHash' => $block->Hash, 'TransactionTime' => $block->BlockTime];
