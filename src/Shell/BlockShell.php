@@ -58,11 +58,11 @@ class BlockShell extends Shell {
         $redis_key = 'claim.oid';
         $last_claim_oid = $redis->exists($redis_key) ? $redis->get($redis_key) : 0;
         try {
-            $stmt = $conn->execute('SELECT COUNT(Id) AS RecordCount FROM Outputs WHERE Id > ?', [$last_claim_oid]);
+            $stmt = $conn->execute('SELECT COUNT(Id) AS RecordCount FROM Outputs WHERE Id > ? AND TransactionId <= 1776540', [$last_claim_oid]);
             $count = min(500000, $stmt->fetch(\PDO::FETCH_OBJ)->RecordCount);
 
             $idx = 0;
-            $stmt = $conn->execute('SELECT O.Id, O.TransactionId, O.Vout, O.ScriptPubKeyAsm, T.Hash, IFNULL(T.TransactionTime, T.CreatedTime) AS TxTime FROM Outputs O JOIN Transactions T ON T.Id = O.TransactionId WHERE O.Id > ? ORDER BY O.Id ASC LIMIT 500000', [$last_claim_oid]);
+            $stmt = $conn->execute('SELECT O.Id, O.TransactionId, O.Vout, O.ScriptPubKeyAsm, T.Hash, IFNULL(T.TransactionTime, T.CreatedTime) AS TxTime FROM Outputs O JOIN Transactions T ON T.Id = O.TransactionId WHERE O.Id > ? AND O.TransactionId <= 1776540 ORDER BY O.Id ASC LIMIT 500000', [$last_claim_oid]);
             while ($out = $stmt->fetch(\PDO::FETCH_OBJ)) {
                 $idx++;
                 $idx_str = str_pad($idx, strlen($count), '0', STR_PAD_LEFT);
