@@ -233,7 +233,7 @@ if (strlen(trim($desc)) == 0) {
                 <div class="clear spacer"></div>
 
                 <?php if ($claim->ClaimType == 2): ?>
-                <div class="label half-width">Content type</div>
+                <div class="label half-width">Content Type</div>
                 <div class="label half-width">Language</div>
 
                 <div class="value half-width" title="<?php echo $claim->ContentType ?>"><?php echo $claim->ContentType ?></div>
@@ -348,7 +348,7 @@ if (strlen(trim($desc)) == 0) {
             <div class="clear spacer"></div>
 
             <?php if ($claim->ClaimType == 2): ?>
-            <div class="label half-width">Content type</div>
+            <div class="label half-width">Content Type</div>
             <div class="label half-width">Language</div>
 
             <div class="value half-width" title="<?php echo $claim->ContentType ?>"><?php echo $claim->ContentType ?></div>
