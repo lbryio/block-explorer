@@ -152,7 +152,7 @@
         <?php if ($numTransactions > 0):
         $begin = ($currentPage - 1) * 50 + 1;
         ?>
-        Showing <?php echo number_format($begin, 0, '', ',') ?> - <?php echo number_format(min($numTransactions, $begin + 50), 0, '', ','); ?> of <?php echo number_format($numTransactions, 0, '', ','); ?> result<?php echo $numTransactions == 1 ? '' : 's' ?>
+        Showing <?php echo number_format($begin, 0, '', ',') ?> - <?php echo number_format(min($numTransactions, ($begin + 50) - 1), 0, '', ','); ?> of <?php echo number_format($numTransactions, 0, '', ','); ?> result<?php echo $numTransactions == 1 ? '' : 's' ?>
         <?php endif; ?>
     </div>
 
