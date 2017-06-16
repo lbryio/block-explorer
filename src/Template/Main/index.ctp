@@ -77,7 +77,23 @@
         setInterval(updateStatus, updateInterval);
         setInterval(updateRecentBlocks, updateInterval);
 
-        $('.claim-box img').on('error', function() {
+        $(document).on('click', '.recent-claims .claim-box', function() {
+            var id = $(this).attr('data-id');
+            window.location.href = '/claims/' + id;
+
+            // center the popup
+            /*var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
+            var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
+            var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+            var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+            var left = ((width / 2) - (1366 / 2)) + dualScreenLeft;
+            var top = ((height / 2) - (768 / 2)) + dualScreenTop;
+
+            window.open('/claims/' + id, 'claim_details', 'width=1366,height=768,left=' + left + ',top=' + top);*/
+        });
+
+        $(document).on('error', '.claim-box img', function() {
             var img = $(this);
             var parent = img.parent();
             var text = parent.attr('data-autothumb');
@@ -184,7 +200,7 @@
                     $autoThumbText = strtoupper(substr($str, 0, min (strlen($str), 2 )));
                 }
             ?>
-            <div class="claim-box<?php if ($idx == 5): ?> last<?php endif; ?>">
+            <div data-id="<?php echo $claim->ClaimId ?>" class="claim-box<?php if ($idx == 5): ?> last<?php endif; ?>">
                 <div class="tags">
                     <?php if ($ctTag): ?>
                     <div class="content-type"><?php echo strtoupper($ctTag) ?></div>
