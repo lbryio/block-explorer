@@ -330,7 +330,7 @@ class BlockShell extends Shell {
         /** 2017-06-12 21:38:07 **/
         //$last_fixed_txid = $redis->exists('fix.txid') ? $redis->get('fix.txid') : 0;
         try {
-            $stmt = $conn->execute('SELECT Id FROM Transactions WHERE Created >= ? AND Created <= ? LIMIT 1000000', ['2017-06-15 15:44:50', '2017-06-15 22:48:16']);
+            $stmt = $conn->execute('SELECT Id FROM Transactions WHERE Created >= ? AND Created <= ? LIMIT 1000000', ['2017-06-15 15:44:50', '2017-06-16 08:02:09']);
             $txids = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
             $count = count($txids);
@@ -821,12 +821,12 @@ class BlockShell extends Shell {
                     $claim_stream_data = $all_claim_data['claim_stream_data'];
 
                     if (!$claim) {
-                        break;
+                        continue;
                     }
 
                     if ($claim['ClaimType'] == 2 && !$claim_stream_data) {
                         echo "***claim stream data missing for streamType claim\n";
-                        break;
+                        continue;
                     }
 
                     $claim_entity = $this->Claims->newEntity($claim);
@@ -834,7 +834,7 @@ class BlockShell extends Shell {
 
                     if (!$res) {
                         echo "***claim could not be saved.\n";
-                        break;
+                        continue;
                     }
 
                     if (!$data_error && $claim_stream_data) {
