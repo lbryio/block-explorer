@@ -61,8 +61,8 @@ $desc = $claim->Description;
 if (strlen(trim($desc)) == 0) {
     $desc = '<em>No description available.</em>';
 } else {
-    $desc = preg_replace('#((https?|ftp)://(\S*?\.\S*?))([\s)\[\]{},;"\':<]|\.\s|$)#i','<a href="$1" target="_blank">$1</a>$4', $desc);
-    $desc = preg_replace('/(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/is', '<a href="mailto:$0">$0</a>', $desc);
+    $desc = preg_replace('#((https?|ftp)://(\S*?\.\S*?))([\s)\[\]{},;"\':<]|\.\s|$)#i','<a href="$1" target="_blank" rel="nofollow">$1</a>$4', $desc);
+    $desc = preg_replace('/(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/is', '<a href="mailto:$0" rel="nofollow">$0</a>', $desc);
 }
 
 ?>
@@ -103,7 +103,7 @@ if (strlen(trim($desc)) == 0) {
             <div class="value"><a href="/tx/<?php echo $claim->TransactionHash ?>#output-<?php echo $claim->Vout ?>"><?php echo $claim->TransactionHash ?></a></div>
 
             <?php if ($claim->ClaimType == 2): ?>
-            <div class="label half-width">Fee</div>
+            <div class="label half-width">Cost</div>
             <div class="label half-width">NSFW</div>
 
             <div class="value half-width"><?php echo $cost ?></div>
