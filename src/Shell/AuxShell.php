@@ -10,6 +10,12 @@ use Mdanter\Ecc\EccFactory;
 
 class AuxShell extends Shell {
 
+    const bittrex = 'https://bittrex.com/api/v1.1/public/getticker?market=BTC-LBC';
+
+    const blockchainticker = 'https://blockchain.info/ticker';
+
+    const lbcpricekey = 'lbc.price';
+
     const pubKeyAddress = [0, 85];
 
     const scriptAddress = [5, 122];
@@ -116,6 +122,62 @@ class AuxShell extends Shell {
         self::unlock('auxverify');
     }
 
+    public function pricehistory() {
+        self::lock('pricehistory');
+
+        $conn = ConnectionManager::get('default');
+        $redis = new \Predis\Client('tcp://127.0.0.1:6379');
+
+        try {
+            // Only allow 5-minute update intervals
+            $stmt = $conn->execute('SELECT MAX(Created) AS LastUpdate FROM PriceHistory');
+            $res = $stmt->fetch(\PDO::FETCH_OBJ);
+
+            $now = new \DateTime('now', new \DateTimeZone('UTC'));
+            if ($res && strlen(trim($res->LastUpdate)) > 0) {
+                $dt = new \DateTime($res->LastUpdate, new \DateTimeZone('UTC'));
+                $diff = $now->diff($dt);
+                $diffMinutes = $diff->i;
+                if ($diffMinutes < 5) {
+                    echo "Last update is less than 5 minutes ago. Quitting.\n";
+                    self::unlock('pricehistory');
+                    return;
+                }
+            }
+
+            $btrxjson = json_decode(self::curl_get(self::bittrex));
+            $blckjson = json_decode(self::curl_get(self::blockchainticker));
+
+            if ($btrxjson->success) {
+                $btc = $btrxjson->result->Bid;
+                $usd = 0;
+                if (isset($blckjson->USD)) {
+                    $usd = $btc * $blckjson->USD->buy;
+                    $priceInfo = new \stdClass();
+                    $priceInfo->price = number_format($usd, 2, '.', '');
+                    $priceInfo->time = $now->format('c');
+                    if ($redis) {
+                        $redis->set(self::lbcpricekey, json_encode($priceInfo));
+                    }
+
+                    // save the price history if both prices are > 0
+                    if ($usd > 0 && $btc > 0) {
+                        $conn->execute('INSERT INTO PriceHistory (USD, BTC, Created) VALUES (?, ?, UTC_TIMESTAMP())', [$usd, $btc]);
+                        echo "Inserted price history item. USD: $usd, BTC: $btc.\n";
+                    } else {
+                        echo "Could not insert price history item. USD: $usd, BTC: $btc.\n";
+                    }
+                }
+            } else {
+                echo "bittrex requrest returned an invalid result.\n";
+            }
+        } catch (\Exception $e) {
+            print_r($e);
+        }
+
+        self::unlock('pricehistory');
+    }
+
     public static function lock($process_name) {
         if (!is_dir(TMP . 'lock')) {
             mkdir(TMP . 'lock');
@@ -135,6 +197,26 @@ class AuxShell extends Shell {
         }
 		return true;
 	}
+
+    public static function curl_get($url) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($ch);
+        if ($response === false) {
+            $error = curl_error($ch);
+            $errno = curl_errno($ch);
+            curl_close($ch);
+
+            throw new \Exception(sprintf('The request failed: %s', $error), $errno);
+        } else {
+            curl_close($ch);
+        }
+
+        return $response;
+    }
 }
 
 ?>
