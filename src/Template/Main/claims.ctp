@@ -138,7 +138,7 @@ if (strlen(trim($desc)) == 0) {
     <?php if (count($moreClaims) > 0): ?>
 
     <div class="more-claims">
-        <h4>More from the publisher</h4>
+        <h4><?php echo isset($claim->Publisher) ? 'More from the publisher' : 'Published by this identity' ?></h4>
 
         <div class="claims-grid">
         <?php $idx = 1; $row = 1; $rowCount = ceil(count($moreClaims) / 3); foreach ($moreClaims as $claim):

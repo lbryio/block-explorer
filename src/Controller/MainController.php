@@ -131,19 +131,21 @@ class MainController extends AppController {
                 return $this->redirect('/');
             }
 
-            $json = json_decode($claim->Stream->Stream);
-            if (isset($json->metadata->license)) {
-                $claim->License = $json->metadata->license;
-            }
-            if (isset($json->metadata->licenseUrl)) {
-                $claim->LicenseUrl = $json->metadata->licenseUrl;
+            if (isset($claim->Stream)) {
+                $json = json_decode($claim->Stream->Stream);
+                if (isset($json->metadata->license)) {
+                    $claim->License = $json->metadata->license;
+                }
+                if (isset($json->metadata->licenseUrl)) {
+                    $claim->LicenseUrl = $json->metadata->licenseUrl;
+                }
             }
 
             $moreClaims = [];
-            if (isset($claim->Publisher)) {
+            if (isset($claim->Publisher) || $claim->ClaimType == 1) {
                 // find more claims for the publisher
                 $moreClaims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->
-                    where(['Claims.ClaimType' => 2, 'Claims.Id <>' => $claim->Id, 'Claims.PublisherId' => $claim->Publisher->ClaimId])->
+                    where(['Claims.ClaimType' => 2, 'Claims.Id <>' => $claim->Id, 'Claims.PublisherId' => isset($claim->Publisher) ? $claim->Publisher->ClaimId : $claim->ClaimId])->
                     limit(9)->order(['RAND()' => 'DESC'])->toArray();
                 for ($i = 0; $i < count($moreClaims); $i++) {
                     if (isset($moreClaims[$i]->Stream)) {
