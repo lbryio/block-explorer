@@ -456,7 +456,7 @@ class BlockShell extends Shell {
                         }
 
                         if ($addr_id > -1) {
-                            $conn->execute('INSERT INTO OutputsAddresses (OutputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE OutputId = OutputId', [$exist_output->Id, $addr_id]);
+                            $conn->execute('INSERT INTO OutputsAddresses (OutputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE OutputId = OutputId', [$out_entity->Id, $addr_id]);
                             $conn->execute('INSERT INTO TransactionsAddresses (TransactionId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE TransactionId = TransactionId', [$txid, $addr_id]);
                         }
 
@@ -544,7 +544,7 @@ class BlockShell extends Shell {
                                 }
 
                                 if ($addr_id > -1) {
-                                    $conn->execute('INSERT INTO InputsAddresses (InputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE InputId = InputId', [$exist_input->Id, $addr_id]);
+                                    $conn->execute('INSERT INTO InputsAddresses (InputId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE InputId = InputId', [$in_entity->Id, $addr_id]);
                                     $conn->execute('INSERT INTO TransactionsAddresses (TransactionId, AddressId) VALUES (?, ?) ON DUPLICATE KEY UPDATE TransactionId = TransactionId', [$txid, $addr_id]);
                                 }
 
