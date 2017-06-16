@@ -48,6 +48,30 @@ class BlockShell extends Shell {
         return $string;
     }
 
+    public function updateclaimfees() {
+        self::lock('claimfees');
+
+        $conn = ConnectionManager::get('default');
+        try {
+            $stmt = $conn->execute('SELECT CS.Id, CS.Stream FROM ClaimStreams CS JOIN Claims C ON C.Id = CS.Id WHERE C.Fee = 0 AND C.Id <= 11462 ORDER BY Id ASC');
+            $claims = $stmt->fetchAll(\PDO::FETCH_OBJ);
+            foreach ($claims as $claim) {
+                $stream = json_decode($claim->Stream);
+                if (isset($stream->metadata->fee) && $stream->metadata->fee->amount > 0) {
+                    $fee = $stream->metadata->fee->amount;
+                    $currency = $stream->metadata->fee->currency;
+
+                    $conn->execute('UPDATE Claims SET Fee = ?, FeeCurrency = ? WHERE Id = ?', [$fee, $currency, $claim->Id]);
+                    echo "Updated fee for claim ID: $claim->Id. Fee: $fee, Currency: $currency\n";
+                }
+            }
+        } catch (\Exception $e) {
+            print_r($e);
+        }
+
+        self::unlock('claimfees');
+    }
+
     public function buildclaimindex() {
         self::lock('buildindex');
 
@@ -58,11 +82,13 @@ class BlockShell extends Shell {
         $redis_key = 'claim.oid';
         $last_claim_oid = $redis->exists($redis_key) ? $redis->get($redis_key) : 0;
         try {
-            $stmt = $conn->execute('SELECT COUNT(Id) AS RecordCount FROM Outputs WHERE Id > ? AND TransactionId <= 1776540', [$last_claim_oid]);
+            $stmt = $conn->execute('SELECT COUNT(Id) AS RecordCount FROM Outputs WHERE Id > ?', [$last_claim_oid]);
             $count = min(500000, $stmt->fetch(\PDO::FETCH_OBJ)->RecordCount);
 
             $idx = 0;
-            $stmt = $conn->execute('SELECT O.Id, O.TransactionId, O.Vout, O.ScriptPubKeyAsm, T.Hash, IFNULL(T.TransactionTime, T.CreatedTime) AS TxTime FROM Outputs O JOIN Transactions T ON T.Id = O.TransactionId WHERE O.Id > ? AND O.TransactionId <= 1776540 ORDER BY O.Id ASC LIMIT 500000', [$last_claim_oid]);
+            $stmt = $conn->execute('SELECT O.Id, O.TransactionId, O.Vout, O.ScriptPubKeyAsm, T.Hash, IFNULL(T.TransactionTime, T.CreatedTime) AS TxTime FROM Outputs O ' .
+                                   'JOIN Transactions T ON T.Id = O.TransactionId WHERE O.Id > ? ORDER BY O.Id ASC LIMIT 500000',
+                                   [$last_claim_oid]);
             while ($out = $stmt->fetch(\PDO::FETCH_OBJ)) {
                 $idx++;
                 $idx_str = str_pad($idx, strlen($count), '0', STR_PAD_LEFT);
@@ -71,6 +97,14 @@ class BlockShell extends Shell {
                 $vout = $out->Vout;
 
                 if (strpos($out->ScriptPubKeyAsm, 'OP_CLAIM_NAME') !== false) {
+                    // check if the claim already exists in the claims table
+                    $stmt2 = $conn->execute('SELECT Id FROM Claims WHERE TransactionHash = ? AND Vout = ?', [$out->Hash, $out->Vout]);
+                    $exist_claim = $stmt2->fetch(\PDO::FETCH_OBJ);
+                    if ($exist_claim) {
+                        echo "[$idx_str/$count] claim already exists for [$out->Hash:$vout]. Skipping.\n";
+                        continue;
+                    }
+
                     $asm_parts = explode(' ', $out->ScriptPubKeyAsm, 4);
                     $name_hex = $asm_parts[1];
                     $claim_name = @pack('H*', $name_hex);
@@ -123,6 +157,8 @@ class BlockShell extends Shell {
                                 'Author' => isset($claim->stream->metadata->author) ? $claim->stream->metadata->author : null,
                                 'ThumbnailUrl' => isset($claim->stream->metadata->thumbnail) ? $claim->stream->metadata->thumbnail : null,
                                 'IsNSFW' => isset($claim->stream->metadata->nsfw) ? $claim->stream->metadata->nsfw : 0,
+                                'Fee' => isset($claim->stream->metadata->fee) ? $claim->stream->metadata->fee->amount : 0,
+                                'FeeCurrency' => isset($claim->stream->metadata->fee) ? $claim->stream->metadata->fee->currency : 0,
                                 'Created' => $tx_dt->format('Y-m-d H:i:s'),
                                 'Modified' => $tx_dt->format('Y-m-d H:i:s')
                             ];
@@ -245,6 +281,8 @@ class BlockShell extends Shell {
                                 'Author' => isset($claim->stream->metadata->author) ? $claim->stream->metadata->author : null,
                                 'ThumbnailUrl' => isset($claim->stream->metadata->thumbnail) ? $claim->stream->metadata->thumbnail : null,
                                 'IsNSFW' => isset($claim->stream->metadata->nsfw) ? $claim->stream->metadata->nsfw : 0,
+                                'Fee' => isset($claim->stream->metadata->fee) ? $claim->stream->metadata->fee->amount : 0,
+                                'FeeCurrency' => isset($claim->stream->metadata->fee) ? $claim->stream->metadata->fee->currency : 0,
                                 'Created' => $tx_dt->format('Y-m-d H:i:s'),
                                 'Modified' => $tx_dt->format('Y-m-d H:i:s')
                             ];

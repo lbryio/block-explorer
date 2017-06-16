@@ -111,9 +111,19 @@ class MainController extends AppController {
         $this->loadModel('Claims');
         $this->loadModel('Transactions');
 
+        $canConvert = false;
+        $priceInfo = json_decode($this->redis->get(self::lbcPriceKey));
+        if (isset($priceInfo->price)) {
+            $canConvert = true;
+        }
+
         if (!$id) {
             $claims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->order(['Claims.Created' => 'DESC'])->limit(96)->toArray();
             for ($i = 0; $i < count($claims); $i++) {
+                if ($canConvert && $claims[$i]->Fee > 0 && $claims[$i]->FeeCurrency == 'USD') {
+                    $claims[$i]->Price = $claims[$i]->Fee * $priceInfo->price;
+                }
+
                 if (isset($claims[$i]->Stream)) {
                     $json = json_decode($claims[$i]->Stream->Stream);
                     if (isset($json->metadata->license)) {
@@ -131,6 +141,10 @@ class MainController extends AppController {
                 return $this->redirect('/');
             }
 
+            if ($canConvert && $claim->Fee > 0 && $claim->FeeCurrency == 'USD') {
+                $claim->Price = $claim->Fee * $priceInfo->price;
+            }
+
             if (isset($claim->Stream)) {
                 $json = json_decode($claim->Stream->Stream);
                 if (isset($json->metadata->license)) {
@@ -146,8 +160,12 @@ class MainController extends AppController {
                 // find more claims for the publisher
                 $moreClaims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->
                     where(['Claims.ClaimType' => 2, 'Claims.Id <>' => $claim->Id, 'Claims.PublisherId' => isset($claim->Publisher) ? $claim->Publisher->ClaimId : $claim->ClaimId])->
-                    limit(9)->order(['RAND()' => 'DESC'])->toArray();
+                    limit(9)->order(['Claims.Fee' => 'DESC'])->toArray();
                 for ($i = 0; $i < count($moreClaims); $i++) {
+                    if ($canConvert && $moreClaims[$i]->Fee > 0 && $moreClaims[$i]->FeeCurrency == 'USD') {
+                        $moreClaims[$i]->Price = $moreClaims[$i]->Fee * $priceInfo->price;
+                    }
+
                     if (isset($moreClaims[$i]->Stream)) {
                         $json = json_decode($moreClaims[$i]->Stream->Stream);
                         if (isset($json->metadata->license)) {

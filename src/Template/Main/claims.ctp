@@ -50,6 +50,13 @@ if ($claim->ClaimType == 1) { $autoThumbText = strtoupper(substr($claim->Name, 1
     $autoThumbText = strtoupper(substr($str, 0, min( strlen($str), 10 )));
 }
 
+$cost = 'Free';
+if (isset($claim->Price) && $claim->Price > 0) {
+    $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
+} else if (isset($claim->Fee) && strtolower($claim->FeeCurrency) === 'lbc') {
+    $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
+}
+
 $desc = $claim->Description;
 if (strlen(trim($desc)) == 0) {
     $desc = '<em>No description available.</em>';
@@ -96,8 +103,13 @@ if (strlen(trim($desc)) == 0) {
             <div class="value"><a href="/tx/<?php echo $claim->TransactionHash ?>#output-<?php echo $claim->Vout ?>"><?php echo $claim->TransactionHash ?></a></div>
 
             <?php if ($claim->ClaimType == 2): ?>
-            <div class="label">NSFW</div>
-            <div class="value"><?php echo $claim->IsNSFW ? 'Yes' : 'No' ?></div>
+            <div class="label half-width">Fee</div>
+            <div class="label half-width">NSFW</div>
+
+            <div class="value half-width"><?php echo $cost ?></div>
+            <div class="value half-width"><?php echo $claim->IsNSFW ? 'Yes' : 'No' ?></div>
+
+            <div class="clear"></div>
             <?php endif; ?>
         </div>
     </div>
@@ -141,7 +153,9 @@ if (strlen(trim($desc)) == 0) {
         <h4><?php echo isset($claim->Publisher) ? 'More from the publisher' : 'Published by this identity' ?></h4>
 
         <div class="claims-grid">
-        <?php $idx = 1; $row = 1; $rowCount = ceil(count($moreClaims) / 3); foreach ($moreClaims as $claim):
+        <?php $idx = 1; $row = 1; $rowCount = ceil(count($moreClaims) / 3);
+
+        foreach ($moreClaims as $claim):
             $last_row = ($row == $rowCount);
             if ($idx % 3 == 0) {
                 $row++;
@@ -153,6 +167,12 @@ if (strlen(trim($desc)) == 0) {
                 $link = $claim->Publisher->Name . '/' . $link;
             }
             $link = 'lbry://' . $link;
+            $cost = '';
+            if (isset($claim->Price) && $claim->Price > 0) {
+                $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
+            } else if (isset($claim->Fee) && strtolower($claim->FeeCurrency) === 'lbc') {
+                $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
+            }
 
             // content type
             $ctTag = null;
@@ -175,11 +195,15 @@ if (strlen(trim($desc)) == 0) {
 
         ?>
         <div data-id="<?php echo $claim->ClaimId ?>" class="claim-grid-item<?php if ($idx % 3 == 0): ?> last-item<?php endif; ?><?php if ($last_row): ?> last-row<?php endif; ?>">
-            <div class="tags">
-            <?php if ($ctTag): ?>
-            <div class="content-type"><?php echo strtoupper($ctTag) ?></div>
+            <?php if (strlen(trim($cost)) > 0): ?>
+                <div class="price-tag"><?php echo $cost ?></div>
             <?php endif; ?>
-            <?php if ($claim->IsNSFW): ?>
+
+            <div class="tags">
+                <?php if ($ctTag): ?>
+                <div class="content-type"><?php echo strtoupper($ctTag) ?></div>
+                <?php endif; ?>
+                <?php if ($claim->IsNSFW): ?>
                 <div class="nsfw">NSFW</div>
                 <?php endif; ?>
             </div>
@@ -259,6 +283,13 @@ if (strlen(trim($desc)) == 0) {
         }
         $link = 'lbry://' . $link;
 
+        $cost = '';
+        if (isset($claim->Price) && $claim->Price > 0) {
+            $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
+        } else if (isset($claim->Fee) && strtolower($claim->FeeCurrency) === 'lbc') {
+            $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
+        }
+
         // content type
         $ctTag = null;
         if (substr($claim->ContentType, 0, 5) === 'audio') {
@@ -280,11 +311,15 @@ if (strlen(trim($desc)) == 0) {
 
     ?>
     <div data-id="<?php echo $claim->ClaimId ?>" class="claim-grid-item<?php if ($idx % 3 == 0): ?> last-item<?php endif; ?><?php if ($last_row): ?> last-row<?php endif; ?>">
-        <div class="tags">
-        <?php if ($ctTag): ?>
-        <div class="content-type"><?php echo strtoupper($ctTag) ?></div>
+        <?php if (strlen(trim($cost)) > 0): ?>
+        <div class="price-tag"><?php echo $cost ?></div>
         <?php endif; ?>
-        <?php if ($claim->IsNSFW): ?>
+
+        <div class="tags">
+            <?php if ($ctTag): ?>
+            <div class="content-type"><?php echo strtoupper($ctTag) ?></div>
+            <?php endif; ?>
+            <?php if ($claim->IsNSFW): ?>
             <div class="nsfw">NSFW</div>
             <?php endif; ?>
         </div>

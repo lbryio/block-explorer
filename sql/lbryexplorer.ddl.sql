@@ -192,6 +192,8 @@ CREATE TABLE `Claims`
     `Language` VARCHAR(20) CHARACTER SET latin1 COLLATE latin1_general_ci,
     `ThumbnailUrl` TEXT,
     `Title` TEXT,
+    `Fee` DECIMAL(18,8) DEFAULT 0 NOT NULL,
+    `FeeCurrency` CHAR(3),
 
     `Created` DATETIME NOT NULL,
     `Modified` DATETIME NOT NULL,
@@ -217,3 +219,6 @@ CREATE TABLE ClaimStreams
     PRIMARY KEY `PK_ClaimStream` (`Id`),
     FOREIGN KEY `PK_ClaimStreamClaim` (`Id`) REFERENCES `Claims` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
+
+ALTER TABLE Claims ADD COLUMN Fee DECIMAL(18,8) DEFAULT 0 NOT NULL AFTER Title;
+ALTER TABLE Claims ADD COLUMN FeeCurrency CHAR(3) AFTER Fee;
