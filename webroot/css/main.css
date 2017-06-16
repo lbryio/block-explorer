@@ -247,12 +247,20 @@ footer .content .page-time { position: absolute; right: 12px; bottom: 0px; paddi
 .address-summary .box .value { font-size: 180%; font-weight: 300; margin-top: 8px }
 .address-summary .box.last { border-color: transparent }
 
+.recent-transactions { position: relative }
 .recent-transactions h3 { font-weight: 300; margin: 0; margin-bottom: 12px }
 .recent-transactions { width: 1200px; margin: 48px auto 0 auto; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 36px; cursor: default }
+.recent-transactions .results-meta { position: absolute; right: 36px; top: 44px; font-size: 75%; color: #aaa }
 
 .tx-table td { vertical-align: top; line-height: 24px }
 .tx-table td.credit, .tx-table td div.credit { color: #00e676 }
 .tx-table td.debit, .tx-table td div.debit { color: #ff0000 }
 .tx-table td div.debit { padding-top: 8px }
+
+.pagination { width: 1200px; margin: 36px auto 0 auto; cursor: default }
+.pagination .prev { float: left; width: 20%; font-size: 75% }
+.pagination .next { float: left; width: 20%; text-align: right; font-size: 75% }
+.pagination .pages { float: left; width: 60%; text-align: center }
+.pagination .pages .page-number { display: inline-block; width: 28px; height: 28px; line-height: 24px; text-align: center; font-size: 75% }
 
 .clear { clear: both }

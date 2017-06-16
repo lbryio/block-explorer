@@ -406,6 +406,11 @@ class MainController extends AppController {
             return $this->redirect('/');
         }
 
+        $offset = 0;
+        $pageLimit = 50;
+        $numTransactions = 0;
+        $page = intval($this->request->query('page'));
+
         $canTag = false;
         $totalRecvAmount = 0;
         $totalSentAmount = 0;
@@ -419,6 +424,7 @@ class MainController extends AppController {
         if (!$pending) {
             $tagRequestAmount = '25.' . rand(11111111, 99999999);
         }
+
 
         $address = $this->Addresses->find()->where(['Address' => $addr])->first();
         if (!$address) {
@@ -434,16 +440,28 @@ class MainController extends AppController {
             $canTag = true;
             $addressId = $address->Id;
 
+            $stmt = $conn->execute('SELECT COUNT(TransactionId) AS Total FROM TransactionsAddresses WHERE AddressId = ?', [$addressId]);
+            $count = $stmt->fetch(\PDO::FETCH_OBJ);
+            $numTransactions = $count->Total;
+            $numPages = ceil($numTransactions / $pageLimit);
+            if ($page < 1) {
+                $page = 1;
+            }
+            if ($page > $numPages) {
+                $page = $numPages;
+            }
+
+            $offset = ($page - 1) * $pageLimit;
             $stmt = $conn->execute('SELECT A.TotalReceived, A.TotalSent FROM Addresses A WHERE A.Id = ?', [$address->Id]);
             $totals = $stmt->fetch(\PDO::FETCH_OBJ);
 
-            $stmt = $conn->execute('SELECT T.Id, T.Hash, T.InputCount, T.OutputCount, T.Value, ' .
+            $stmt = $conn->execute(sprintf('SELECT T.Id, T.Hash, T.InputCount, T.OutputCount, T.Value, ' .
                                    'TA.DebitAmount, TA.CreditAmount, ' .
                                    'B.Height, B.Confirmations, IFNULL(T.TransactionTime, T.CreatedTime) AS TxTime ' .
                                    'FROM Transactions T ' .
                                    'LEFT JOIN Blocks B ON T.BlockHash = B.Hash ' .
                                    'RIGHT JOIN (SELECT TransactionId, DebitAmount, CreditAmount FROM TransactionsAddresses ' .
-                                   '            WHERE AddressId = ? ORDER BY TransactionTime DESC LIMIT 0, 20) TA ON TA.TransactionId = T.Id', [$addressId]);
+                                   '            WHERE AddressId = ? ORDER BY TransactionTime DESC LIMIT %d, %d) TA ON TA.TransactionId = T.Id', $offset, $pageLimit), [$addressId]);
             $recentTxs = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
             $totalRecvAmount = $totals->TotalReceived == 0 ? '0' : $totals->TotalReceived + 0;
@@ -451,6 +469,7 @@ class MainController extends AppController {
             $balanceAmount = bcsub($totalRecvAmount, $totalSentAmount, 8) + 0;
         }
 
+        $this->set('offset', $offset);
         $this->set('canTag', $canTag);
         $this->set('pending', $pending);
         $this->set('tagRequestAmount', $tagRequestAmount);
@@ -459,6 +478,9 @@ class MainController extends AppController {
         $this->set('totalSent', $totalSentAmount);
         $this->set('balanceAmount', $balanceAmount);
         $this->set('recentTxs', $recentTxs);
+        $this->set('numTransactions', $numTransactions);
+        $this->set('numPages', $numPages);
+        $this->set('currentPage', $page);
     }
 
     public function qr($data = null) {
