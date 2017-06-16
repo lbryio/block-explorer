@@ -332,8 +332,8 @@ if (strlen(trim($desc)) == 0) {
         </div>
 
         <div class="metadata">
-            <div class="title"><?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '<em>No Title</em>') ?></div>
-            <div class="link"><a href="<?php echo $link ?>" rel="nofollow"><?php echo $link ?></a></div>
+            <div class="title" title="<?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '') ?>"><?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '<em>No Title</em>') ?></div>
+            <div class="link" title="<?php echo $link ?>"><a href="<?php echo $link ?>" rel="nofollow"><?php echo $link ?></a></div>
 
             <div class="desc"><?php echo strlen(trim($claim->Description)) > 0 ? $claim->Description : '<em>No description available</em>' ?></div>
 
