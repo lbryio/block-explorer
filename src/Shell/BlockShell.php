@@ -330,7 +330,7 @@ class BlockShell extends Shell {
         /** 2017-06-12 21:38:07 **/
         //$last_fixed_txid = $redis->exists('fix.txid') ? $redis->get('fix.txid') : 0;
         try {
-            $stmt = $conn->execute('SELECT Id FROM Transactions WHERE Created >= ? AND Created <= ? LIMIT 1000000', ['2017-06-15 15:44:50', '2017-06-16 08:02:09']);
+            $stmt = $conn->execute('SELECT Id FROM Transactions WHERE Created >= ? AND Created <= ? LIMIT 1000000', ['2017-06-15 20:44:50', '2017-06-16 08:02:09']);
             $txids = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
             $count = count($txids);
@@ -412,7 +412,34 @@ class BlockShell extends Shell {
                     $stmt = $conn->execute('SELECT Id FROM Outputs WHERE TransactionId = ? AND Vout = ?', [$txid, $vout]);
                     $exist_output = $stmt->fetch(\PDO::FETCH_OBJ);
 
-                    if ($exist_output) {
+                    if (!$exist_output) {
+                        $out['TransactionId'] = $txid;
+                        $out_entity = $this->Outputs->newEntity($out);
+
+                        //$stmt->execute('INSERT INTO Outputs')
+                        $conn->execute('INSERT INTO Outputs (TransactionId, Vout, Value, Type, ScriptPubKeyAsm, ScriptPubKeyHex, RequiredSignatures, Hash160, Addresses, Created, Modified) '.
+                                       'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())',
+                                       [$out['TransactionId'],
+                                        $out['Vout'],
+                                        $out['Value'],
+                                        $out['Type'],
+                                        $out['ScriptPubKeyAsm'],
+                                        $out['ScriptPubKeyHex'],
+                                        $out['RequiredSignatures'],
+                                        $out['Hash160'],
+                                        $out['Addresses']
+                                       ]);
+
+                        // get the last insert id
+                        $stmt = $conn->execute('SELECT LAST_INSERT_ID() AS outputId');
+                        $linsert = $stmt->fetch(\PDO::FETCH_OBJ);
+                        $out_entity->Id = $linsert->outputId;
+
+                        if ($out_entity->Id === 0) {
+                            $data_error = true;
+                            break;
+                        }
+
                         $json_addr = json_decode($out['Addresses']);
                         $address = $json_addr[0];
 
@@ -472,7 +499,7 @@ class BlockShell extends Shell {
                             $stmt = $conn->execute('SELECT Id FROM Inputs WHERE TransactionId = ? AND PrevoutHash = ? AND PrevoutN = ?', [$txid, $prevout_hash, $in_prevout]);
                             $exist_input = $stmt->fetch(\PDO::FETCH_OBJ);
 
-                            if ($exist_input) {
+                            if (!$exist_input) {
                                 $json_addr = json_decode($src_output->Addresses);
                                 $address = $json_addr[0];
 
@@ -486,6 +513,34 @@ class BlockShell extends Shell {
                                         $addr_id = $src_addr->Id;
                                         $addr_id_map[$address] = $addr_id;
                                     }
+                                }
+
+                                $in_entity = $this->Inputs->newEntity($in);
+                                $in['TransactionId'] = $txid;
+                                if ($addr_id > -1) {
+                                    $in['AddressId'] = $addr_id;
+                                }
+                                $conn->execute('INSERT INTO Inputs (TransactionId, TransactionHash, AddressId, PrevoutHash, PrevoutN, Sequence, Value, ScriptSigAsm, ScriptSigHex, Created, Modified) ' .
+                                               'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())',
+                                               [$in['TransactionId'],
+                                                $in['TransactionHash'],
+                                                isset($in['AddressId']) ? $in['AddressId'] : null,
+                                                $in['PrevoutHash'],
+                                                $in['PrevoutN'],
+                                                $in['Sequence'],
+                                                isset($in['Value']) ? $in['Value'] : 0,
+                                                $in['ScriptSigAsm'],
+                                                $in['ScriptSigHex']
+                                                ]);
+
+                                // get last insert id
+                                $stmt = $conn->execute('SELECT LAST_INSERT_ID() AS inputId');
+                                $linsert = $stmt->fetch(\PDO::FETCH_OBJ);
+                                $in_entity->Id = $linsert->inputId;
+
+                                if ($in_entity->Id === 0) {
+                                    $data_error = true;
+                                    break;
                                 }
 
                                 if ($addr_id > -1) {
