@@ -160,7 +160,7 @@ class MainController extends AppController {
                 // find more claims for the publisher
                 $moreClaims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->
                     where(['Claims.ClaimType' => 2, 'Claims.Id <>' => $claim->Id, 'Claims.PublisherId' => isset($claim->Publisher) ? $claim->Publisher->ClaimId : $claim->ClaimId])->
-                    limit(9)->order(['RAND()' => 'DESC', 'Claims.Fee' => 'DESC'])->toArray();
+                    limit(9)->order(['Claims.Fee' => 'DESC', 'RAND()' => 'DESC'])->toArray();
                 for ($i = 0; $i < count($moreClaims); $i++) {
                     if ($canConvert && $moreClaims[$i]->Fee > 0 && $moreClaims[$i]->FeeCurrency == 'USD') {
                         $moreClaims[$i]->Price = $moreClaims[$i]->Fee / $priceInfo->price;
