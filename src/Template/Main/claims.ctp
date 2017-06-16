@@ -97,7 +97,7 @@ if (strlen(trim($desc)) == 0) {
             <?php endif; ?>
 
             <div class="label">Created</div>
-            <div class="value"><?php echo $claim->Created->format('j M Y H:i:s') ?> UTC</div>
+            <div class="value"><?php echo \DateTime::createFromFormat('U', $claim->TransactionTime > 0 ? $claim->TransactionTime : $claim->Created->format('U'))->format('j M Y H:i:s') ?> UTC</div>
 
             <div class="label">Transaction</div>
             <div class="value"><a href="/tx/<?php echo $claim->TransactionHash ?>#output-<?php echo $claim->Vout ?>"><?php echo $claim->TransactionHash ?></a></div>
@@ -343,7 +343,7 @@ if (strlen(trim($desc)) == 0) {
 
             <div class="value half-width"><a href="/tx/<?php echo $claim->TransactionHash ?>#output-<?php echo $claim->Vout ?>" title="<?php echo $claim->TransactionHash ?>"><?php echo $claim->TransactionHash ?></a></div>
             <div class="value half-width" title="<?php echo $claim->Created->format('j M Y H:i:s') ?> UTC">
-                <?php echo \Carbon\Carbon::createFromTimestamp($claim->Created->format('U'))->diffForHumans(); ?>
+                <?php echo \Carbon\Carbon::createFromTimestamp($claim->TransactionTime > 0 ? $claim->TransactionTime : $claim->Created->format('U'))->diffForHumans(); ?>
             </div>
 
             <div class="clear spacer"></div>
