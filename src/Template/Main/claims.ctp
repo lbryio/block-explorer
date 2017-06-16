@@ -104,10 +104,10 @@ if (strlen(trim($desc)) == 0) {
 
             <?php if ($claim->ClaimType == 2): ?>
             <div class="label half-width">Cost</div>
-            <div class="label half-width">NSFW</div>
+            <div class="label half-width">Safe for work</div>
 
             <div class="value half-width"><?php echo $cost ?></div>
-            <div class="value half-width"><?php echo $claim->IsNSFW ? 'Yes' : 'No' ?></div>
+            <div class="value half-width"><?php echo $claim->IsNSFW ? 'No' : 'Yes' ?></div>
 
             <div class="clear"></div>
             <?php endif; ?>
