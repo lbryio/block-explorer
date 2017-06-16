@@ -210,7 +210,7 @@
             <?php if ($numTransactions > 0):
 
                 $start = $numPages > 1 ? 1 : 0;
-                $end = $numPages > 1 ? 10 : 0;
+                $end = $numPages > 1 ? min($numPages, 10) : 0;
                 // use currentPage as the starting point
                 if ($numPages > 10) {
                     if ($currentPage > 5) {
