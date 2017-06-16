@@ -93,7 +93,7 @@
             window.open('/claims/' + id, 'claim_details', 'width=1366,height=768,left=' + left + ',top=' + top);*/
         });
 
-        $(document).on('error', '.claim-box img', function() {
+        $('.claim-box img').on('error', function() {
             var img = $(this);
             var parent = img.parent();
             var text = parent.attr('data-autothumb');
