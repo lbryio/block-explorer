@@ -219,7 +219,7 @@
                 </div>
 
                 <div class="metadata">
-                    <div class="title"><?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '<em>No Title</em>') ?></div>
+                    <div class="title" title="<?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : ''); ?>"><?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '<em>No Title</em>') ?></div>
                     <div class="link"><a href="<?php echo $link ?>"><?php echo $link ?></a></div>
 
                     <div class="clear"></div>

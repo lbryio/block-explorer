@@ -217,8 +217,8 @@ if (strlen(trim($desc)) == 0) {
             </div>
 
             <div class="metadata">
-                <div class="title"><?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '<em>No Title</em>') ?></div>
-                <div class="link"><a href="<?php echo $link ?>" rel="nofollow"><?php echo $link ?></a></div>
+                <div class="title" title="<?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '') ?>"><?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '<em>No Title</em>') ?></div>
+                <div class="link" title="<?php echo $link ?>><a href="<?php echo $link ?>" rel="nofollow"><?php echo $link ?></a></div>
 
                 <div class="desc"><?php echo strlen(trim($claim->Description)) > 0 ? $claim->Description : '<em>No description available</em>' ?></div>
 
@@ -236,21 +236,20 @@ if (strlen(trim($desc)) == 0) {
                 <div class="label half-width">Content type</div>
                 <div class="label half-width">Language</div>
 
-                <div class="value half-width"><?php echo $claim->ContentType ?></div>
-                <div class="value half-width"><?php echo $claim->Language == 'en' ? 'English' : $claim->Language ?></div>
+                <div class="value half-width" title="<?php echo $claim->ContentType ?>"><?php echo $claim->ContentType ?></div>
+                <div class="value half-width" title="<?php echo $claim->Language == 'en' ? 'English' : $claim->Language ?>"><?php echo $claim->Language == 'en' ? 'English' : $claim->Language ?></div>
 
                 <div class="clear spacer"></div>
 
                 <div class="label half-width">Author</div>
                 <div class="label half-width">License</div>
 
-                <div class="value half-width"><?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?></div>
-                <div class="value half-width">
+                <div class="value half-width" title="<?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?>"><?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?></div>
+                <div class="value half-width" title="<?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '' ?>">
                     <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
                     <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
                     <?php if (strlen(trim($claim->LicenseUrl))): ?></a><?php endif; ?>
                 </div>
-
                 <?php endif; ?>
 
             </div>
@@ -352,23 +351,21 @@ if (strlen(trim($desc)) == 0) {
             <div class="label half-width">Content type</div>
             <div class="label half-width">Language</div>
 
-            <div class="value half-width"><?php echo $claim->ContentType ?></div>
-            <div class="value half-width"><?php echo $claim->Language == 'en' ? 'English' : $claim->Language ?></div>
+            <div class="value half-width" title="<?php echo $claim->ContentType ?>"><?php echo $claim->ContentType ?></div>
+            <div class="value half-width" title="<?php echo $claim->Language == 'en' ? 'English' : $claim->Language ?>"><?php echo $claim->Language == 'en' ? 'English' : $claim->Language ?></div>
 
             <div class="clear spacer"></div>
 
             <div class="label half-width">Author</div>
             <div class="label half-width">License</div>
 
-            <div class="value half-width"><?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?></div>
-            <div class="value half-width">
+            <div class="value half-width" title="<?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?>"><?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?></div>
+            <div class="value half-width" title="<?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '' ?>">
                 <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
                 <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
                 <?php if (strlen(trim($claim->LicenseUrl))): ?></a><?php endif; ?>
             </div>
-
             <?php endif; ?>
-
         </div>
     </div>
     <?php $idx++; endforeach; ?>

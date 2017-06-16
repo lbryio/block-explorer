@@ -47,7 +47,7 @@ border-radius: 0 6px 8px 0 }
 .home-container-cell .recent-claims .claim-box .tags .nsfw { background: #e53935; text-align: center; color: #fff; position: relative; left: 1px }
 .home-container-cell .recent-claims .claim-box .tags .content-type { background: #880e4f; text-align: center; color: #fff; }
 .home-container-cell .recent-claims .claim-box .metadata { padding: 12px; font-size: 90% }
-.home-container-cell .recent-claims .claim-box .title { font-size: 120%; height: 25px; line-height: 25px; overflow: hidden; text-overflow: ellipsis }
+.home-container-cell .recent-claims .claim-box .title { font-size: 120%; height: 25px; line-height: 25px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 .home-container-cell .recent-claims .claim-box .desc { font-size: 80%; font-weight: 300; height: 100px; overflow: hidden; text-overflow: ellipsis; margin: 3px 0; line-height: 20px }
 .home-container-cell .recent-claims .claim-box .link { font-size: 80%; font-weight: 300; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; line-height: 20px; height: 20px }
 .home-container-cell .recent-claims .claim-box .tx-link { font-size: 80%; font-weight: 300; color: #fff; background: #1e88e5; position: absolute; bottom: 0; width: 100%; display: block; line-height: 20px; height: 32px; padding: 6px 0; text-align: center; cursor: pointer  }
@@ -79,7 +79,7 @@ border-radius: 0 6px 8px 0 }
 .claims-grid .claim-grid-item .tags .nsfw { background: #e53935; text-align: center; color: #fff; position: relative; left: 1px }
 .claims-grid .claim-grid-item .tags .content-type { background: #880e4f; text-align: center; color: #fff; }
 .claims-grid .claim-grid-item .metadata { padding: 24px; font-size: 90% }
-.claims-grid .claim-grid-item .title { font-size: 120%; height: 25px; line-height: 25px; overflow: hidden; text-overflow: ellipsis }
+.claims-grid .claim-grid-item .title { font-size: 120%; height: 25px; line-height: 25px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 .claims-grid .claim-grid-item .desc { font-size: 90%; font-weight: 300; height: 72px; overflow: hidden; text-overflow: ellipsis; margin: 8px 0 20px 0; line-height: 24px }
 .claims-grid .claim-grid-item .link { font-size: 95%; font-weight: 300; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; line-height: 20px; height: 20px; margin-top: 6px }
 
