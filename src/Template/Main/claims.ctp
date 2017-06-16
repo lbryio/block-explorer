@@ -54,7 +54,7 @@ $cost = 'Free';
 if (isset($claim->Price) && $claim->Price > 0) {
     $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
 } else if (isset($claim->Fee) && strtolower($claim->FeeCurrency) === 'lbc') {
-    $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
+    $cost = $this->Amount->formatCurrency($claim->Fee) . ' LBC';
 }
 
 $desc = $claim->Description;
@@ -171,7 +171,7 @@ if (strlen(trim($desc)) == 0) {
             if (isset($claim->Price) && $claim->Price > 0) {
                 $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
             } else if (isset($claim->Fee) && strtolower($claim->FeeCurrency) === 'lbc') {
-                $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
+                $cost = $this->Amount->formatCurrency($claim->Fee) . ' LBC';
             }
 
             // content type
@@ -286,7 +286,7 @@ if (strlen(trim($desc)) == 0) {
         if (isset($claim->Price) && $claim->Price > 0) {
             $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
         } else if (isset($claim->Fee) && strtolower($claim->FeeCurrency) === 'lbc') {
-            $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
+            $cost = $this->Amount->formatCurrency($claim->Fee) . ' LBC';
         }
 
         // content type
