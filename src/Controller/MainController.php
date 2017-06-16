@@ -443,15 +443,24 @@ class MainController extends AppController {
             $stmt = $conn->execute('SELECT COUNT(TransactionId) AS Total FROM TransactionsAddresses WHERE AddressId = ?', [$addressId]);
             $count = $stmt->fetch(\PDO::FETCH_OBJ);
             $numTransactions = $count->Total;
-            $numPages = ceil($numTransactions / $pageLimit);
-            if ($page < 1) {
+            $all = $this->request->query('all');
+            if ($all === 'true') {
+                $offset = 0;
+                $pageLimit = $numTransactions;
+                $numPages = 1;
                 $page = 1;
-            }
-            if ($page > $numPages) {
-                $page = $numPages;
+            } else {
+                $numPages = ceil($numTransactions / $pageLimit);
+                if ($page < 1) {
+                    $page = 1;
+                }
+                if ($page > $numPages) {
+                    $page = $numPages;
+                }
+
+                $offset = ($page - 1) * $pageLimit;
             }
 
-            $offset = ($page - 1) * $pageLimit;
             $stmt = $conn->execute('SELECT A.TotalReceived, A.TotalSent FROM Addresses A WHERE A.Id = ?', [$address->Id]);
             $totals = $stmt->fetch(\PDO::FETCH_OBJ);
 
@@ -481,6 +490,7 @@ class MainController extends AppController {
         $this->set('numTransactions', $numTransactions);
         $this->set('numPages', $numPages);
         $this->set('currentPage', $page);
+        $this->set('pageLimit', $pageLimit);
     }
 
     public function qr($data = null) {
