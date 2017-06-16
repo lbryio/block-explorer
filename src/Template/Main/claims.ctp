@@ -134,7 +134,7 @@ if (strlen(trim($desc)) == 0) {
                 <div class="label half-width">Language</div>
 
                 <div class="value half-width"<?php if(strlen(trim($claim->License)) > 0): ?> title="<?php echo $claim->License ?>"<?php endif; ?>>
-                    <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow"><?php endif; ?>
+                    <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
                     <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
                     <?php if (strlen(trim($claim->LicenseUrl))): ?></a><?php endif; ?>
                 </div>
@@ -246,7 +246,7 @@ if (strlen(trim($desc)) == 0) {
 
                 <div class="value half-width"><?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?></div>
                 <div class="value half-width">
-                    <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow"><?php endif; ?>
+                    <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
                     <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
                     <?php if (strlen(trim($claim->LicenseUrl))): ?></a><?php endif; ?>
                 </div>
@@ -362,7 +362,7 @@ if (strlen(trim($desc)) == 0) {
 
             <div class="value half-width"><?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?></div>
             <div class="value half-width">
-                <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow"><?php endif; ?>
+                <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
                 <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
                 <?php if (strlen(trim($claim->LicenseUrl))): ?></a><?php endif; ?>
             </div>
