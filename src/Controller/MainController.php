@@ -121,7 +121,7 @@ class MainController extends AppController {
             $claims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->order(['Claims.Created' => 'DESC'])->limit(96)->toArray();
             for ($i = 0; $i < count($claims); $i++) {
                 if ($canConvert && $claims[$i]->Fee > 0 && $claims[$i]->FeeCurrency == 'USD') {
-                    $claims[$i]->Price = $claims[$i]->Fee * $priceInfo->price;
+                    $claims[$i]->Price = $claims[$i]->Fee / $priceInfo->price;
                 }
 
                 if (isset($claims[$i]->Stream)) {
@@ -142,7 +142,7 @@ class MainController extends AppController {
             }
 
             if ($canConvert && $claim->Fee > 0 && $claim->FeeCurrency == 'USD') {
-                $claim->Price = $claim->Fee * $priceInfo->price;
+                $claim->Price = $claim->Fee / $priceInfo->price;
             }
 
             if (isset($claim->Stream)) {
@@ -163,7 +163,7 @@ class MainController extends AppController {
                     limit(9)->order(['Claims.Fee' => 'DESC'])->toArray();
                 for ($i = 0; $i < count($moreClaims); $i++) {
                     if ($canConvert && $moreClaims[$i]->Fee > 0 && $moreClaims[$i]->FeeCurrency == 'USD') {
-                        $moreClaims[$i]->Price = $moreClaims[$i]->Fee * $priceInfo->price;
+                        $moreClaims[$i]->Price = $moreClaims[$i]->Fee / $priceInfo->price;
                     }
 
                     if (isset($moreClaims[$i]->Stream)) {
