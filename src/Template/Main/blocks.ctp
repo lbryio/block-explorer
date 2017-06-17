@@ -166,7 +166,7 @@
                 parseDates: true,
                 minPeriod: minPeriod, // DD for daily
                 minorGridEnabled: true,
-                axisColor: '#DADADA',
+                axisColor: '#dadada',
                 twoLineMode: true,
                 dateFormats: [{
                     period: 'fff',
@@ -207,7 +207,7 @@
                     bulletSize: 6,
                     useLineColorForBulletBorder: true,
                     lineColor: '#1e88e5',
-                    hideBulletsCount: 30,
+                    hideBulletsCount: 101,
                     balloonText: '[[AvgBlockSize]] KB',
                     switchable: false,
                     balloonFunction: function(item, graph) {
@@ -235,7 +235,7 @@
                         }
                         return result.replace('[[AvgUSD]]', item.dataContext.AvgUSD.toFixed(2));
                     },
-                    hideBulletsCount: 30,
+                    hideBulletsCount: 101,
                     labelFunction: function(value) {
                         return '$' + value;
                     },
@@ -249,7 +249,12 @@
                 cursorColor: '#1e88e5',
                 categoryBalloonDateFormat: minPeriod === 'hh' ? 'D MMM HH:NN ' : 'D MMM'
             },
-            chartScrollbar: {},
+            chartScrollbar: {
+                autoGridCount: true,
+                scrollbarHeight: 36,
+                color: '#888888',
+                gridColor: '#bbbbbb'
+            },
             legend: {
                 marginLeft: 110,
                 useGraphSettings: true,
