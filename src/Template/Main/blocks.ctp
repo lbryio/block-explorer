@@ -139,7 +139,8 @@
     var chartData = [];
     var chartLoadInProgress = false;
     var minPeriod = 'hh';
-    var defaultPeriod = '24h';
+    var validPeriods = ['24h', '72h', '168h', '30d', '90d', '1y'];
+    var defaultPeriod = validPeriods.indexOf(localStorage.getItem('chartPeriod') > -1) ? localStorage.getItem('chartPeriod') : '24h';
     var periodGridCounts = {'24h': 24, '72h': 24, '168h': 14, '30d': 30, '90d': 45, '1y': 12 };
     AmCharts.ready(function() {
         chart = AmCharts.makeChart('block-size-chart', {
@@ -319,7 +320,9 @@
                         }
                     }
 
-                    //var dataSet = chart.mainDataSet;
+                    // save selcted period to localStorage
+                    localStorage.setItem('chartPeriod', dataPeriod);
+
                     if (chart) {
                         var isHourly = (dataPeriod.indexOf('h') > -1);
                         var gridCount = periodGridCounts[dataPeriod];
@@ -357,6 +360,8 @@
             var period = link.attr('data-period');
             loadChartData(period);
         });
+
+        $('a[data-period="' + defaultPeriod + '"]').addClass('active').siblings().removeClass('active');
     });
 </script>
 <?php   $this->end(); ?>
@@ -369,7 +374,7 @@
     <div class="load-progress inc"></div>
     <h3>Block Size Chart</h3>
     <div class="block-size-data-links">
-        <a href="#" title="24 hours" data-period="24h" class="active">24h</a>
+        <a href="#" title="24 hours" data-period="24h">24h</a>
         <a href="#" title="72 hours" data-period="72h">72h</a>
         <a href="#" title="1 week" data-period="168h">1w</a>
         <a href="#" title="30 days" data-period="30d">30d</a>
