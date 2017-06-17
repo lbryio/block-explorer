@@ -142,6 +142,7 @@
 
         <div class="recent-blocks">
             <h3>Recent Blocks</h3>
+            <a class="all-blocks-link" href="/blocks">LBRY Blocks</a>
             <table class="table table-striped">
                 <thead>
                     <tr>

@@ -57,6 +57,7 @@ Router::scope('/', function (RouteBuilder $routes) {
     $routes->connect('/api/v1/address/:addr/utxo', ['controller' => 'Main', 'action' => 'apiaddrutxo'], ['addr' => '[A-Za-z0-9,]+', 'pass' => ['addr']]);
     $routes->connect('/api/v1/address/:addr/transactions', ['controller' => 'Main', 'action' => 'apiaddrtx'], ['addr' => '[A-Za-z0-9,]+', 'pass' => ['addr']]);
 
+    $routes->connect('/api/v1/charts/blocksize/:period', ['controller' => 'Main', 'action' => 'apiblocksize'], ['period' => '[012346789dhy]+', 'pass' => ['period']]);
     $routes->connect('/api/v1/realtime/blocks', ['controller' => 'Main', 'action' => 'apirealtimeblocks']);
     $routes->connect('/api/v1/realtime/tx', ['controller' => 'Main', 'action' => 'apirealtimetx']);
     $routes->connect('/api/v1/recentblocks', ['controller' => 'Main', 'action' => 'apirecentblocks']);

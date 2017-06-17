@@ -203,6 +203,54 @@ class MainController extends AppController {
         $this->set('txs', $txs);
     }
 
+    public function apiblocksize($timePeriod = '24h') {
+        $this->autoRender = false;
+
+        if (!$this->request->is('get')) {
+            return $this->_jsonError('Invalid HTTP request method.', 400);
+        }
+
+        $validPeriods = ['24h', '72h', '168h', '30d', '90d', '1y'];
+        if (!in_array($timePeriod, $validPeriods)) {
+            return $this->_jsonError('Invalid time period specified.', 400);
+        }
+
+        $isHourly = (strpos($timePeriod, 'h') !== false);
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        $dateFormat = $isHourly ? 'Y-m-d H:00:00' : 'Y-m-d';
+        $sqlDateFormat = $isHourly ? '%Y-%m-%d %H:00:00' : '%Y-%m-%d';
+        $intervalPrefix = $isHourly ? 'PT' : 'P';
+        $start = $now->sub(new \DateInterval($intervalPrefix . strtoupper($timePeriod)));
+
+        $resultSet = [];
+
+        $conn = ConnectionManager::get('default');
+
+        // get avg block sizes for the time period
+        $stmt = $conn->execute("SELECT AVG(BlockSize) AS AvgBlockSize, DATE_FORMAT(FROM_UNIXTIME(BlockTime), '$sqlDateFormat') AS TimePeriod " .
+                               "FROM Blocks WHERE DATE_FORMAT(FROM_UNIXTIME(BlockTime), '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
+        $avgBlockSizes = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        foreach ($avgBlockSizes as $size) {
+            if (!isset($resultSet[$size->TimePeriod])) {
+                $resultSet[$size->TimePeriod] = [];
+            }
+            $resultSet[$size->TimePeriod]['AvgBlockSize'] = (float) $size->AvgBlockSize;
+        }
+
+        // get avg prices
+        $stmt = $conn->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(Created, '$sqlDateFormat') AS TimePeriod " .
+                               "FROM PriceHistory WHERE DATE_FORMAT(Created, '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
+        $avgPrices = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        foreach ($avgPrices as $price) {
+            if (!isset($resultSet[$price->TimePeriod])) {
+                $resultSet[$price->TimePeriod] = [];
+            }
+            $resultSet[$price->TimePeriod]['AvgUSD'] = (float) $price->AvgUSD;
+        }
+
+        return $this->_jsonResponse(['success' => true, 'data' => $resultSet]);
+    }
+
     public function apirealtimeblocks() {
         // load 10 blocks
         $this->autoRender = false;
@@ -306,7 +354,30 @@ class MainController extends AppController {
 
         if ($height === null) {
             // paginate blocks
-            return $this->redirect('/');
+            $offset = 0;
+            $pageLimit = 50;
+            $page = intval($this->request->query('page'));
+
+            $conn = ConnectionManager::get('default');
+            $stmt = $conn->execute('SELECT COUNT(Id) AS Total FROM Blocks');
+            $count = $stmt->fetch(\PDO::FETCH_OBJ);
+            $numBlocks = $count->Total;
+
+            $numPages = ceil($numBlocks  / $pageLimit);
+            if ($page < 1) {
+                $page = 1;
+            }
+            if ($page > $numPages) {
+                $page = $numPages;
+            }
+
+            $offset = ($page - 1) * $pageLimit;
+            $blocks = $this->Blocks->find()->offset($offset)->limit($pageLimit)->order(['Height' => 'DESC'])->toArray();
+            $this->set('blocks', $blocks);
+            $this->set('pageLimit', $pageLimit);
+            $this->set('numPages', $numPages);
+            $this->set('numRecords', $numBlocks);
+            $this->set('currentPage', $page);
         } else {
             $this->loadModel('Transactions');
             $height = intval($height);
@@ -487,7 +558,7 @@ class MainController extends AppController {
         $this->set('totalSent', $totalSentAmount);
         $this->set('balanceAmount', $balanceAmount);
         $this->set('recentTxs', $recentTxs);
-        $this->set('numTransactions', $numTransactions);
+        $this->set('numRecords', $numTransactions);
         $this->set('numPages', $numPages);
         $this->set('currentPage', $page);
         $this->set('pageLimit', $pageLimit);
