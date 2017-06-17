@@ -156,7 +156,7 @@
                     axisColor: '#1e88e5',
                     axisThickness: 2,
                     labelFunction: function(value) {
-                        return (Math.round((value / 1000) * 100)/100) + ' KB';
+                        return (Math.round((value / 1000) * 100)/100).toFixed(2) + ' KB';
                     }
                 },
                 {
@@ -222,7 +222,7 @@
                     switchable: false,
                     balloonFunction: function(item, graph) {
                         var result = graph.balloonText;
-                        return result.replace('[[AvgBlockSize]]', Math.round((item.dataContext.AvgBlockSize / 1000) * 100)/100);
+                        return result.replace('[[AvgBlockSize]]', (Math.round((item.dataContext.AvgBlockSize / 1000) * 100)/100).toFixed(2));
                     }
                 },
                 {
@@ -274,7 +274,7 @@
                     if (item.dataContext) {
                         var g = item.graph;
                         if (g.id === 'g-block-size' && item.dataContext.AvgBlockSize > 0) {
-                            return g.balloonText.replace('[[AvgBlockSize]]', Math.round((item.dataContext.AvgBlockSize / 1000) * 100)/100);
+                            return g.balloonText.replace('[[AvgBlockSize]]', (Math.round((item.dataContext.AvgBlockSize / 1000) * 100)/100).toFixed(2) );
                         }
                         if (g.id === 'g-price' && item.dataContext.AvgUSD) {
                             return g.balloonText.replace('[[AvgUSD]]', item.dataContext.AvgUSD.toFixed(2));
