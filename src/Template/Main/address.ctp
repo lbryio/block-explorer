@@ -180,7 +180,7 @@
             <tr>
                 <td class="w125"><?php if ($tx->Height === null): ?><em>Unconfirmed</em><?php else: ?><a href="/blocks/<?php echo $tx->Height ?>"><?php echo $tx->Height ?></a><?php endif; ?></td>
                 <td class="w250"><div><a href="/tx/<?php echo $tx->Hash ?>?address=<?php echo $address->Address ?>#<?php echo $address->Address ?>"><?php echo $tx->Hash ?></a></div></td>
-                <td><?php echo \DateTime::createFromFormat('U', $tx->TxTime)->format('j M Y H:i:s') . ' UTC'; ?></td>
+                <td><?php echo \DateTime::createFromFormat('U', $tx->TxTime)->format('d M Y H:i:s') . ' UTC'; ?></td>
                 <td class="right"><?php echo number_format($tx->Confirmations, 0, '', ',') ?></td>
                 <td class="right"><?php echo $tx->InputCount ?></td>
                 <td class="right"><?php echo $tx->OutputCount ?></td>

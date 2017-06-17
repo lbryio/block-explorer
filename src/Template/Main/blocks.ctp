@@ -382,7 +382,7 @@
                 <td class="right"><?php echo count(json_decode($block->TransactionHashes)) ?></td>
                 <td class="right"><?php echo round($block->BlockSize / 1024, 2) . 'KB' ?></td>
                 <td class="right pad-left"><?php echo $block->Nonce ?></td>
-                <td class="pad-left"><?php echo \DateTime::createFromFormat('U', $block->BlockTime)->format('j M Y H:i:s') ?> UTC</td>
+                <td class="pad-left"><?php echo \DateTime::createFromFormat('U', $block->BlockTime)->format('d M Y H:i:s') ?> UTC</td>
             </tr>
             <?php endforeach; ?>
         </tbody>
