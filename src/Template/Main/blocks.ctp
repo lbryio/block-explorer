@@ -228,6 +228,13 @@
                     useLineColorForBulletBorder: true,
                     lineColor: '#00e676',
                     balloonText: '$[[AvgUSD]]',
+                    balloonFunction: function(item, graph) {
+                        var result = graph.balloonText;
+                        if (!item.dataContext.AvgUSD) {
+                            return '';
+                        }
+                        return result.replace('[[AvgUSD]]', item.dataContext.AvgUSD.toFixed(2));
+                    },
                     hideBulletsCount: 30,
                     labelFunction: function(value) {
                         return '$' + value;
@@ -256,7 +263,7 @@
                             return g.balloonText.replace('[[AvgBlockSize]]', Math.round((item.dataContext.AvgBlockSize / 1000) * 100)/100);
                         }
                         if (g.id === 'g-price' && item.dataContext.AvgUSD) {
-                            return g.balloonText.replace('[[AvgUSD]]', item.dataContext.AvgUSD);
+                            return g.balloonText.replace('[[AvgUSD]]', item.dataContext.AvgUSD.toFixed(2));
                         }
                     }
 
@@ -297,6 +304,7 @@
                         var isHourly = (dataPeriod.indexOf('h') > -1);
                         chart.categoryAxis.minPeriod = isHourly ? 'hh' : 'DD';
                         chart.categoryAxis.dateFormats[4].format = isHourly ? 'DD MMM' : 'DD';
+                        chart.chartCursor.categoryBalloonDateFormat = isHourly ? 'D MMM HH:NN ' : 'D MMM YYYY';
                         chart.dataProvider = chartData;
                         chart.validateNow();
                         chart.validateData();
