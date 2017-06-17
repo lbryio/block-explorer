@@ -132,6 +132,7 @@
 <script type="text/javascript">
     var chart;
     var chartData = [];
+    var chartLoadInProgress = false;
     var minPeriod = 'hh';
     var defaultPeriod = '24h';
     var periodGridCounts = {'24h': 24, '72h': 24, '168h': 14, '30d': 30, '90d': 45, '1y': 12 };
@@ -290,6 +291,7 @@
             type: 'get',
             dataType: 'json',
             beforeSend: function() {
+                chartLoadInProgress = true;
                 loadProgress.css({ display: 'block' });
             },
             success: function(response) {
@@ -322,6 +324,7 @@
                 }
             },
             complete: function() {
+                chartLoadInProgress = false;
                 loadProgress.css({ display: 'none' });
             }
         });
@@ -330,6 +333,10 @@
     $(document).ready(function() {
         $('.block-size-data-links a').on('click', function(evt) {
             evt.preventDefault();
+            if (chartLoadInProgress) {
+                return;
+            }
+
             var link = $(this);
             if (link.hasClass('active')) {
                 return;
