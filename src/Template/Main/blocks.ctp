@@ -134,6 +134,7 @@
     var chartData = [];
     var minPeriod = 'hh';
     var defaultPeriod = '24h';
+    var periodGridCounts = {'24h': 24, '72h': 24, '168h': 14, '30d': 30, '90d': 45, '1y': 12 };
     AmCharts.ready(function() {
         chart = AmCharts.makeChart('block-size-chart', {
             type: 'serial',
@@ -165,7 +166,9 @@
             categoryAxis: {
                 parseDates: true,
                 minPeriod: minPeriod, // DD for daily
+                autoGridCount: false,
                 minorGridEnabled: true,
+                minorGridAlpha: 0.04,
                 axisColor: '#dadada',
                 twoLineMode: true,
                 dateFormats: [{
@@ -250,7 +253,6 @@
                 categoryBalloonDateFormat: minPeriod === 'hh' ? 'D MMM HH:NN ' : 'D MMM'
             },
             chartScrollbar: {
-                autoGridCount: true,
                 scrollbarHeight: 36,
                 color: '#888888',
                 gridColor: '#bbbbbb'
@@ -307,9 +309,12 @@
                     //var dataSet = chart.mainDataSet;
                     if (chart) {
                         var isHourly = (dataPeriod.indexOf('h') > -1);
+                        var gridCount = periodGridCounts[dataPeriod];
                         chart.categoryAxis.minPeriod = isHourly ? 'hh' : 'DD';
                         chart.categoryAxis.dateFormats[4].format = isHourly ? 'DD MMM' : 'DD';
                         chart.chartCursor.categoryBalloonDateFormat = isHourly ? 'D MMM HH:NN ' : 'D MMM YYYY';
+                        chart.categoryAxis.gridCount = gridCount;
+                        chart.chartScrollbar.gridCount = periodGridCounts[dataPeriod];
                         chart.dataProvider = chartData;
                         chart.validateNow();
                         chart.validateData();
