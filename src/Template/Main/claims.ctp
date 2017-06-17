@@ -47,7 +47,7 @@ if (isset($claim->Publisher->Name)) {
 $link = 'lbry://' . $link;
 if ($claim->ClaimType == 1) { $autoThumbText = strtoupper(substr($claim->Name, 1, min( strlen($claim->Name), 10 ))); } else {
     $str = str_replace(' ', '', (strlen(trim($claim->Title)) > 0) ? $claim->Title : $claim->Name);
-    $autoThumbText = strtoupper(substr($str, 0, min( strlen($str), 10 )));
+    $autoThumbText = strtoupper(mb_substr($str, 0, min( strlen($str), 10 )));
 }
 
 $cost = 'Free';
@@ -190,7 +190,7 @@ if (strlen(trim($desc)) == 0) {
 
             if ($claim->ClaimType == 1) { $autoThumbText = strtoupper(substr($claim->Name, 1, min( strlen($claim->Name), 10 ))); } else {
                 $str = str_replace(' ', '', (strlen(trim($claim->Title)) > 0) ? $claim->Title : $claim->Name);
-                $autoThumbText = strtoupper(substr($str, 0, min( strlen($str), 10 )));
+                $autoThumbText = strtoupper(mb_substr($str, 0, min( strlen($str), 10 )));
             }
 
         ?>
@@ -314,7 +314,7 @@ if (strlen(trim($desc)) == 0) {
 
         if ($claim->ClaimType == 1) { $autoThumbText = strtoupper(substr($claim->Name, 1, min( strlen($claim->Name), 10 ))); } else {
             $str = str_replace(' ', '', (strlen(trim($claim->Title)) > 0) ? $claim->Title : $claim->Name);
-            $autoThumbText = strtoupper(substr($str, 0, min( strlen($str), 10 )));
+            $autoThumbText = strtoupper(mb_substr($str, 0, min( strlen($str), 10 )));
         }
 
     ?>
