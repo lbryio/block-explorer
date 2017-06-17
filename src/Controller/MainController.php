@@ -118,7 +118,26 @@ class MainController extends AppController {
         }
 
         if (!$id) {
-            $claims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->order(['Claims.Created' => 'DESC'])->limit(96)->toArray();
+            // paginate claims
+            $offset = 0;
+            $pageLimit = 96;
+            $page = intval($this->request->query('page'));
+
+            $conn = ConnectionManager::get('default');
+            $stmt = $conn->execute('SELECT COUNT(Id) AS Total FROM Claims');
+            $count = $stmt->fetch(\PDO::FETCH_OBJ);
+            $numClaims = $count->Total;
+
+            $numPages = ceil($numClaims  / $pageLimit);
+            if ($page < 1) {
+                $page = 1;
+            }
+            if ($page > $numPages) {
+                $page = $numPages;
+            }
+
+            $offset = ($page - 1) * $pageLimit;
+            $claims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->order(['Claims.Created' => 'DESC'])->offset($offset)->limit($pageLimit)->toArray();
             for ($i = 0; $i < count($claims); $i++) {
                 if ($canConvert && $claims[$i]->Fee > 0 && $claims[$i]->FeeCurrency == 'USD') {
                     $claims[$i]->Price = $claims[$i]->Fee / $priceInfo->price;
@@ -134,6 +153,11 @@ class MainController extends AppController {
                     }
                 }
             }
+
+            $this->set('pageLimit', $pageLimit);
+            $this->set('numPages', $numPages);
+            $this->set('numRecords', $numClaims);
+            $this->set('currentPage', $page);
             $this->set('claims', $claims);
         } else {
             $claim = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['ClaimId', 'Name']]])->where(['Claims.ClaimId' => $id])->first();

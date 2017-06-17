@@ -273,8 +273,17 @@ if (strlen(trim($desc)) == 0) {
 </div>
 
 <div class="claims-grid">
-    <?php $idx = 1; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow']; foreach ($claims as $claim):
-        $last_row = (count($claims) - $idx < 3);
+    <?php
+
+    $idx = 1;
+    $row = 1;
+    $rowCount = ceil(count($claims) / 3);
+    $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow'];
+    foreach ($claims as $claim):
+        $last_row = ($row == $rowCount);
+        if ($idx % 3 == 0) {
+            $row++;
+        }
         $autoThumbText = '';
         $link = $claim->Name;
         if (isset($claim->Publisher->Name)) {
@@ -372,5 +381,7 @@ if (strlen(trim($desc)) == 0) {
 
     <div class="clear"></div>
 </div>
+
+<?php echo $this->element('pagination') ?>
 
 <?php endif ?>
