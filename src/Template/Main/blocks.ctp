@@ -140,7 +140,7 @@
     var chartLoadInProgress = false;
     var minPeriod = 'hh';
     var validPeriods = ['24h', '72h', '168h', '30d', '90d', '1y'];
-    var defaultPeriod = validPeriods.indexOf(localStorage.getItem('chartPeriod') > -1) ? localStorage.getItem('chartPeriod') : '24h';
+    var defaultPeriod = (validPeriods.indexOf(localStorage.getItem('chartPeriod')) > -1) ? localStorage.getItem('chartPeriod') : '24h';
     var periodGridCounts = {'24h': 24, '72h': 24, '168h': 14, '30d': 30, '90d': 45, '1y': 12 };
     AmCharts.ready(function() {
         chart = AmCharts.makeChart('block-size-chart', {
