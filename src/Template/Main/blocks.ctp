@@ -126,9 +126,14 @@
 
         $this->assign('title', 'Blocks');
 
+        $this->start('css');
+        echo $this->Html->css('/amcharts/plugins/export/export.css');
+        $this->end();
+
         $this->start('script'); ?>
 <script type="text/javascript" src="/amcharts/amcharts.js"></script>
 <script type="text/javascript" src="/amcharts/serial.js"></script>
+<script type="text/javascript" src="/amcharts/plugins/export/export.min.js"></script>
 <script type="text/javascript">
     var chart;
     var chartData = [];
@@ -208,7 +213,7 @@
                     bulletBorderThickness: 1,
                     bulletBorderAlpha: 1,
                     bulletColor: '#ffffff',
-                    bulletSize: 6,
+                    bulletSize: 5,
                     useLineColorForBulletBorder: true,
                     lineColor: '#1e88e5',
                     hideBulletsCount: 101,
@@ -228,7 +233,7 @@
                     bulletBorderThickness: 1,
                     bulletBorderAlpha: 1,
                     bulletColor: '#ffffff',
-                    bulletSize: 6,
+                    bulletSize: 5,
                     useLineColorForBulletBorder: true,
                     lineColor: '#00e676',
                     balloonText: '$[[AvgUSD]]',
@@ -277,6 +282,12 @@
 
                     return formatted;
                 }
+            },
+            export: {
+                enabled: true,
+                fileName: 'lbry-block-size-chart',
+                position: 'bottom-right',
+                divId: 'chart-export'
             }
         });
 
@@ -316,7 +327,7 @@
                         chart.categoryAxis.dateFormats[4].format = isHourly ? 'DD MMM' : 'DD';
                         chart.chartCursor.categoryBalloonDateFormat = isHourly ? 'D MMM HH:NN ' : 'D MMM YYYY';
                         chart.categoryAxis.gridCount = gridCount;
-                        chart.chartScrollbar.gridCount = periodGridCounts[dataPeriod];
+                        chart.chartScrollbar.gridCount = gridCount;
                         chart.dataProvider = chartData;
                         chart.validateNow();
                         chart.validateData();
@@ -366,6 +377,7 @@
         <a href="#" title="1 year" data-period="1y">1y</a>
     </div>
     <div id="block-size-chart" class="chart"></div>
+    <div id="chart-export" class="btn-chart-export"></div>
 </div>
 
 <div class="all-blocks">
