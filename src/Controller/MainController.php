@@ -160,7 +160,7 @@ class MainController extends AppController {
             $this->set('currentPage', $page);
             $this->set('claims', $claims);
         } else {
-            $claim = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['ClaimId', 'Name']]])->where(['Claims.ClaimId' => $id])->first();
+            $claim = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['ClaimId', 'Name']]])->where(['Claims.ClaimId' => $id])->order(['Claims.Created' => 'DESC'])->first();
             if (!$claim) {
                 return $this->redirect('/');
             }
