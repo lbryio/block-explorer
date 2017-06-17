@@ -172,7 +172,7 @@
 
         <div class="recent-claims">
             <h3>Recent Claims</h3>
-            <a class="claim-explorer-link" href="/claims">Claim Explorer</a>
+            <a class="claim-explorer-link" href="/claims">Claims Explorer</a>
             <?php $idx = 0; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow']; foreach ($recentClaims as $claim):
                 $idx++;
                 $autoThumbText = '';
