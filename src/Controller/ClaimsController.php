@@ -48,7 +48,7 @@ class ClaimsController extends AppController {
         }
 
         if ($nsfw !== 'true') {
-            $conditions['IsNSFW <>'] = 1;
+            $conditions['Claims.IsNSFW <>'] = 1;
         }
 
         $claims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->distinct(['Claims.ClaimId'])->where($conditions)->
