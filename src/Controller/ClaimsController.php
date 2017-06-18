@@ -11,7 +11,7 @@ class ClaimsController extends AppController {
         $this->loadModel('Claims');
 
         $offset = 0;
-        $pageLimit = 24;
+        $pageLimit = 48;
         $page = intval($this->request->query('page'));
 
         $conn = ConnectionManager::get('default');
