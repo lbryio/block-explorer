@@ -14,6 +14,7 @@ class ClaimsController extends AppController {
         $beforeId = intval($this->request->query('before'));
         $afterId = intval($this->request->query('after'));
         $sort = trim($this->request->query('sort'));
+        $nsfw = trim($this->request->query('nsfw'));
         switch ($sort) {
             case 'popular':
                 // TODO: sort by upvote/downvote score
@@ -44,6 +45,10 @@ class ClaimsController extends AppController {
             $conditions['Claims.Id >'] = $afterId;
         } else if ($beforeId) {
             $conditions['Claims.Id <'] = $beforeId;
+        }
+
+        if ($nsfw !== 'true') {
+            $conditions['IsNSFW <>'] = 1;
         }
 
         $claims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->distinct(['Claims.ClaimId'])->where($conditions)->
