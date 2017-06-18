@@ -46,7 +46,7 @@ class ClaimsController extends AppController {
             $conditions['Claims.Id <'] = $beforeId;
         }
 
-        $claims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->where($conditions)->
+        $claims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->distinct(['Claims.ClaimId'])->where($conditions)->
             limit($pageLimit)->order($order)->toArray();
 
         return $this->_jsonResponse(['success' => true, 'claims' => $claims, 'total' => (int) $numClaims]);
