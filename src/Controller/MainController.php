@@ -799,17 +799,6 @@ class MainController extends AppController {
         return $this->_jsonResponse(['success' => true, 'utxo' => $utxo]);
     }
 
-    protected function _jsonResponse($object = [], $statusCode = null)
-    {
-        $this->response->statusCode($statusCode);
-        $this->response->type('json');
-        $this->response->body(json_encode($object));
-    }
-
-    protected function _jsonError($message, $statusCode = null) {
-        return $this->_jsonResponse(['error' => true, 'message' => $message], $statusCode);
-    }
-
     private static function curl_json_post($url, $data, $headers = []) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);

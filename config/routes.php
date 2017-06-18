@@ -64,6 +64,8 @@ Router::scope('/', function (RouteBuilder $routes) {
     $routes->connect('/api/v1/status', ['controller' => 'Main', 'action' => 'apistatus']);
     //$routes->connect('/api/v1/recenttxs', ['controller' => 'Main', 'action' => 'apirecenttxs']);
 
+    $routes->connect('/api/v1/claims/recent', ['controller' => 'Claims', 'action' => 'apirecent']);
+
     //$routes->fallbacks(DashedRoute::class);
 });
 
