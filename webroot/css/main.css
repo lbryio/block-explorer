@@ -108,7 +108,7 @@ border-radius: 0 6px 8px 0 }
 
 .claims-body .claim-metadata { width: 750px; margin-left: 50px; float: left; box-shadow: 0 2px 4px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px 36px 88px 36px; cursor: default; position: relative }
 .claims-body .claim-metadata .title { font-weight: 300; font-size: 170%; margin-bottom: 16px; color: #1e88e5; padding: 0 8px }
-.claims-body .claim-metadata .desc { font-weight: 300; font-size: 130%; line-height: 36px; padding: 0 12px }
+.claims-body .claim-metadata .desc { font-weight: 300; font-size: 130%; line-height: 36px; padding: 0 12px; word-break: break-word; word-wrap: break-word }
 .claims-body .claim-metadata .details { margin-top: 36px; border-top: 1px solid #ddd; padding: 36px 16px 0 16px }
 .claims-body .claim-metadata .details .label { font-size: 90%; color: #1e88e5 }
 .claims-body .claim-metadata .details .value { font-size: 110%; font-weight: 300; margin-bottom: 24px }
