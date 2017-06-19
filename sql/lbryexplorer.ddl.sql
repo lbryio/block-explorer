@@ -194,6 +194,7 @@ CREATE TABLE `Claims`
     `Title` TEXT,
     `Fee` DECIMAL(18,8) DEFAULT 0 NOT NULL,
     `FeeCurrency` CHAR(3),
+    `IsFiltered` TINYINT(1) DEFAULT 0 NOT NULL,
 
     `Created` DATETIME NOT NULL,
     `Modified` DATETIME NOT NULL,

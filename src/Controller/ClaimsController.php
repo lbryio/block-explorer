@@ -40,7 +40,7 @@ class ClaimsController extends AppController {
             $beforeId = 0;
         }
 
-        $conditions = ['Claims.ThumbnailUrl IS NOT' => null, 'LENGTH(TRIM(Claims.ThumbnailUrl)) >' => 0];
+        $conditions = ['Claims.ThumbnailUrl IS NOT' => null, 'LENGTH(TRIM(Claims.ThumbnailUrl)) >' => 0, 'IsFiltered <>' => 1];
         if ($afterId > 0) {
             $conditions['Claims.Id >'] = $afterId;
         } else if ($beforeId) {
