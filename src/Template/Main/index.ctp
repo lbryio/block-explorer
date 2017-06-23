@@ -77,6 +77,10 @@
         setInterval(updateStatus, updateInterval);
         setInterval(updateRecentBlocks, updateInterval);
 
+        $(document).on('click', '.recent-claims .claim-box .tx-link', function(evt) {
+            evt.stopImmediatePropagation();
+        });
+
         $(document).on('click', '.recent-claims .claim-box', function() {
             var id = $(this).attr('data-id');
             window.location.href = '/claims/' + id;
