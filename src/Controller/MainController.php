@@ -100,7 +100,9 @@ class MainController extends AppController {
 
         // recent claims
         $claims = $this->Claims->find()->select(['TransactionHash', 'Name', 'Vout', 'ClaimId', 'ClaimType', 'Author', 'Title', 'Description', 'ContentType',
-                                                 'IsNSFW', 'Language', 'ThumbnailUrl', 'Created'])->contain(['Publisher' => ['fields' => ['Name']]])->order(['Claims.Created' => 'DESC'])->limit(5)->toArray();
+                                                 'IsNSFW', 'Language', 'ThumbnailUrl', 'Created'])->
+            distinct(['Claims.ClaimId'])->
+            contain(['Publisher' => ['fields' => ['Name']]])->order(['Claims.Created' => 'DESC'])->limit(5)->toArray();
 
         $this->set('recentBlocks', $blocks);
         $this->set('recentClaims', $claims);
@@ -137,7 +139,7 @@ class MainController extends AppController {
             }
 
             $offset = ($page - 1) * $pageLimit;
-            $claims = $this->Claims->find()->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->order(['Claims.Created' => 'DESC'])->offset($offset)->limit($pageLimit)->toArray();
+            $claims = $this->Claims->find()->distinct(['Claims.ClaimId'])->contain(['Stream', 'Publisher' => ['fields' => ['Name']]])->order(['Claims.Created' => 'DESC'])->offset($offset)->limit($pageLimit)->toArray();
             for ($i = 0; $i < count($claims); $i++) {
                 if ($canConvert && $claims[$i]->Fee > 0 && $claims[$i]->FeeCurrency == 'USD') {
                     $claims[$i]->Price = $claims[$i]->Fee / $priceInfo->price;

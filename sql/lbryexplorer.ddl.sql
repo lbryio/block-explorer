@@ -201,6 +201,7 @@ CREATE TABLE `Claims`
     PRIMARY KEY `PK_Claim` (`Id`),
     FOREIGN KEY `FK_ClaimTransaction` (`TransactionHash`) REFERENCES `Transactions` (`Hash`),
     FOREIGN KEY `FK_ClaimPublisher` (`PublisherId`) REFERENCES `Claims` (`ClaimId`),
+    UNIQUE KEY `Idx_ClaimUnique` (`TransactionHash`, `Vout`, `ClaimId`),
     CONSTRAINT `Cnt_ClaimCertificate` CHECK(`Certificate` IS NULL OR JSON_VALID(`Certificate`)), -- certificate type
     INDEX `Idx_Claim` (`ClaimId`),
     INDEX `Idx_ClaimTransactionTime` (`TransactionTime`),
@@ -230,3 +231,5 @@ CREATE TABLE `PriceHistory`
     PRIMARY KEY `PK_PriceHistory` (`Id`),
     UNIQUE KEY `Idx_PriceHistoryCreated` (`Created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
+
+ALTER TABLE Claims ADD UNIQUE KEY `Idx_ClaimUnique` (`TransactionHash`, `Vout`, `ClaimId`);
