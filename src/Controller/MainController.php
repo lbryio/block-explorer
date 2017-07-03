@@ -491,6 +491,37 @@ class MainController extends AppController {
         $this->set('sourceAddress', $sourceAddress);
     }
 
+    public function stats() {
+        $this->loadModel('Addresses');
+
+        $richList = $this->Addresses->find()->order(['Balance' => 'DESC'])->limit(500)->toArray();
+
+        $priceRate = 0;
+        $priceInfo = json_decode($this->redis->get(self::lbcPriceKey));
+        if (isset($priceInfo->price)) {
+            $priceRate = $priceInfo->price;
+        }
+
+        // calculate percentages
+        $totalBalance = 0;
+        $maxBalance = 0;
+        $minBalance = 0;
+        foreach ($richList as $item) {
+            $totalBalance = bcadd($totalBalance, $item->Balance, 8);
+            $minBalance = $minBalance == 0 ? $item->Balance : min($minBalance, $item->Balance);
+            $maxBalance = max($maxBalance, $item->Balance);
+        }
+        for ($i = 0; $i < count($richList); $i++) {
+            $item = $richList[$i];
+            $percentage = bcdiv($item->Balance, $totalBalance, 8) * 100;
+            $richList[$i]->Top500Percent = $percentage;
+            $richList[$i]->MinMaxPercent = bcdiv($item->Balance, $maxBalance, 8) * 100;
+        }
+
+        $this->set('richList', $richList);
+        $this->set('rate', $priceRate);
+    }
+
     public function address($addr = null) {
         set_time_limit(0);
 
@@ -558,7 +589,7 @@ class MainController extends AppController {
                 $offset = ($page - 1) * $pageLimit;
             }
 
-            $stmt = $conn->execute('SELECT A.TotalReceived, A.TotalSent FROM Addresses A WHERE A.Id = ?', [$address->Id]);
+            $stmt = $conn->execute('SELECT A.TotalReceived, A.TotalSent, A.Balance FROM Addresses A WHERE A.Id = ?', [$address->Id]);
             $totals = $stmt->fetch(\PDO::FETCH_OBJ);
 
             $stmt = $conn->execute(sprintf('SELECT T.Id, T.Hash, T.InputCount, T.OutputCount, T.Value, ' .
@@ -572,7 +603,7 @@ class MainController extends AppController {
 
             $totalRecvAmount = $totals->TotalReceived == 0 ? '0' : $totals->TotalReceived + 0;
             $totalSentAmount = $totals->TotalSent == 0 ? '0' : $totals->TotalSent + 0;
-            $balanceAmount = bcsub($totalRecvAmount, $totalSentAmount, 8) + 0;
+            $balanceAmount = $totals->Balance == 0 ? '0' : $totals->Balance + 0;
         }
 
         $this->set('offset', $offset);

@@ -116,7 +116,7 @@
             <div class="title">LBRY Block Explorer</div>
             <form method="get" action="/find">
                 <input class="search-input" name="q" type="text" placeholder="Enter a block height or hash, claim id or name, transaction hash or address" />
-                <div class="ctls"><button class="btn btn-search">Search</button> <a href="/realtime">Realtime</a></div>
+                <div class="ctls"><button class="btn btn-search">Search</button> <div class="links"><a href="/realtime">Realtime</a> &bull; <a href="/stats" class="last">Stats</a></div></div>
             </form>
         </div>
 

@@ -50,6 +50,7 @@ Router::scope('/', function (RouteBuilder $routes) {
     $routes->connect('/claims/*', ['controller' => 'Main', 'action' => 'claims']);
     $routes->connect('/find', ['controller' => 'Main', 'action' => 'find']);
     $routes->connect('/realtime', ['controller' => 'Main', 'action' => 'realtime']);
+    $routes->connect('/stats', ['controller' => 'Main', 'action' => 'stats']);
     $routes->connect('/tx/*', ['controller' => 'Main', 'action' => 'tx']);
     $routes->connect('/qr/*', ['controller' => 'Main', 'action' => 'qr']);
 

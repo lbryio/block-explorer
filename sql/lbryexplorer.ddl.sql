@@ -73,6 +73,7 @@ CREATE TABLE `Addresses`
     `FirstSeen` DATETIME,
     `TotalReceived` DECIMAL(18,8) DEFAULT 0 NOT NULL,
     `TotalSent` DECIMAL(18,8) DEFAULT 0 NOT NULL,
+    `Balance` DECIMAL(18,8) AS (`TotalReceived` - `TotalSent`) PERSISTENT,
     `Tag` VARCHAR(30) NOT NULL,
     `TagUrl` VARCHAR(200),
     `Created` DATETIME NOT NULL,
@@ -82,6 +83,7 @@ CREATE TABLE `Addresses`
     UNIQUE KEY `Idx_AddressTag` (`Tag`),
     INDEX `Idx_AddressTotalReceived` (`TotalReceived`),
     INDEX `Idx_AddressTotalSent` (`TotalSent`),
+    INDEX `Idx_AddressBalance` (`Balance`),
     INDEX `Idx_AddressCreated` (`Created`),
     INDEX `Idx_AddressModified` (`Modified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
@@ -233,3 +235,5 @@ CREATE TABLE `PriceHistory`
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
 
 ALTER TABLE Claims ADD UNIQUE KEY `Idx_ClaimUnique` (`TransactionHash`, `Vout`, `ClaimId`);
+ALTER TABLE Addresses ADD COLUMN `Balance` DECIMAL(18,8) AS (`TotalReceived` - `TotalSent`) PERSISTENT AFTER `TotalSent`;
+ALTER TABLE Addresses ADD INDEX `Idx_AddressBalance` (`Balance`);

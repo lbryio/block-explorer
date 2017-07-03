@@ -21,7 +21,9 @@ border-radius: 0 6px 8px 0 }
 .home-container-cell .ctls { width: 720px; text-align: center; margin: 24px auto; position: relative }
 .home-container-cell .ctls .btn-search { font-size: 115%; display: inline-block; padding: 12px 48px; background: #1e88e5; color: #fff; border-radius: 8px; border: none; font-weight: 300; cursor: pointer }
 .home-container-cell .ctls .btn-search:hover { background: #1976d2 }
-.home-container-cell .ctls a { font-size: 115%; display: inline-block; font-weight: 300; position: absolute; right: 0; padding-top: 12px }
+.home-container-cell .ctls .links { display: inline-block; font-weight: 300; position: absolute; right: 0; padding-top: 12px; }
+.home-container-cell .ctls a { font-size: 115%; display: inline-block; margin-right: 12px }
+.home-container-cell .ctls a.last { margin-left: 12px; margin-right: 0 }
 .home-container-cell .ctls a:hover { text-decoration: none; color: #1976d2 }
 
 .home-container-cell .recent-blocks { width: 1000px; margin: 48px auto 0 auto; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px 24px 36px 24px; cursor: default; position: relative }
@@ -122,14 +124,17 @@ border-radius: 0 6px 8px 0 }
 .table thead tr th { border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 12px 4px }
 .table tbody tr td { padding: 8px; border-bottom: 1px solid #eee; font-weight: 300; white-space: nowrap }
 .table tbody tr td.nodata { text-align: center; font-style: italic; font-weight: 300 }
+.table .topvalign { vertical-align: top }
 .table .last-cell { padding-left: 48px }
 .table .pad-right { padding-right: 12px }
 .table .pad-left { padding-left: 48px }
+.table .med-pad-left { padding-left: 24px }
 
 .left { text-align: left }
 .center { text-align: center }
 .right { text-align: right }
 
+.w50 { width: 50px }
 .w80 { width: 80px }
 .w100 { width: 100px }
 .w125 { width: 125px }
@@ -139,6 +144,7 @@ border-radius: 0 6px 8px 0 }
 .w250, .w250 > div { width: 250px }
 .w275, .w275 > div { width: 275px }
 .w300, .w300 > div { width: 300px }
+.w350 { width: 350px }
 .w200 > div, .w250 > div, .w275 > div, .w300 > div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 
 footer { padding-top: 64px; font-size: 80%; cursor: default }
@@ -195,6 +201,17 @@ footer .content .page-time { position: absolute; right: 12px; bottom: 0px; paddi
 .realtime-main h3 { font-weight: 300; margin: 0 0 12px 0 }
 .realtime-main .realtime-blocks { width: 350px; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px; cursor: default; float: left }
 .realtime-main .realtime-tx { width: 800px; margin-left: 50px; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px; cursor: default; float: left }
+
+.stats-head { width: 1200px; margin: 0 auto 36px auto; cursor: default }
+.stats-head h3 { font-weight: 300; margin: 0; font-size: 200% }
+.stats-main .richlist { width: 1200px; margin: 0 auto; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px; cursor: default }
+.stats-main .richlist .tag { font-weight: normal; margin-top: 1px; font-size: 80%; color: #333 }
+.stats-main .richlist .tag a:link, .tx-details-layout .tag a:visited { color: #333 }
+.stats-main .richlist .tag a:hover { text-decoration: none }
+.stats-main .richlist .top500-percent-cell { padding: 0; position: relative }
+.stats-main .richlist .top500-percent { background: #e3f2fd; height: 100%; position: absolute; top: 0 }
+.stats-main .richlist .top500-percent-cell .text { z-index: 100; position: relative }
+.stats-main h3 { font-weight: 300; margin: 0 0 12px 0 }
 
 .stats { width: 1000px; margin: 0 auto 48px auto; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px; cursor: default }
 .stats .box { padding: 24px 0; border-right: 1px solid #ccc; float: left; text-align: center; width: 25% }
