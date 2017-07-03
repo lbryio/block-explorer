@@ -41,7 +41,7 @@
                     <td class="right topvalign"><?php echo number_format($item->Balance, 8, '.', ',') ?></td>
                     <td class="right topvalign">$<?php echo number_format(bcmul($item->Balance, $rate, 8), 2, '.', ',') ?></td>
                     <td class="med-pad-left topvalign"><?php echo $item->FirstSeen->format('d M Y H:i:s') . ' UTC'; ?></td>
-                    <td class="w150 center top500-percent-cell"><div class="top500-percent" style="width: <?php echo $item->MinMaxPercent ?>%"></div><div class="text"><?php echo number_format($item->Top500Percent, 2, '.', '') ?>%</div></td>
+                    <td class="w150 center top500-percent-cell"><div class="top500-percent" style="width: <?php echo $item->MinMaxPercent ?>%"></div><div class="text"><?php echo number_format($item->Top500Percent, 5, '.', '') ?>%</div></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
