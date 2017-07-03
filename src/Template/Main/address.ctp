@@ -186,8 +186,8 @@
                 <td class="right"><?php echo $tx->OutputCount ?></td>
                 <td class="right<?php echo ' ' . (($tx->DebitAmount > 0 && $tx->CreditAmount > 0) ? '' : (($tx->DebitAmount > 0) ? 'debit' : 'credit')) ?>">
                     <?php if ($tx->DebitAmount > 0 && $tx->CreditAmount > 0): ?>
-                        <div class="credit">+<?php echo number_format($tx->CreditAmount, 8, '.', '') ?> LBC</div>
-                        <div class="debit">-<?php echo number_format($tx->DebitAmount, 8, '.', '') ?> LBC</div>
+                        <div class="credit">+<?php echo number_format($tx->CreditAmount, 8, '.', ',') ?> LBC</div>
+                        <div class="debit">-<?php echo number_format($tx->DebitAmount, 8, '.', ',') ?> LBC</div>
                     <?php else: ?>
                         <?php echo (($tx->DebitAmount > 0) ? '-' : '+'); ?><?php echo number_format((($tx->DebitAmount > 0) ? $tx->DebitAmount : $tx->CreditAmount), 8, '.', ',') ?> LBC
                     <?php endif; ?>
