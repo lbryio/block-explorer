@@ -40,6 +40,47 @@ class BlockShell extends Shell {
         $decoded = self::decode_tx($raw);
     }
 
+    public function fixscripthashtx() {
+        $conn = ConnectionManager::get('default');
+        $otxs = $this->Outputs->find()->select(['TransactionId'])->distinct(['TransactionId'])->where(['Type' => 'scripthash'])->toArray();
+        foreach ($otxs as $otx) {
+            $txid = $otx->TransactionId;
+            $tx = $this->Transactions->find()->select(['Hash'])->where(['Id' => $txid])->first();
+            $req = ['method' => 'getrawtransaction', 'params' => [$tx->Hash]];
+            $response = self::curl_json_post(self::rpcurl, json_encode($req));
+            $json = json_decode($response);
+            $tx_result = $json->result;
+            $raw_tx = $tx_result;
+            $tx_data = self::decode_tx($raw_tx);
+            $all_tx_data = $this->txdb_data_from_decoded($tx_data);
+
+            foreach ($all_tx_data['outputs'] as $out) {
+                if ($out['Type'] != 'scripthash') {
+                    continue;
+                }
+
+                // get the old address
+                $old_output = $this->Outputs->find()->select(['Id', 'Addresses'])->where(['TransactionId' => $txid, 'Vout' => $out['Vout']])->first();
+                if ($old_output) {
+                    $old_addresses = json_decode($old_output->Addresses);
+                    $old_address = $old_addresses[0];
+                    $new_addresses = json_decode($out['Addresses']);
+                    $new_address = $new_addresses[0];
+
+                    // update the output with new addresses array
+                    $conn->begin();
+                    $conn->execute('UPDATE Outputs SET Addresses = ? WHERE Id = ?', [$out['Addresses'], $old_output->Id]);
+
+                    // update the old address with the new one
+                    $conn->execute('UPDATE Addresses SET Address = ? WHERE Address = ?', [$new_address, $old_address]);
+                    $conn->commit();
+
+                    echo "$old_address => $new_address\n";
+                }
+            }
+        }
+    }
+
     public static function hex2str($hex){
         $string = '';
         for ($i = 0; $i < strlen($hex)-1; $i+=2){
@@ -1937,7 +1978,7 @@ class BlockShell extends Shell {
                     $return['addresses'][0] = self::hash160_to_address($return['hash160'], self::pubKeyAddress[0]);
                 } else {
                     $return['hash160'] = $data[$define[$tx_type]['data_index_for_hash']];
-                    $return['addresses'][0] = self::hash160_to_address($return['hash160'], self::pubKeyAddress[0]); // TODO: Pay to claim transaction?
+                    $return['addresses'][0] = self::hash160_to_address($return['hash160'], ($tx_type === 'p2sh') ? self::scriptAddress[0] : self::pubKeyAddress[0]); // TODO: Pay to claim transaction?
                 }
                 unset($return['data_index_for_hash']);
             }
