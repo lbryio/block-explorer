@@ -494,7 +494,8 @@ class MainController extends AppController {
     public function stats() {
         $this->loadModel('Addresses');
 
-        $richList = $this->Addresses->find()->order(['Balance' => 'DESC'])->limit(500)->toArray();
+        // exclude bHW58d37s1hBjj3wPBkn5zpCX3F8ZW3uWf (genesis block)
+        $richList = $this->Addresses->find()->where(['Address <>' => 'bHW58d37s1hBjj3wPBkn5zpCX3F8ZW3uWf'])->order(['Balance' => 'DESC'])->limit(500)->toArray();
 
         $priceRate = 0;
         $priceInfo = json_decode($this->redis->get(self::lbcPriceKey));
