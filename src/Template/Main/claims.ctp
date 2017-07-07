@@ -42,7 +42,7 @@ $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow'];
 $autoThumbText = '';
 $link = $claim->Name;
 if (isset($claim->Publisher->Name)) {
-    $link = $claim->Publisher->Name . '/' . $link;
+    $link = urlencode($claim->Publisher->Name) . '/' . $link;
 }
 $link = 'lbry://' . $link;
 if ($claim->ClaimType == 1) { $autoThumbText = strtoupper(substr($claim->Name, 1, min( strlen($claim->Name), 10 ))); } else {
@@ -164,7 +164,7 @@ if (strlen(trim($desc)) == 0) {
             $autoThumbText = '';
             $link = $claim->Name;
             if (isset($claim->Publisher->Name)) {
-                $link = $claim->Publisher->Name . '/' . $link;
+                $link = urlencode($claim->Publisher->Name) . '/' . $link;
             }
             $link = 'lbry://' . $link;
             $cost = '';
@@ -287,7 +287,7 @@ if (strlen(trim($desc)) == 0) {
         $autoThumbText = '';
         $link = $claim->Name;
         if (isset($claim->Publisher->Name)) {
-            $link = $claim->Publisher->Name . '/' . $link;
+            $link = urlencode($claim->Publisher->Name) . '/' . $link;
         }
         $link = 'lbry://' . $link;
 
