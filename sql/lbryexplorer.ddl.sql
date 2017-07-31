@@ -163,7 +163,7 @@ CREATE TABLE `TransactionsAddresses`
     `AddressId` BIGINT UNSIGNED NOT NULL,
     `DebitAmount` DECIMAL(18,8) DEFAULT 0 NOT NULL COMMENT 'Sum of the inputs to this address for the tx',
     `CreditAmount` DECIMAL(18,8) DEFAULT 0 NOT NULL COMMENT 'Sum of the outputs to this address for the tx',
-    `TransactionTime` DATETIME DEFAULT UTC_TIMESTAMP() NOT NULL,
+    `LatestTransactionTime` DATETIME DEFAULT UTC_TIMESTAMP() NOT NULL,
     PRIMARY KEY `PK_TransactionAddress` (`TransactionId`, `AddressId`),
     FOREIGN KEY `Idx_TransactionsAddressesTransaction` (`TransactionId`) REFERENCES `Transactions` (`Id`),
     FOREIGN KEY `Idx_TransactionsAddressesAddress` (`AddressId`) REFERENCES `Addresses` (`Id`),

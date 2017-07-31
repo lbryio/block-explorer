@@ -181,10 +181,13 @@
                 $idx++;
                 $autoThumbText = '';
                 $link = $claim->Name;
+                $rawLink = $claim->Name;
                 if (isset($claim->Publisher->Name)) {
-                    $link = $claim->Publisher->Name . '/' . $link;
+                    $link = urlencode($claim->Publisher->Name) . '/' . $link;
+                    $rawLink = $claim->Publisher->Name . '/' . $link;
                 }
                 $link = 'lbry://' . $link;
+                $rawLink = 'lbry://' . $rawLink;
 
                 // content type
                 $ctTag = null;
@@ -225,7 +228,7 @@
 
                 <div class="metadata">
                     <div class="title" title="<?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : ''); ?>"><?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '<em>No Title</em>') ?></div>
-                    <div class="link"><a href="<?php echo $link ?>"><?php echo $link ?></a></div>
+                    <div class="link" title="<?php echo $rawLink ?>"><a href="<?php echo $link ?>"><?php echo $rawLink ?></a></div>
 
                     <div class="clear"></div>
                     <?php if ($claim->ClaimType == 2 && strlen(trim($claim->Description)) > 0): ?>
