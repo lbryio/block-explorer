@@ -723,7 +723,7 @@ class MainController extends AppController {
     public function apiaddrtag($base58address = null) {
         $this->autoRender = false;
         if (!isset($base58address) || strlen(trim($base58address)) !== 34) {
-            return $this->_jsonError('Invalid base58 address not specified.', 400);
+            return $this->_jsonError('Invalid base58 address specified.', 400);
         }
         if (!$this->request->is('post')) {
             return $this->_jsonError('Invalid HTTP request method.', 400);
@@ -781,6 +781,25 @@ class MainController extends AppController {
         }
 
         return $this->_jsonResponse(['success' => true, 'tag' => $entity->Tag]);
+    }
+
+    public function apiaddrbalance($base58address = null) {
+        $this->autoRender = false;
+        $this->loadModel('Addresses');
+
+        if (!isset($base58address)) {
+            return $this->_jsonError('Base58 address not specified.', 400);
+        }
+
+        // TODO: Add unconfirmed_balance to response
+        $result = $this->Addresses->find()->select(['Balance'])->where(['Address' => $base58address])->first();
+        if (!$result) {
+            // Return 0 for address that does not exist?
+            $result = new \stdClass();
+            $result->Balance = 0;
+        }
+
+        return $this->_jsonResponse(['success' => true, ['balance' => ['confirmed' => $result->Balance, 'unconfirmed' => 0]]]);
     }
 
     public function apiaddrutxo($base58address = null) {
