@@ -16,7 +16,7 @@
     <script src="https://use.typekit.net/yst3vhs.js"></script>
     <script>try{Typekit.load({ async: true });}catch(e){}</script>
 
-    <?php if ($_SERVER['HTTP_HOST'] !== 'local.lbry.block.ng'): ?>
+    <?php if ($_SERVER['HTTP_HOST'] !== 'local.lbry.block.ng' && $_SERVER['HTTP_HOST'] !== 'explorer.lbry.io'): ?>
     <!-- Analytics -->
     <script type="text/javascript">
         var _paq = _paq || [];
@@ -42,9 +42,7 @@
     <?php echo $this->fetch('content') ?>
     <footer>
         <div class="content">
-            <a href="/">LBRY Block Explorer</a> is an alternative blockchain explorer for the <a href="https://lbry.io/get?r=RzJNi">LBRY</a> blockchain. Please report issues or send feedback to <a href="mailto:hello@aureolin.co?Subject=LBRY%20Block%20Explorer">hello@aureolin.co</a>.<br />
-            If you like this explorer, LBC donations to <a href="/address/bacon25yAnhH2YZxKDt4G7DcygXD8xpM1a">bacon25yAnhH2YZxKDt4G7DcygXD8xpM1a</a> are appreciated.<br />
-            &copy; 2017 <a href="https://www.aureolin.co">Aureolin</a>.
+            <a href="https://lbry.io">LBRY</a>
 
             <div class="page-time">Page took <?php echo round((microtime(true) - TIME_START) * 1000, 0) ?>ms</div>
         </div>
