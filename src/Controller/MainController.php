@@ -53,7 +53,7 @@ class MainController extends AppController {
                 $lastPriceDt = new \DateTime($priceInfo->time);
                 $diff = $now->diff($lastPriceDt);
                 $diffMinutes = $diff->i;
-                if ($diffMinutes >= 15) { // 15 minutes
+                if ($diffMinutes >= 15 || $priceInfo->price == 0) { // 15 minutes (or if the price is 0)
                     $shouldRefreshPrice = true;
                 }
             }
@@ -68,10 +68,12 @@ class MainController extends AppController {
                 $lbcPrice = 0;
                 if (isset($blckjson->USD)) {
                     $lbcPrice = $onelbc * $blckjson->USD->buy;
-                    $priceInfo->price = number_format($lbcPrice, 2, '.', '');
-                    $priceInfo->time = $now->format('c');
-                    if ($this->redis) {
-                        $this->redis->set(self::lbcPriceKey, json_encode($priceInfo));
+                    if ($lbcPrice > 0) {
+                        $priceInfo->price = number_format($lbcPrice, 2, '.', '');
+                        $priceInfo->time = $now->format('c');
+                        if ($this->redis) {
+                            $this->redis->set(self::lbcPriceKey, json_encode($priceInfo));
+                        }
                     }
                 }
             }
