@@ -77,7 +77,7 @@ class MainController extends AppController {
             }
         }
 
-        $lbcUsdPrice = isset($priceInfo->price) ? '$' . $priceInfo->price : 'N/A';
+        $lbcUsdPrice = (isset($priceInfo->price) && ($priceInfo->price > 0)) ? '$' . $priceInfo->price : 'N/A';
         return $lbcUsdPrice;
     }
 
