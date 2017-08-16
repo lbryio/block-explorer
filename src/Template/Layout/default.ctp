@@ -42,7 +42,6 @@
             var txhash = null;
             if (hashpart.indexOf('?id=') > -1) {
                 txhash = hashpart.substring(hashpart.indexOf('?id=') + 4);
-                alert(txhash);
             } else {
                 var parts = hashpart.split('/');
                 if (parts.length > 1) {
