@@ -53,6 +53,7 @@ Router::scope('/', function (RouteBuilder $routes) {
     $routes->connect('/stats', ['controller' => 'Main', 'action' => 'stats']);
     $routes->connect('/tx/*', ['controller' => 'Main', 'action' => 'tx']);
     $routes->connect('/qr/*', ['controller' => 'Main', 'action' => 'qr']);
+    $routes->connect('/*', ['controller' => 'Main', 'action' => 'index']);
 
     $routes->connect('/api/v1/address/:addr/tag', ['controller' => 'Main', 'action' => 'apiaddrtag'], ['addr' => '[A-Za-z0-9,]+', 'pass' => ['addr']]);
     $routes->connect('/api/v1/address/:addr/utxo', ['controller' => 'Main', 'action' => 'apiaddrutxo'], ['addr' => '[A-Za-z0-9,]+', 'pass' => ['addr']]);

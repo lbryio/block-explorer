@@ -448,10 +448,6 @@ class MainController extends AppController {
         $this->loadModel('Outputs');
         $sourceAddress = $this->request->query('address');
 
-        if (!$hash) {
-            return $this->redirect('/');
-        }
-
         $tx = $this->Transactions->find()->select(
             ['Id', 'BlockHash', 'InputCount', 'OutputCount', 'Hash', 'Value', 'TransactionTime', 'TransactionSize', 'Created', 'Version', 'LockTime', 'Raw'])->where(['Hash' => $hash])->first();
         if (!$tx) {
