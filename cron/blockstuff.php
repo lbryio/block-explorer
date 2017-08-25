@@ -19,6 +19,9 @@ class BlockSyncThread extends \Thread {
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $data_error = false;
         $conn->beginTransaction();
+
+        // TODO: Batch block synchronisation from memory to DB
+
         for ($curr_height = $this->_startHeight; $curr_height <= $this->_endHeight; $curr_height++) {
             $idx_str = str_pad($curr_height, strlen($this->_maxHeight), '0', STR_PAD_LEFT);
 
@@ -64,7 +67,7 @@ class BlockStuff {
         $stmt->execute([]);
         $max_block = $stmt->fetch(PDO::FETCH_OBJ);
         if ($max_block) {
-            $chunk_limit = 10;
+            $chunk_limit = 2;
             $curr_height = 0;
             $chunks = floor($max_block->Height / $chunk_limit);
             $threads = [];
