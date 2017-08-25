@@ -64,7 +64,7 @@ class BlockStuff {
         $stmt->execute([]);
         $max_block = $stmt->fetch(PDO::FETCH_OBJ);
         if ($max_block) {
-            $chunk_limit = 10;
+            $chunk_limit = 2;
             $curr_height = 0;
             $chunks = floor($max_block->Height / $chunk_limit);
             $threads = [];
