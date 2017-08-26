@@ -29,7 +29,7 @@
             \DateTime::createFromFormat('U', $tx->TransactionTime)->format('j M Y H:i:s') . ' UTC' ?>
 
             <?php if ($tx->TransactionTime > $tx->Created->getTimestamp()):
-                $diffSeconds = $tx->TransactionTime - $tx->Created->Timestamp();
+                $diffSeconds = $tx->TransactionTime - $tx->Created->getTimestamp();
                 if ($diffSeconds <= 60) {
                     echo sprintf(' (+%s second%s)', $diffSeconds, $diffSeconds == 1 ? '' : 's');
                 } else {
