@@ -195,6 +195,10 @@ footer .content .page-time { position: absolute; right: 12px; bottom: 0px; paddi
 .tx-head h3 { font-size: 200%; margin-bottom: 3px }
 .tx-head h4 { font-size: 125% }
 
+.tx-time { width: 1200px; margin: 0 auto 32px auto; font-weight: 300 }
+.tx-time h3 { font-size: 105%; margin: 0; margin-bottom: 4px; font-weight: normal; cursor: help; border-bottom: 1px dotted #999; display: inline-block }
+.tx-time .created-time, .tx-time .conf-time { float: left; width: 25% }
+
 .realtime-head { width: 1200px; margin: 0 auto 36px auto; cursor: default }
 .realtime-head h3 { font-weight: 300; margin: 0; font-size: 200% }
 .realtime-main { width: 1200px; margin: 0 auto 0 auto }

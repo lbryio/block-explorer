@@ -17,6 +17,33 @@
     <h4><?php echo $tx->Hash ?></h4>
 </div>
 
+<div class="tx-time">
+    <div class="created-time">
+        <h3 title="Represents the time this transaction was created on the explorer">Time Created</h3>
+        <div><?php echo $tx->Created->format('j M Y H:i:s') . ' UTC '; ?></div>
+    </div>
+
+    <div class="conf-time">
+        <h3 title="The time the first confirmation of this transaction happened on the blockchain">Block Time</h3>
+        <div><?php echo ($tx->TransactionTime == null || strlen(trim($tx->TransactionTime)) == 0) ? '<em>Not yet confirmed</em>' :
+            \DateTime::createFromFormat('U', $tx->TransactionTime)->format('j M Y H:i:s') . ' UTC' ?>
+
+            <?php if ($tx->TransactionTime > $tx->Created->getTimestamp()):
+                $diffSeconds = $tx->TransactionTime - $tx->Created->Timestamp();
+                if ($diffSeconds <= 60) {
+                    echo sprintf(' (+%s second%s)', $diffSeconds, $diffSeconds == 1 ? '' : 's');
+                } else {
+                    $diffMinutes = ceil($diffSeconds / 60);
+                    echo sprintf(' (+%s minute%s)', $diffMinutes, $diffMinutes == 1 ? '' : 's');
+                }
+            ?>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+</div>
+
 <div class="tx-summary">
     <div class="box p25">
         <div class="title">Amount (LBC)</div>
