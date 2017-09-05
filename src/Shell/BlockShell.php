@@ -1298,7 +1298,11 @@ class BlockShell extends Shell {
                     }
                 }
             } catch (\Exception $e) {
-                echo "Error occurred processing mempool: " . $e->getMessage() . "\n";
+                echo "Mempool database error. Attempting to reconnect.\n";
+
+                // Final fix for MySQL server has gone away (hopefully)
+                $conn->disconnect();
+                $conn->connect();
             }
 
             echo "*******************\n";
