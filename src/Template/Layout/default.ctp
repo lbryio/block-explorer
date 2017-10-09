@@ -34,30 +34,6 @@
     <!-- End Analytics Code -->
     <?php endif; ?>
 
-<<<<<<< HEAD
-=======
-    <script type="text/javascript">
-        // handle coinomi and lbry app urls
-        var hashpart = window.location.hash;
-        if (hashpart.length > 3) {
-            hashpart = hashpart.substring(3);
-            var txhash = null;
-            if (hashpart.indexOf('?id=') > -1) {
-                txhash = hashpart.substring(hashpart.indexOf('?id=') + 4);
-            } else {
-                var parts = hashpart.split('/');
-                if (parts.length > 1) {
-                    txhash = parts[1];
-                }
-            }
-
-            if (txhash && $.trim(txhash.trim).length > 0) {
-                window.location.href = '/tx/' + txhash;
-            }
-        }
-    </script>
-
->>>>>>> 04802c3... removed unnecessary alert
     <?php echo $this->fetch('meta') ?>
     <?php echo $this->fetch('css') ?>
     <?php echo $this->fetch('script') ?>
