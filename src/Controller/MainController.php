@@ -883,8 +883,7 @@ class MainController extends AppController {
           
          $circulating = $txoutsetinfo->total_amount - $reservedtotal;
    
-        return $this->_jsonResponse(['success' => true, ['utxosupply' => ['total' => $txoutsetinfo->total_amount, 'circulating' => $circulating]]]);
-
+        return $this->_jsonResponse(['success' => true, 'utxosupply' => ['total' => $txoutsetinfo->total_amount, 'circulating' => $circulating]]);
     }
     
     private static function curl_json_post($url, $data, $headers = []) {
