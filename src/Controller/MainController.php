@@ -863,7 +863,7 @@ class MainController extends AppController {
 
       public function apiutxosupply() {
         $this->autoRender = false;
-        $this->loadModel('Addresses')
+        $this->loadModel('Addresses');
               
         $circulating = 0;
         $reservedcommunity = 0;
