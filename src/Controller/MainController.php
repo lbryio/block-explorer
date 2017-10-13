@@ -863,6 +863,8 @@ class MainController extends AppController {
 
       public function apiutxosupply() {
         $this->autoRender = false;
+        $this->loadModel('Addresses')
+              
         $circulating = 0;
         $reservedcommunity = 0;
         $reservedoperational = 0;
@@ -874,8 +876,12 @@ class MainController extends AppController {
         $reservedcommunity = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd'])->first();
         $reservedoperational = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL'])->first();
         $reservedinstitutional = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi'])->first();
-        $reservedtotal = $reservedcommunity->Balance + $reservedoperational->Balance + $reservedinstitutional->Balance;
-        $circulating = $txoutsetinfo->total_amount - $reservedtotal;
+        //aux is the address where some of the LBRY operational fund are, but not sold on market.
+        $reservedaux = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt'])->first();
+        $reservedtotal = $reservedcommunity->Balance + $reservedoperational->Balance + $reservedinstitutional->Balance + $reservedaux->Balance;
+        
+          
+         $circulating = $txoutsetinfo->total_amount - $reservedtotal;
    
         return $this->_jsonResponse(['success' => true, ['utxosupply' => ['total' => $txoutsetinfo->total_amount, 'circulating' => $circulating]]]);
 
