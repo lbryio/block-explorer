@@ -680,7 +680,18 @@ class MainController extends AppController {
             return 'N/A';
         }
     }
-
+    private function _gettxoutsetinfo() {
+        $req = ['method' => 'gettxoutsetinfo', 'params' => []];
+        try {
+            $res = json_decode(self::curl_json_post(self::rpcurl, json_encode($req)));
+            if (!isset($res->result)) {
+                return 0;
+            }
+            return $res->result;
+        } catch (\Exception $e) {
+            return 'N/A';
+        }
+    }
     public function apistatus() {
         $this->autoRender = false;
         $this->loadModel('Blocks');
@@ -850,6 +861,32 @@ class MainController extends AppController {
         return $this->_jsonResponse(['success' => true, 'utxo' => $utxo]);
     }
 
+      public function apiutxosupply() {
+        $this->autoRender = false;
+        $this->loadModel('Addresses');
+              
+        $circulating = 0;
+        $reservedcommunity = 0;
+        $reservedoperational = 0;
+        $reservedinstitutional = 0;
+        $reservedtotal = 0;
+        $circulating = 0;
+          
+        $txoutsetinfo = $this->_gettxoutsetinfo();
+        $reservedcommunity = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd'])->first();
+        $reservedoperational = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL'])->first();
+        $reservedinstitutional = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi'])->first();
+        //aux is the address where some of the LBRY operational fund are, but not sold on market.
+        $reservedaux = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt'])->first();
+        $reservedtotal = $reservedcommunity->Balance + $reservedoperational->Balance + $reservedinstitutional->Balance + $reservedaux->Balance;
+        
+          
+         $circulating = $txoutsetinfo->total_amount - $reservedtotal;
+   
+        return $this->_jsonResponse(['success' => true, ['utxosupply' => ['total' => $txoutsetinfo->total_amount, 'circulating' => $circulating]]]);
+
+    }
+    
     private static function curl_json_post($url, $data, $headers = []) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
