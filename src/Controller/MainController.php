@@ -876,8 +876,13 @@ class MainController extends AppController {
         $reservedcommunity = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd'])->first();
         $reservedoperational = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL'])->first();
         $reservedinstitutional = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi'])->first();
-        //aux is the address where some of the LBRY operational fund are, but not sold on market.
-        $reservedaux = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt'])->first();
+        //aux is the address of hot wallets and where some of the LBRY operational fund are, but not sold on market.
+        $reservedaux = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt'])->first() +
+                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2'])->first() +
+                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD'])->first() +
+                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz'])->first() +
+                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc'])->first() +
+                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi'])->first();
         $reservedtotal = $reservedcommunity->Balance + $reservedoperational->Balance + $reservedinstitutional->Balance + $reservedaux->Balance;
         
           
