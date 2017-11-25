@@ -113,7 +113,8 @@
 <div class="home-container">
     <div class="home-container-cell">
         <div class="main">
-            <div class="title">LBRY Block Explorer</div>
+            <div class="title">LBRY Block Explorer</div><br>
+            <div class="links"><a href="https://lbry.io/get">Download the LBRY App</a></div>
             <form method="get" action="/find">
                 <input class="search-input" name="q" type="text" placeholder="Enter a block height or hash, claim id or name, transaction hash or address" />
                 <div class="ctls"><button class="btn btn-search">Search</button> <div class="links"><a href="/realtime">Realtime</a> &bull; <a href="/stats" class="last">Stats</a></div></div>
