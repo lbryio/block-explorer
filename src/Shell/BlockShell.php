@@ -35,11 +35,6 @@ class BlockShell extends Shell {
         $this->out('No arguments specified');
     }
 
-    public function testtx() {
-        $raw = '0100000001e4801fa8c9621753410e6c576c73168cc551624e08e4cc56e9a9189e8ebabcc3010000006b483045022100dcc5ae5564353e05cd8415936cdb534a26049a80a9866dbcab5dbb6ab16abbc702203af681fb5fbba5c78af887778aa32f27bc653312322b44c2a78e883e322921790121031c38def6b103b58481818d7d8aba39f9f51798f686ec3332bac23726a23366adffffffff0200e1f50500000000fd3a01b512626c6f636b6578706c6f7265722d686f6d654d0801080110011aa3010801125c080410011a1c4c42525920426c6f636b204578706c6f72657220486f6d6570616765222c574950204c42525920426c6f636b204578706c6f72657220686f6d6520706167652073637265656e73686f742a00320038004a0052005a001a41080110011a3038c6bf4a310d5b172aaae03cffb93e5a27c47f3946f58af0a4b9f99d7be42998f7dcec9b0fb0c124a6477bdb4c5311db2209696d6167652f706e672a5c080110031a401eb69f65768ba2cc347067dfb1317131137f7d685a5e804a4aeedd2385332c70f3ec7632fcebfbc073e37a58dbfbf4e6641853bbfc188b0d8bf27435b540801d22146b2a1d378efcdb7db7a03baa7dfedb86b976bc4a6d7576a914b7182b0f7c896ab240d233f81cb891e3f25e739988ac8085e811000000001976a9146fde27b4dac0b79a9ea06756562a52b019da7a8e88ac00000000';
-        $decoded = self::decode_tx($raw);
-    }
-
     public function fixscripthashtx() {
         $conn = ConnectionManager::get('default');
         $otxs = $this->Outputs->find()->select(['TransactionId'])->distinct(['TransactionId'])->where(['Type' => 'scripthash'])->toArray();
@@ -1298,7 +1293,11 @@ class BlockShell extends Shell {
                     }
                 }
             } catch (\Exception $e) {
-                echo "Error occurred processing mempool: " . $e->getMessage() . "\n";
+                echo "Mempool database error. Attempting to reconnect.\n";
+
+                // Final fix for MySQL server has gone away (hopefully)
+                $conn->disconnect();
+                $conn->connect();
             }
 
             echo "*******************\n";
