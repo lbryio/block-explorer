@@ -233,7 +233,3 @@ CREATE TABLE `PriceHistory`
     PRIMARY KEY `PK_PriceHistory` (`Id`),
     UNIQUE KEY `Idx_PriceHistoryCreated` (`Created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
-
-ALTER TABLE Claims ADD UNIQUE KEY `Idx_ClaimUnique` (`TransactionHash`, `Vout`, `ClaimId`);
-ALTER TABLE Addresses ADD COLUMN `Balance` DECIMAL(18,8) AS (`TotalReceived` - `TotalSent`) PERSISTENT AFTER `TotalSent`;
-ALTER TABLE Addresses ADD INDEX `Idx_AddressBalance` (`Balance`);
