@@ -16,22 +16,16 @@
     <script src="https://use.typekit.net/yst3vhs.js"></script>
     <script>try{Typekit.load({ async: true });}catch(e){}</script>
 
-    <?php if ($_SERVER['HTTP_HOST'] !== 'local.lbry.block.ng' && $_SERVER['HTTP_HOST'] !== 'explorer.lbry.io'): ?>
     <!-- Analytics -->
-    <script type="text/javascript">
-        var _paq = _paq || [];
-        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
-        (function() {
-            var u="//analytics.aureolin.co/";
-            _paq.push(['setTrackerUrl', u+'piwik.php']);
-            _paq.push(['setSiteId', '1']);
-            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-        })();
+    <?php if ($_SERVER['HTTP_HOST'] === 'explorer.lbry.io'): ?>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="//www.googletagmanager.com/gtag/js?id=UA-60403362-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-60403362-1');
     </script>
-    <!-- End Analytics Code -->
     <?php endif; ?>
 
     <script type="text/javascript">
