@@ -9,6 +9,6 @@
                 <button class="btn btn-inline-search">Search</button>
             </div>
         </form>
-    </div
+    </div>
     <div class="clear"></div>
 </div>
