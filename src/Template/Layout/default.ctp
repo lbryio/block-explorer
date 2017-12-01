@@ -24,7 +24,7 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'UA-60403362-1');
+      gtag('config', 'UA-60403362-4');
     </script>
     <?php endif; ?>
 
