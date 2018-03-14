@@ -1296,7 +1296,12 @@ class BlockShell extends Shell {
                 echo "Mempool database error. Attempting to reconnect.\n";
 
                 // Final fix for MySQL server has gone away (hopefully)
-                $conn->disconnect();
+                try {
+                    $conn->disconnect();
+                } catch (\Exception $e) {
+                    // ignore possible disconnect errors
+                }
+                
                 $conn->connect();
             }
 
