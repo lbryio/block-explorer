@@ -89,7 +89,7 @@ if (strlen(trim($desc)) == 0) {
 
         <div class="content">
             <?php if ($claim->ClaimType == 2): ?>
-            <div class="label">Published by</div>
+            <div class="label">Published By</div>
             <div class="value">
                 <?php if (isset($claim->Publisher)): ?>
                     <a href="lbry://<?php echo $claim->Publisher->Name ?>"><?php echo $claim->Publisher->Name ?></a>
@@ -99,15 +99,15 @@ if (strlen(trim($desc)) == 0) {
             </div>
             <?php endif; ?>
 
-            <div class="label">Created</div>
+            <div class="label">Created On</div>
             <div class="value"><?php echo \DateTime::createFromFormat('U', $claim->TransactionTime > 0 ? $claim->TransactionTime : $claim->Created->format('U'))->format('j M Y H:i:s') ?> UTC</div>
 
-            <div class="label">Transaction</div>
+            <div class="label">Transaction ID</div>
             <div class="value"><a href="/tx/<?php echo $claim->TransactionHash ?>#output-<?php echo $claim->Vout ?>"><?php echo $claim->TransactionHash ?></a></div>
 
             <?php if ($claim->ClaimType == 2): ?>
             <div class="label half-width">Cost</div>
-            <div class="label half-width">Safe for work</div>
+            <div class="label half-width">Safe for Work</div>
 
             <div class="value half-width"><?php echo $cost ?></div>
             <div class="value half-width"><?php echo $claim->IsNSFW ? 'No' : 'Yes' ?></div>

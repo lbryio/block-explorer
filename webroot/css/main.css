@@ -6,14 +6,14 @@
 a:link, a:visited { color: #1e88e5; text-decoration: none }
 a:hover { text-decoration: underline; color: #1976d2 }
 
-.header { width: 1200px; margin: 0 auto 24px auto; padding: 12px 0 64px 0; border-bottom: 1px solid #ddd }
+.header { width: 1200px; margin: 0 auto 24px auto; padding: 12px 0 50px 0; border-bottom: 1px solid #ddd }
 .header a:link, .header a:visited { color: #333; text-decoration: none }
 .header .title { font-family: 'adelle-sans', sans-serif; font-weight: bold; font-size: 140%; float: left; position: relative; top: 4px }
 .header .search { float: right }
 .header .search .input-group { border: 2px solid #1e88e5; position: relative; width: 525px; height: 36px; border-radius: 8px }
 .header .search .input-group input { border: none; border-radius: 8px; padding: 8px 133px 8px 8px; width: 100%; height: 32px; width: 521px }
 .header .search .input-group .btn-inline-search { border: none; cursor: pointer; position: absolute; right: -4px; top: 0; height: 100%; background: #1e88e5; color: #fff; width: 125px;
-border-radius: 0 6px 8px 0 }
+border-radius: 0 8px 8px 0 }
 .header .search .input-group .btn-inline-search:hover { background: #1976d2 }
 
 .home-container-cell > .main > .title { font-family: 'adelle-sans', sans-serif; font-weight: bold; font-size: 280%; margin: 24px auto 24px auto; width: 600px; text-align: center; color: #333; cursor: default }
@@ -60,7 +60,7 @@ border-radius: 0 6px 8px 0 }
 .claims-head h2 { font-weight: 300; margin-bottom: 0; font-size: 220% }
 .claims-head { width: 1200px; margin: 0 auto 24px auto; cursor: default }
 .claims-head h3, h4 { font-weight: 300; margin: 0 }
-.claims-head h3 { font-size: 200%; margin-bottom: 3px }
+.claims-head h3 { font-size: 170%; margin-bottom: 3px }
 .claims-head h4 { font-size: 125% }
 
 .claims-grid { width: 1200px; margin: 0 auto 0 auto; cursor: default  }
@@ -93,11 +93,11 @@ border-radius: 0 6px 8px 0 }
 .claims-grid .claim-grid-item .spacer { height: 16px }
 
 .claims-body { width: 1200px; margin: 0 auto 0 auto; cursor: default }
-.claims-body .claim-info { width: 400px; float: left; box-shadow: 0 2px 4px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); cursor: default }
+.claims-body .claim-info { width: 400px; float: left; /*box-shadow: 0 2px 4px rgba(0,0,0,.175);*/ border: 1px solid rgba(0,0,0,.15); cursor: default }
 .claims-body .claim-info .thumbnail { width: 100%; height: 220px; background: #f0f0f0; display: block; position: relative; overflow: hidden }
 .claims-body .claim-info .thumbnail img { width: 100% }
 .claims-body .claim-info .content { padding: 24px }
-.claims-body .claim-info .content .label { font-size: 90%; color: #1e88e5 }
+.claims-body .claim-info .content .label { font-size: inherit; text-decoration: underline; color: #666666 }
 .claims-body .claim-info .content .value { font-weight: 300; margin-bottom: 24px; word-break: break-word; word-wrap: break-word }
 .claims-body .claim-info .content .value:last-child { margin-bottom: 0 }
 .claims-body .claim-info .content .half-width { width: 50%; float: left }
@@ -109,12 +109,12 @@ border-radius: 0 6px 8px 0 }
 .claims-body .claim-info .thumbnail.yellow { background: #fdd835 }
 .claims-body .claim-info .thumbnail .autothumb { display: block; margin: 93px auto 0 auto; text-align: center; font-size: 240%; color: #fff; line-height: 54px }
 
-.claims-body .claim-metadata { width: 750px; margin-left: 50px; float: left; box-shadow: 0 2px 4px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px 36px 88px 36px; cursor: default; position: relative }
-.claims-body .claim-metadata .title { font-weight: 300; font-size: 170%; margin-bottom: 16px; color: #1e88e5; padding: 0 8px }
-.claims-body .claim-metadata .desc { font-weight: 300; font-size: 130%; line-height: 36px; padding: 0 12px; word-break: break-word; word-wrap: break-word }
+.claims-body .claim-metadata { width: 770px; margin-left: 30px; float: left; /*box-shadow: 0 2px 4px rgba(0,0,0,.175);*/ border: 1px solid rgba(0,0,0,.15); padding: 24px 36px 88px 36px; cursor: default; position: relative }
+.claims-body .claim-metadata .title { font-weight: bold; font-size: 120%; margin-bottom: 16px; color: #666666; padding: 0 8px }
+.claims-body .claim-metadata .desc { font-weight: 300; font-size: inherit; line-height: 1.8em; padding: 0 12px; word-break: break-word; word-wrap: break-word }
 .claims-body .claim-metadata .details { margin-top: 36px; border-top: 1px solid #ddd; padding: 36px 16px 0 16px }
-.claims-body .claim-metadata .details .label { font-size: 90%; color: #1e88e5 }
-.claims-body .claim-metadata .details .value { font-size: 110%; font-weight: 300; margin-bottom: 24px }
+.claims-body .claim-metadata .details .label { font-size: inherit; color: #666666; text-decoration: underline }
+.claims-body .claim-metadata .details .value { font-size: inherit; font-weight: 300; margin-bottom: 24px }
 .claims-body .claim-metadata .details .half-width { width: 50%; padding-right: 36px; float: left; height: 25px; line-height: 25px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis }
 .claims-body .claim-metadata .open-lbry-link { position: absolute; right: 36px; bottom: 36px; padding: 10px 24px; color: #fff; font-weight: 300; font-size: 90%; background: #1e88e5 }
 .claims-body .claim-metadata .open-lbry-link:hover { text-decoration: none; background: #1976d2 }
