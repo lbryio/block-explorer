@@ -226,7 +226,7 @@
 
                 <div data-autothumb="<?php echo $autoThumbText ?>" class="thumbnail <?php echo $a[mt_rand(0, count($a) - 1)] ?>">
                     <?php if (!$claim->IsNSFW && strlen(trim($claim->ThumbnailUrl)) > 0): ?>
-                        <img src="<?php echo $claim->ThumbnailUrl ?>" alt="" />
+                        <img src="<?php echo strip_tags($claim->ThumbnailUrl) ?>" alt="" />
                     <?php else: ?>
                         <div class="autothumb"><?php echo $autoThumbText ?></div>
                     <?php endif; ?>
