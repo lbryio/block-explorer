@@ -87,36 +87,7 @@
 
 <div class="address-head">
     <h3>LBRY Address</h3>
-    <h4><?php echo $address->Address ?></h4> <div class="tag">
-    <?php if (isset($address->Tag) && strlen(trim($address->Tag)) > 0): ?>
-        <?php if (strlen(trim($address->TagUrl)) > 0): ?><a href="<?php echo $address->TagUrl ?>" target="_blank" rel="nofollow"><?php echo $address->Tag ?></a><?php else: echo $address->Tag; endif; ?>
-    <?php else: ?><a href="#" class="tag-link">Tag this address</a><?php endif; ?></div>
-
-    <div class="tag-address-container">
-        <h4>Tag adddress</h4>
-        <?php if ($pending): ?>
-            <div class="desc">This address has a pending tag request. If you made this request, please send exactly <strong><?php echo $pending->VerificationAmount ?> LBC</strong> from <strong><?php echo $address->Address ?></strong> to <strong><a href="/address/bLockNgmfvnnnZw7bM6SPz6hk5BVzhevEp" target="_blank">bLockNgmfvnnnZw7bM6SPz6hk5BVzhevEp</a></strong>. Incomplete requests will be automatically deleted 7 days from the request creation date.</div>
-        <?php else: ?>
-            <div class="desc">Label your public LBRY address with a name and an optional link. In order to tag this address, please send exactly <strong><?php echo $tagRequestAmount ?> LBC</strong>
-            from <strong><?php echo $address->Address ?></strong> to <strong><a href="/address/bLockNgmfvnnnZw7bM6SPz6hk5BVzhevEp" target="_blank">bLockNgmfvnnnZw7bM6SPz6hk5BVzhevEp</a></strong>
-            and then specify the desired tag (maximum 30 characters) and link in the fields below. The transaction will be verified after at least 1 confirmation. The <strong><?php echo $tagRequestAmount ?> LBC</strong> fee is a measure to prevent spam and low-effort submissions. Verification is an automatic process, but any tags or URLs that may be considered illegal when brought to attention will be removed.</div>
-            <div class="form-group">
-                <input type="hidden" name="tag_verify_amount" value="<?php echo $tagRequestAmount ?>" />
-                <div class="error-message"></div>
-                <div class="col">
-                    <input name="tag_value" maxlength="30" placeholder="Tag (max. 30 characters)" />
-                </div>
-                <div class="col">
-                    <input name="tag_url" maxlength="200" placeholder="Link (max. 200 characters)" />
-                </div>
-                <div class="col buttons">
-                    <button class="btn btn-tag">Tag address</button>
-                    <button class="btn btn-close">Close</button>
-                </div>
-                <div class="clear"></div>
-            </div>
-        <?php endif; ?>
-    </div>
+    <h4><?php echo $address->Address ?></h4>
 </div>
 
 <div class="address-subhead">
