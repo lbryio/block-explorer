@@ -88,6 +88,9 @@
 <div class="address-head">
     <h3>LBRY Address</h3>
     <h4><?php echo $address->Address ?></h4>
+    <?php if (isset($address->Tag) && strlen(trim($address->Tag)) > 0): ?>
+        <?php if (strlen(trim($address->TagUrl)) > 0): ?><a href="<?php echo $address->TagUrl ?>" target="_blank" rel="nofollow"><?php echo $address->Tag ?></a><?php else: echo $address->Tag; endif; ?>
+    <?php endif; ?>
 </div>
 
 <div class="address-subhead">
