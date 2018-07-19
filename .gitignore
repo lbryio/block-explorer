@@ -1,6 +1,5 @@
 /vendor/*
 /config/app.php
-/tmp/*
 /logs/*
 lbryexplorer.zip
 lbryexplorer.komodoproject

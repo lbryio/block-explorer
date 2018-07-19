@@ -1,4 +1,4 @@
 #!/bin/sh
-cd /var/www/lbry.block.ng
+cd /home/lbry/explorer.lbry.io
 bin/cake block forevermempool &
 

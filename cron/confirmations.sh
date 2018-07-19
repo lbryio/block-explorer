@@ -1,3 +1,3 @@
 #!/bin/sh
-cd /var/www/lbry.block.ng/cron
+cd /home/lbry/explorer.lbry.io/cron
 php -d extension=pthreads.so blockstuff.php
