@@ -295,6 +295,7 @@ footer .content .page-time { position: absolute; right: 12px; bottom: 0px; paddi
 .tx-table td { vertical-align: top; line-height: 24px }
 .tx-table td.credit, .tx-table td div.credit { color: #00e676 }
 .tx-table td.debit, .tx-table td div.debit { color: #ff0000 }
+.tx-table td.diff, .tx-table td div.diff{ color: #337ab7 }
 .tx-table td div.debit { padding-top: 8px }
 
 .pagination { width: 1200px; margin: 36px auto 0 auto; cursor: default }
