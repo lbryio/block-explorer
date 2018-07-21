@@ -4,11 +4,14 @@ namespace App\Shell;
 
 use Cake\Console\ConsoleOutput;
 use Cake\Console\Shell;
+use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 use Mdanter\Ecc\EccFactory;
 
 class BlockShell extends Shell {
+
+    public static $rpcurl;
 
     const mempooltxkey = 'lbc.mempooltx';
 
@@ -16,12 +19,11 @@ class BlockShell extends Shell {
 
     const scriptAddress = [5, 122];
 
-    const rpcurl = 'http://lrpc:lrpc@127.0.0.1:9245';
-
     const redisurl = 'tcp://127.0.0.1:6379';
 
     public function initialize() {
         parent::initialize();
+        self::$rpcurl = Configure::read('Lbry.RpcUrl');
         $this->loadModel('Blocks');
         $this->loadModel('Addresses');
         $this->loadModel('Claims');
@@ -42,7 +44,7 @@ class BlockShell extends Shell {
             $txid = $otx->TransactionId;
             $tx = $this->Transactions->find()->select(['Hash'])->where(['Id' => $txid])->first();
             $req = ['method' => 'getrawtransaction', 'params' => [$tx->Hash]];
-            $response = self::curl_json_post(self::rpcurl, json_encode($req));
+            $response = self::curl_json_post(self::$rpcurl, json_encode($req));
             $json = json_decode($response);
             $tx_result = $json->result;
             $raw_tx = $tx_result;
@@ -160,7 +162,7 @@ class BlockShell extends Shell {
                         $req = ['method' => 'getvalueforname', 'params' => [$claim_name]];
                         $json = null;
                         try {
-                            $json = json_decode(self::curl_json_post(self::rpcurl, json_encode($req)));
+                            $json = json_decode(self::curl_json_post(self::$rpcurl, json_encode($req)));
                             if (!$json) {
                                 echo "[$idx_str/$count] getvalueforname failed for [$out->Hash:$vout]. Skipping.\n";
                                 continue;
@@ -295,7 +297,7 @@ class BlockShell extends Shell {
                 $req = ['method' => 'getvalueforname', 'params' => [$claim_name]];
                 $json = null;
                 try {
-                    $json = json_decode(self::curl_json_post(self::rpcurl, json_encode($req)));
+                    $json = json_decode(self::curl_json_post(self::$rpcurl, json_encode($req)));
                     if ($json) {
                         $claim_data = [];
                         $claim_id = $json->result->claimId;
@@ -391,7 +393,7 @@ class BlockShell extends Shell {
                 // getraw
                 $req = ['method' => 'getrawtransaction', 'params' => [$tx->Hash]];
                 $start_ms = round(microtime(true) * 1000);
-                $response = self::curl_json_post(self::rpcurl, json_encode($req));
+                $response = self::curl_json_post(self::$rpcurl, json_encode($req));
                 $diff_ms = (round(microtime(true) * 1000)) - $start_ms;
                 $total_diff += $diff_ms;
                 echo "getrawtx took {$diff_ms}ms. ";
@@ -673,7 +675,7 @@ class BlockShell extends Shell {
     private function processtx($tx_hash, $block_ts, $block_data, &$data_error) {
         // Get the raw transaction (Use getrawtx daemon instead (for speed!!!)
         $req = ['method' => 'getrawtransaction', 'params' => [$tx_hash]];
-        $response = self::curl_json_post(self::rpcurl, json_encode($req));
+        $response = self::curl_json_post(self::$rpcurl, json_encode($req));
         $json = json_decode($response);
         $tx_result = $json->result;
         $raw_tx = $tx_result;
@@ -1075,12 +1077,13 @@ class BlockShell extends Shell {
         try {
             // Get the best block hash
             $req = ['method' => 'getbestblockhash', 'params' => []];
-            $response = self::curl_json_post(self::rpcurl, json_encode($req));
+            $response = self::curl_json_post(self::$rpcurl, json_encode($req));
             $json = json_decode($response);
+print_r($response); print_r($json);
             $best_hash = $json->result;
 
             $req = ['method' => 'getblock', 'params' => [$best_hash]];
-            $response = self::curl_json_post(self::rpcurl, json_encode($req));
+            $response = self::curl_json_post(self::$rpcurl, json_encode($req));
             $json = json_decode($response);
             $best_block = $json->result;
 
@@ -1103,20 +1106,20 @@ class BlockShell extends Shell {
             for ($curr_height = $min_height; $curr_height <= $max_height; $curr_height++) {
                 // get the block hash
                 $req = ['method' => 'getblockhash', 'params' => [$curr_height]];
-                $response = self::curl_json_post(self::rpcurl, json_encode($req));
+                $response = self::curl_json_post(self::$rpcurl, json_encode($req));
                 $json = json_decode($response);
                 $curr_block_hash = $json->result;
 
                 $next_block_hash = null;
                 if ($curr_height < $max_height) {
                     $req = ['method' => 'getblockhash', 'params' => [$curr_height + 1]];
-                    $response = self::curl_json_post(self::rpcurl, json_encode($req));
+                    $response = self::curl_json_post(self::$rpcurl, json_encode($req));
                     $json = json_decode($response);
                     $next_block_hash = $json->result;
                 }
 
                 $req = ['method' => 'getblock', 'params' => [$curr_block_hash]];
-                $response = self::curl_json_post(self::rpcurl, json_encode($req));
+                $response = self::curl_json_post(self::$rpcurl, json_encode($req));
                 $json = json_decode($response);
                 $curr_block = $json->result;
 
@@ -1127,7 +1130,7 @@ class BlockShell extends Shell {
                 $next_block = null;
                 if ($next_block_hash != null) {
                     $req = ['method' => 'getblock', 'params' => [$next_block_hash]];
-                    $response = self::curl_json_post(self::rpcurl, json_encode($req));
+                    $response = self::curl_json_post(self::$rpcurl, json_encode($req));
                     $json = json_decode($response);
                     $next_block = $json->result;
                 }
@@ -1243,7 +1246,7 @@ class BlockShell extends Shell {
         while (true) {
             try {
                 $data = ['method' => 'getrawmempool', 'params' => []];
-                $res = self::curl_json_post(self::rpcurl, json_encode($data));
+                $res = self::curl_json_post(self::$rpcurl, json_encode($data));
                 $json = json_decode($res);
                 $txs = $json->result;
                 $now = new \DateTime('now', new \DateTimeZone('UTC'));

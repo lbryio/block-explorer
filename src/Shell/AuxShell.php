@@ -4,11 +4,14 @@ namespace App\Shell;
 
 use Cake\Console\ConsoleOutput;
 use Cake\Console\Shell;
+use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 use Mdanter\Ecc\EccFactory;
 
 class AuxShell extends Shell {
+
+    public static $rpcurl;
 
     const bittrex = 'https://bittrex.com/api/v1.1/public/getticker?market=BTC-LBC';
 
@@ -20,12 +23,11 @@ class AuxShell extends Shell {
 
     const scriptAddress = [5, 122];
 
-    const rpcurl = 'http://lrpc:lrpc@127.0.0.1:9245';
-
     const tagrcptaddress = 'bLockNgmfvnnnZw7bM6SPz6hk5BVzhevEp';
 
     public function initialize() {
         parent::initialize();
+        self::$rpcurl = Configure::read('Lbry.RpcUrl');
         $this->loadModel('Addresses');
         $this->loadModel('Inputs');
         $this->loadModel('Outputs');

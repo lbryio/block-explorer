@@ -7,6 +7,7 @@ use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Serializer\PublicKey\PemPublicKeySerializer;
 use Mdanter\Ecc\Serializer\PublicKey\DerPublicKeySerializer;
 use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
+use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 use Endroid\QrCode\ErrorCorrectionLevel;
@@ -15,7 +16,7 @@ use Endroid\QrCode\QrCode;
 
 class MainController extends AppController {
 
-    const rpcurl = 'http://lrpc:lrpc@127.0.0.1:9245';
+    public static $rpcurl;
 
     const lbcPriceKey = 'lbc.price';
 
@@ -29,6 +30,7 @@ class MainController extends AppController {
 
     public function initialize() {
         parent::initialize();
+        self::$rpcurl = Configure::read('Lbry.RpcUrl');
         $this->redis = new \Predis\Client('tcp://127.0.0.1:6379');
         try {
             $this->redis->info('mem');
@@ -421,7 +423,7 @@ class MainController extends AppController {
             try {
                 // update the block confirmations
                 $req = ['method' => 'getblock', 'params' => [$block->Hash]];
-                $response = self::curl_json_post(self::rpcurl, json_encode($req));
+                $response = self::curl_json_post(self::$rpcurl, json_encode($req));
                 $json = json_decode($response);
                 $rpc_block = $json->result;
                 if (isset($rpc_block->confirmations)) {
@@ -671,7 +673,7 @@ class MainController extends AppController {
     private function _gethashrate() {
         $req = ['method' => 'getnetworkhashps', 'params' => []];
         try {
-            $res = json_decode(self::curl_json_post(self::rpcurl, json_encode($req)));
+            $res = json_decode(self::curl_json_post(self::$rpcurl, json_encode($req)));
             if (!isset($res->result)) {
                 return 0;
             }
@@ -683,7 +685,7 @@ class MainController extends AppController {
     private function _gettxoutsetinfo() {
         $req = ['method' => 'gettxoutsetinfo', 'params' => []];
         try {
-            $res = json_decode(self::curl_json_post(self::rpcurl, json_encode($req)));
+            $res = json_decode(self::curl_json_post(self::$rpcurl, json_encode($req)));
             if (!isset($res->result)) {
                 return 0;
             }
