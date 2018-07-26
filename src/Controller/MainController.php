@@ -462,7 +462,9 @@ class MainController extends AppController {
             $conn->execute('UPDATE Transactions SET TransactionSize = ? WHERE Id = ?', [$tx->TransactionSize, $tx->Id]);
         }
 
+        $maxBlock = $this->Blocks->find()->select(['Height'])->order(['Height' => 'desc'])->first();
         $block = $this->Blocks->find()->select(['Confirmations', 'Height'])->where(['Hash' => $tx->BlockHash])->first();
+        $confirmations = $block ? max(1, $maxBlock->Height - $block->Height) : '0';
         $inputs = $this->Inputs->find()->contain(['InputAddresses'])->where(['TransactionId' => $tx->Id])->order(['PrevoutN' => 'asc'])->toArray();
         $outputs = $this->Outputs->find()->contain(['OutputAddresses', 'SpendInput' => ['fields' => ['Id', 'TransactionHash', 'PrevoutN', 'PrevoutHash']]])->where(['Outputs.TransactionId' => $tx->Id])->order(['Vout' => 'asc'])->toArray();
         for ($i = 0; $i < count($outputs); $i++) {
@@ -484,7 +486,7 @@ class MainController extends AppController {
 
         $this->set('tx', $tx);
         $this->set('block', $block);
-        $this->set('confirmations', $block ? number_format($block->Confirmations, 0, '', ',') : '0');
+        $this->set('confirmations', $confirmations);
         $this->set('fee', $fee);
         $this->set('inputs', $inputs);
         $this->set('outputs', $outputs);
@@ -526,6 +528,7 @@ class MainController extends AppController {
     public function address($addr = null) {
         set_time_limit(0);
 
+        $this->loadModel('Blocks');
         $this->loadModel('Addresses');
         $this->loadModel('Transactions');
         $this->loadModel('Inputs');
@@ -553,7 +556,6 @@ class MainController extends AppController {
         if (!$pending) {
             $tagRequestAmount = '25.' . rand(11111111, 99999999);
         }
-
 
         $address = $this->Addresses->find()->where(['Address' => $addr])->first();
         if (!$address) {
@@ -593,13 +595,18 @@ class MainController extends AppController {
             $stmt = $conn->execute('SELECT A.TotalReceived, A.TotalSent, A.Balance FROM Addresses A WHERE A.Id = ?', [$address->Id]);
             $totals = $stmt->fetch(\PDO::FETCH_OBJ);
 
-            $stmt = $conn->execute(sprintf('SELECT T.Id, T.Hash, T.InputCount, T.OutputCount, T.Value, ' .
-                                   'TA.DebitAmount, TA.CreditAmount, ' .
-                                   'B.Height, B.Confirmations, IFNULL(T.TransactionTime, T.CreatedTime) AS TxTime ' .
-                                   'FROM Transactions T ' .
-                                   'LEFT JOIN Blocks B ON T.BlockHash = B.Hash ' .
-                                   'RIGHT JOIN (SELECT TransactionId, DebitAmount, CreditAmount FROM TransactionsAddresses ' .
-                                   '            WHERE AddressId = ? ORDER BY TransactionTime DESC LIMIT %d, %d) TA ON TA.TransactionId = T.Id', $offset, $pageLimit), [$addressId]);
+            $currentBlock = $this->Blocks->find()->select(['Height'])->order(['Height' => 'desc'])->first();
+            $currentHeight = $currentBlock ? intval($currentBlock->Height) : 0;
+
+            $stmt = $conn->execute(sprintf(
+                'SELECT T.Id, T.Hash, T.InputCount, T.OutputCount, T.Value, ' .
+                '    TA.DebitAmount, TA.CreditAmount, ' .
+                '    B.Height, (CASE WHEN B.Height IS NOT NULL THEN GREATEST(1, ' . $currentHeight . ' - B.Height) ELSE NULL END) AS Confirmations, ' .
+                '    IFNULL(T.TransactionTime, T.CreatedTime) AS TxTime ' .
+                'FROM Transactions T ' .
+                'LEFT JOIN Blocks B ON T.BlockHash = B.Hash ' .
+                'RIGHT JOIN (SELECT TransactionId, DebitAmount, CreditAmount FROM TransactionsAddresses ' .
+                '            WHERE AddressId = ? ORDER BY TransactionTime DESC LIMIT %d, %d) TA ON TA.TransactionId = T.Id', $offset, $pageLimit), [$addressId]);
             $recentTxs = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
             $totalRecvAmount = $totals->TotalReceived == 0 ? '0' : $totals->TotalReceived + 0;
@@ -682,6 +689,7 @@ class MainController extends AppController {
             return 'N/A';
         }
     }
+
     private function _gettxoutsetinfo() {
         $req = ['method' => 'gettxoutsetinfo', 'params' => []];
         try {
@@ -694,6 +702,7 @@ class MainController extends AppController {
             return 'N/A';
         }
     }
+
     public function apistatus() {
         $this->autoRender = false;
         $this->loadModel('Blocks');
@@ -866,14 +875,14 @@ class MainController extends AppController {
       public function apiutxosupply() {
         $this->autoRender = false;
         $this->loadModel('Addresses');
-              
+
         $circulating = 0;
         $reservedcommunity = 0;
         $reservedoperational = 0;
         $reservedinstitutional = 0;
         $reservedtotal = 0;
         $circulating = 0;
-          
+
         $txoutsetinfo = $this->_gettxoutsetinfo();
         $reservedcommunity = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd'])->first();
         $reservedoperational = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL'])->first();
@@ -888,15 +897,15 @@ class MainController extends AppController {
                        $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH'])->first() +
                        $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc'])->first() +
                        $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h'])->first();
-          
+
         $reservedtotal = $reservedcommunity->Balance + $reservedoperational->Balance + $reservedinstitutional->Balance + $reservedaux->Balance;
-        
-          
+
+
          $circulating = $txoutsetinfo->total_amount - $reservedtotal;
-   
+
         return $this->_jsonResponse(['success' => true, 'utxosupply' => ['total' => $txoutsetinfo->total_amount, 'circulating' => $circulating]]);
     }
-    
+
     private static function curl_json_post($url, $data, $headers = []) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
