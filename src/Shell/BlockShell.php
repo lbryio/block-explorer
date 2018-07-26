@@ -1304,7 +1304,7 @@ print_r($response); print_r($json);
                 } catch (\Exception $e) {
                     // ignore possible disconnect errors
                 }
-                
+
                 $conn->connect();
             }
 
@@ -1855,7 +1855,7 @@ print_r($response); print_r($json);
         // Other standard: pay to pubkey hash
         $define['p2pk'] = array('type' => 'pubkeyhash',
                                 'reqSigs' => 1,
-                                'data_index_for_hash' => 1);
+                                'data_index_for_hash' => 0);
         $rule['p2pk'] = [
             '0' => '/^[0-9a-f]+$/i',
             '1' => '/^OP_CHECKSIG/'
