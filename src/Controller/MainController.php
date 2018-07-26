@@ -464,7 +464,7 @@ class MainController extends AppController {
 
         $maxBlock = $this->Blocks->find()->select(['Height'])->order(['Height' => 'desc'])->first();
         $block = $this->Blocks->find()->select(['Confirmations', 'Height'])->where(['Hash' => $tx->BlockHash])->first();
-        $confirmations = $block ? max(1, $maxBlock->Height - $block->Height) : '0';
+        $confirmations = $block ? (($maxBlock->Height - $block->Height) + 1) : '0';
         $inputs = $this->Inputs->find()->contain(['InputAddresses'])->where(['TransactionId' => $tx->Id])->order(['PrevoutN' => 'asc'])->toArray();
         $outputs = $this->Outputs->find()->contain(['OutputAddresses', 'SpendInput' => ['fields' => ['Id', 'TransactionHash', 'PrevoutN', 'PrevoutHash']]])->where(['Outputs.TransactionId' => $tx->Id])->order(['Vout' => 'asc'])->toArray();
         for ($i = 0; $i < count($outputs); $i++) {
@@ -601,7 +601,7 @@ class MainController extends AppController {
             $stmt = $conn->execute(sprintf(
                 'SELECT T.Id, T.Hash, T.InputCount, T.OutputCount, T.Value, ' .
                 '    TA.DebitAmount, TA.CreditAmount, ' .
-                '    B.Height, (CASE WHEN B.Height IS NOT NULL THEN GREATEST(1, ' . $currentHeight . ' - B.Height) ELSE NULL END) AS Confirmations, ' .
+                '    B.Height, (CASE WHEN B.Height IS NOT NULL THEN ((' . $currentHeight . ' - B.Height) + 1) ELSE NULL END) AS Confirmations, ' .
                 '    IFNULL(T.TransactionTime, T.CreatedTime) AS TxTime ' .
                 'FROM Transactions T ' .
                 'LEFT JOIN Blocks B ON T.BlockHash = B.Hash ' .
