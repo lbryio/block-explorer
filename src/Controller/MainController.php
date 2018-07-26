@@ -402,7 +402,11 @@ class MainController extends AppController {
             }
 
             $offset = ($page - 1) * $pageLimit;
-            $blocks = $this->Blocks->find()->offset($offset)->limit($pageLimit)->order(['Height' => 'DESC'])->toArray();
+            $currentBlock = $this->Blocks->find()->select(['Height'])->order(['Height' => 'DESC'])->first();
+            $blocks = $this->Blocks->find()->select(
+                ['Height', 'Difficulty', 'TransactionHashes', 'BlockSize', 'Nonce', 'BlockTime']
+            )->offset($offset)->limit($pageLimit)->order(['Height' => 'DESC'])->toArray();
+            $this->set('currentBlock', $currentBlock);
             $this->set('blocks', $blocks);
             $this->set('pageLimit', $pageLimit);
             $this->set('numPages', $numPages);

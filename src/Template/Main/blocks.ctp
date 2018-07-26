@@ -412,7 +412,7 @@
             <tr>
                 <td class="right"><a href="/blocks/<?php echo $block->Height ?>"><?php echo $block->Height ?></a></td>
                 <td class="pad-left"><?php echo number_format($block->Difficulty, 8, '.', '') ?></td>
-                <td class="right"><?php echo number_format($block->Confirmations, 0, '', ',') ?></td>
+                <td class="right"><?php echo number_format((($currentBlock->Height - $block->Height) + 1), 0, '', ',') ?></td>
                 <td class="right"><?php echo count(json_decode($block->TransactionHashes)) ?></td>
                 <td class="right"><?php echo round($block->BlockSize / 1024, 2) . 'KB' ?></td>
                 <td class="right pad-left"><?php echo $block->Nonce ?></td>
