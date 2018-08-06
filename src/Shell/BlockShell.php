@@ -13,17 +13,18 @@ class BlockShell extends Shell {
 
     public static $rpcurl;
 
+    public static $redisurl;
+
     const mempooltxkey = 'lbc.mempooltx';
 
     const pubKeyAddress = [0, 85];
 
     const scriptAddress = [5, 122];
 
-    const redisurl = 'tcp://127.0.0.1:6379';
-
     public function initialize() {
         parent::initialize();
         self::$rpcurl = Configure::read('Lbry.RpcUrl');
+        self::$redisurl = Configure::read('Redis.Url');
         $this->loadModel('Blocks');
         $this->loadModel('Addresses');
         $this->loadModel('Claims');
@@ -2073,7 +2074,7 @@ print_r($response); print_r($json);
     }
 
     public static function _init_redis() {
-        $redis = new \Predis\Client(self::redisurl);
+        $redis = new \Predis\Client(self::$redisurl);
         try {
             $redis->info('mem');
         } catch (\Predis\Connection\ConnectionException $e) {
