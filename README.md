@@ -5,14 +5,14 @@ A simple PHP block explorer for browsing transactions and claims on the [LBRY](h
 ## Installation
 There are some prerequisites that need to be installed before the explorer can be accessed.
 * Web server - Apache, caddy or nginx
-* lbrycrd with txindex turned on
-* Python claims decoder (https://github.com/cryptodevorg/lbry-decoder)
+* [lbrycrd](https://github.com/lbryio/lbrycrd) with txindex turned on
+* [Python claims decoder](https://github.com/cryptodevorg/lbry-decoder)
 * MariaDB 10.2 or higher
 * Redis Server (optional, only required for the CakePHP redis cache engine, or to run `forevermempool`)
 * PHP 7.2 or higher
   * php-fpm
-  * igbinary extension (https://github.com/igbinary/igbinary)
-  * phpredis extension (https://github.com/phpredis/phpredis)
+  * [igbinary extension](https://github.com/igbinary/igbinary)
+  * [phpredis extension](https://github.com/phpredis/phpredis)
 * composer (PHP package manager)
 
 ### Installation steps
@@ -54,31 +54,38 @@ server {
 ```
 * Restart your web server.
 
+
 ### Cron jobs
 There are a few scripts which can be set up as cron jobs or scheduled tasks.
+
 #### blocks.sh
 Detect new LBRY blocks. Can also be configured to be triggered using the lbrycrd `blocknotify` flag. This cron will create new blocks obtained from lbrycrd starting from the highest block number in the database, and then create the corresponding block transactions. If there are pending transactions created by the forevermempool script, they will be automatically associated with the respective blocks.
+
 #### claimindex.sh
 Create claims found on the LBRY blockchain in the database. This requires the Python decoder to be running in the background.
+
 #### pricehistory.sh
 Get the current LBC price in USD and store the value in the `PriceHistory` table. This also caches the most recent price in Redis.
+
 #### forever.sh
 Run the `forevermempool` script, and restart if necessary. The `forevermempool` script checks the LBRY blockchain mempool every second and creates transactions found in the database. The script makes use of Redis for caching the pending transation IDs.
+
 
 ## Usage
 Launch the URL for the configured web server root in a browser.
 
-## Running from Source
-There are no particular steps required to run from source.
 
 ## Contributing
 Contributions to this project are welcome, encouraged, and compensated. For more details, see https://lbry.io/faq/contributing
 
+
 ## License
 This project is MIT licensed. For the full license, see [LICENSE](LICENSE).
 
+
 ## Security
 We take security seriously. Please contact security@lbry.io regarding any security issues. Our PGP key is [here](https://keybase.io/lbry/key.asc) if you need it.
+
 
 ## Contact
 The primary contact for this project is [@akinwale](https://github.com/akinwale) (akinwale@lbry.io)
