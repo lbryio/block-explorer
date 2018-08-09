@@ -31,7 +31,7 @@ class MainController extends AppController {
     public function initialize() {
         parent::initialize();
         self::$rpcurl = Configure::read('Lbry.RpcUrl');
-        $this->redis = new \Predis\Client('tcp://127.0.0.1:6379');
+        $this->redis = new \Predis\Client(Configure::read('Redis.Url'));
         try {
             $this->redis->info('mem');
         } catch (\Predis\Connection\ConnectionException $e) {

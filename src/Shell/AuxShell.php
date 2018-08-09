@@ -128,7 +128,7 @@ class AuxShell extends Shell {
         self::lock('pricehistory');
 
         $conn = ConnectionManager::get('default');
-        $redis = new \Predis\Client('tcp://127.0.0.1:6379');
+        $redis = new \Predis\Client(Configure::read('Redis.Url'));
 
         try {
             // Only allow 5-minute update intervals
