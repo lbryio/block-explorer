@@ -452,6 +452,8 @@ class MainController extends AppController {
         $this->loadModel('Transactions');
         $this->loadModel('Inputs');
         $this->loadModel('Outputs');
+        $this->loadModel('Claims');
+        
         $sourceAddress = $this->request->query('address');
 
         $tx = $this->Transactions->find()->select(
@@ -475,6 +477,8 @@ class MainController extends AppController {
             $outputs[$i]->IsClaim = (strpos($outputs[$i]->ScriptPubKeyAsm, 'CLAIM') > -1);
             $outputs[$i]->IsSupportClaim = (strpos($outputs[$i]->ScriptPubKeyAsm, 'SUPPORT_CLAIM') > -1);
             $outputs[$i]->IsUpdateClaim = (strpos($outputs[$i]->ScriptPubKeyAsm, 'UPDATE_CLAIM') > -1);
+            $claim = $this->Claims->find()->where(['TransactionHash' => $tx->Hash, 'Vout' => $outputs[$i]->Vout])->first();
+            $outputs[$i]->Claim = $claim;
         }
 
         $totalIn = 0;

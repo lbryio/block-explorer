@@ -252,6 +252,7 @@ footer .content .page-time { position: absolute; right: 12px; bottom: 0px; paddi
 .tx-details-layout .outputs .output .labels .support { background: #ffeb3b }
 .tx-details-layout .outputs .output .labels .update { background: #ea80fc }
 .tx-details-layout .outputs .output .labels .claim { background: #76ff03 }
+.tx-details-layout .outputs .output .view-claim { text-decoration: none; color: black }
 .tx-details-layout .inputs .input .value, .tx-details-layout .outputs .output .value  { font-weight: normal }
 .tx-details-layout .inputs .input.is-source, .tx-details-layout .outputs .output.is-source  { border-right-width: 18px; border-right-color: #1e88e5; background: #e3f2fd }
 .tx-details-layout .inputs .input.highlighted, .tx-details-layout .outputs .output.highlighted { background: #f1f8e9 }
