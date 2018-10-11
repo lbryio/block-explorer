@@ -163,11 +163,11 @@ CREATE TABLE `TransactionsAddresses`
     `AddressId` BIGINT UNSIGNED NOT NULL,
     `DebitAmount` DECIMAL(18,8) DEFAULT 0 NOT NULL COMMENT 'Sum of the inputs to this address for the tx',
     `CreditAmount` DECIMAL(18,8) DEFAULT 0 NOT NULL COMMENT 'Sum of the outputs to this address for the tx',
-    `LatestTransactionTime` DATETIME DEFAULT UTC_TIMESTAMP() NOT NULL,
+    `TransactionTime` DATETIME DEFAULT UTC_TIMESTAMP() NOT NULL,
     PRIMARY KEY `PK_TransactionAddress` (`TransactionId`, `AddressId`),
     FOREIGN KEY `Idx_TransactionsAddressesTransaction` (`TransactionId`) REFERENCES `Transactions` (`Id`),
     FOREIGN KEY `Idx_TransactionsAddressesAddress` (`AddressId`) REFERENCES `Addresses` (`Id`),
-    INDEX `Idx_TransactionsAddressesLatestTransactionTime` (`LatestTransactionTime`),
+    INDEX `Idx_TransactionsAddressesTransactionTime` (`TransactionTime`),
     INDEX `Idx_TransactionsAddressesDebit` (`DebitAmount`),
     INDEX `Idx_TransactionsAddressesCredit` (`CreditAmount`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4;
