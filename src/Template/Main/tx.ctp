@@ -136,9 +136,10 @@
             foreach ($outputs as $out): ?>
             <div id="output-<?php echo $out->Vout ?>" class="output <?php if (isset($out['OutputAddresses']) && count($out['OutputAddresses']) > 0 && $out['OutputAddresses'][0]->Address == $sourceAddress): ?>is-source<?php endif; ?>">
                 <div class="labels">
-                    <?php if($out->IsSupportClaim): ?><div class="support"><a class="view-claim" href="<?php echo $out->Claim->getExplorerLink() ?>">SUPPORT</a></div><?php endif; ?>
-                    <?php if($out->IsUpdateClaim): ?><div class="update"><a class="view-claim" href="<?php echo $out->Claim->getExplorerLink() ?>">UPDATE</a></div><?php endif; ?>
-                    <?php if($out->IsClaim): ?><div class="claim"><a class="view-claim" href="<?php echo $out->Claim->getExplorerLink() ?>">CLAIM</a></div><?php endif; ?>
+                    <?php if($out->IsClaim or $out->IsSupportClaim or $out->IsUpdateClaim): ?><a class="view-claim" href="<?php echo $out->Claim->getExplorerLink() ?>">View</a><?php endif; ?>
+                    <?php if($out->IsSupportClaim): ?><div class="support">SUPPORT</div><?php endif; ?>
+                    <?php if($out->IsUpdateClaim): ?><div class="update">UPDATE</div><?php endif; ?>
+                    <?php if($out->IsClaim): ?><div class="claim">CLAIM</div><?php endif; ?>
                 </div>
 
                 <?php if (strlen(trim($out['Value'])) == 0): ?>
