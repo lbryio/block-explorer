@@ -508,12 +508,13 @@ class MainController extends AppController {
         $richList = $this->Addresses->find()->where(['Address <>' => 'bHW58d37s1hBjj3wPBkn5zpCX3F8ZW3uWf'])->order(['Balance' => 'DESC'])->limit(500)->toArray();
 
         $priceRate = 0;
-        $priceInfo = json_decode($this->redis->get(self::lbcPriceKey));
+        //$priceInfo = json_decode($this->redis->get(self::lbcPriceKey));
+        $priceInfo->price = 0.05;
         if (isset($priceInfo->price)) {
             $priceRate = $priceInfo->price;
         }
-
-        // calculate percentages
+        
+        $lbryAddresses = ['rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd', 'r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL', 'r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi', 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt', 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2', 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD', 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393', 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h'];
         $totalBalance = 0;
         $maxBalance = 0;
         $minBalance = 0;
@@ -531,6 +532,7 @@ class MainController extends AppController {
 
         $this->set('richList', $richList);
         $this->set('rate', $priceRate);
+        $this->set('lbryAddresses', $lbryAddresses);
     }
 
     public function address($addr = null) {

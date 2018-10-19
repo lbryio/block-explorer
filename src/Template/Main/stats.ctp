@@ -48,6 +48,11 @@
                 <tr>
                     <td class="right topvalign"><?php echo $rank ?></td>
                     <td class="topvalign"><a href="/address/<?php echo $item->Address ?>" target="_blank"><?php echo $item->Address ?></a>
+                    <?php if(in_array($item->Address, $lbryAddresses)): ?>
+                    <span class="lbry-address">
+                        <img src="/img/lbry.png" height="18px" width="18px" title="Address owned by LBRY Inc."/>
+                    </span>
+                    <?php endif; ?>
                     <?php  if (isset($item->Tag) && strlen(trim($item->Tag)) > 0): ?>
                     <div class="tag">
                         <?php if (strlen(trim($item->TagUrl)) > 0): ?><a href="<?php echo $item->TagUrl ?>" target="_blank" rel="nofollow"><?php echo $tiem->Tag ?></a><?php else: echo $item->Tag; endif; ?>
