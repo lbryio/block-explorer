@@ -13,7 +13,7 @@ class Claim extends Entity {
         $link = 'lbry://' . $link;
         return $link;
     }
-    
+
     function getExplorerLink() {
         $link = '/claims/' . $this->ClaimId;
         return $link;
