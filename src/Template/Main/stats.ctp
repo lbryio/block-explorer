@@ -1,19 +1,34 @@
 <?php $this->assign('title', 'Stats &amp; Rich List') ?>
 
-<?php $this->start('script'); ?>
-<script type="text/javascript">
-
-</script>
-<?php $this->end(); ?>
-
 <?php echo $this->element('header') ?>
 
+<?php $this->start('script'); ?>
+<script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+<script src="https://www.amcharts.com/lib/3/serial.js"></script>
+<script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+<script src="https://www.amcharts.com/lib/3/plugins/responsive/responsive.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="/js/mining-inflation-chart.js"></script>
+<?php $this->end(); ?>
+
+<?php
+    $this->start('css');
+    echo $this->Html->css('/css/mining-inflation-chart.css');
+    echo $this->Html->css('https://www.amcharts.com/lib/3/plugins/export/export.css');
+    $this->end();
+ ?>
 <div class="stats-head">
     <h3>LBRY Stats</h3>
 </div>
 
-<div class="stats-main">
+<div class="stats-main">  
 
+    <div class="mining-inflation-chart-container">
+        <div class="load-progress inc"></div>
+        <h3>Mining Inflation Chart</h3>
+        <div id="mining-inflation-chart" class="chart"></div>
+        <div id="chart-export" class="btn-chart-export"></div>
+    </div>
+    
     <div class="richlist">
         <h3>LBRY Rich List (Top 500)</h3>
         <table class="table">
