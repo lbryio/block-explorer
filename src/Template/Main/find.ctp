@@ -114,8 +114,9 @@
             <div class="label half-width">Created</div>
 
             <div class="value half-width"><a href="/tx/<?php echo $claim->TransactionHash ?>#output-<?php echo $claim->Vout ?>" title="<?php echo $claim->TransactionHash ?>"><?php echo $claim->TransactionHash ?></a></div>
-            
-
+            <div class="value half-width" title="<?php echo $claim->Created->format('j M Y H:i:s') ?> UTC">
+                    <?php echo \Carbon\Carbon::createFromTimestamp($claim->Created->format('U'))->diffForHumans(); ?>
+                </div>
             <div class="clear spacer"></div>
 
             <?php if ($claim->ClaimType == 2): ?>
