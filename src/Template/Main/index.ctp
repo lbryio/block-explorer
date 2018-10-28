@@ -185,7 +185,7 @@
             <a class="claim-explorer-link" href="/claims">Claims Explorer</a>
             <?php $idx = 0; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow']; foreach ($recentClaims as $claim):
                 $idx++;
-                $autoThumbText = '';
+                $autoThumbText = $claim->getAutoThumbText();
                 $link = $claim->Name;
                 $rawLink = $claim->Name;
                 if (isset($claim->Publisher->Name)) {
@@ -196,23 +196,7 @@
                 $rawLink = 'lbry://' . $rawLink;
 
                 // content type
-                $ctTag = null;
-                if (substr($claim->ContentType, 0, 5) === 'audio') {
-                    $ctTag = 'audio';
-                } else if (substr($claim->ContentType, 0, 5) === 'video') {
-                    $ctTag = 'video';
-                } else if (substr($claim->ContentType, 0, 5) === 'image') {
-                    $ctTag = 'image';
-                }
-
-                if (!$ctTag && $claim->ClaimType == 1) {
-                    $ctTag = 'identity';
-                }
-
-                if ($claim->ClaimType == 1) { $autoThumbText = strtoupper(substr($claim->Name, 1, min( strlen($claim->Name), 3 ))); } else {
-                    $str = (strlen(trim($claim->Title)) > 0) ? $claim->Title : $claim->Name;
-                    $autoThumbText = strtoupper(substr($str, 0, min (strlen($str), 2 )));
-                }
+                $ctTag = $claim->getContentTag();
             ?>
             <div data-id="<?php echo $claim->ClaimId ?>" class="claim-box<?php if ($idx == 5): ?> last<?php endif; ?>">
                 <div class="tags">

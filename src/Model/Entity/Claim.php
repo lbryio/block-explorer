@@ -18,6 +18,33 @@ class Claim extends Entity {
         $link = '/claims/' . $this->ClaimId;
         return $link;
     }
+    
+    function getContentTag() {
+        $ctTag = null;
+        if (substr($this->ContentType, 0, 5) === 'audio') {
+            $ctTag = 'audio';
+        } else if (substr($this->ContentType, 0, 5) === 'video') {
+            $ctTag = 'video';
+        } else if (substr($this->ContentType, 0, 5) === 'image') {
+            $ctTag = 'image';
+        }
+    
+        if (!$ctTag && $this->ClaimType == 1) {
+            $ctTag = 'identity';
+        }
+        return $ctTag;
+    }
+    
+    function getAutoThumbText() {
+        $autoThumbText = '';
+        if ($this->ClaimType == 1) { 
+            $autoThumbText = strtoupper(substr($this->Name, 1, min( strlen($this->Name), 3 ))); 
+        } else {
+            $str = (strlen(trim($this->Title)) > 0) ? $this->Title : $this->Name;
+            $autoThumbText = strtoupper(substr($str, 0, min (strlen($str), 2 )));
+        }
+        return $autoThumbText;
+    }
 }
 
 ?>

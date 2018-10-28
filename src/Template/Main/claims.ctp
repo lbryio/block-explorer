@@ -39,12 +39,7 @@
 <?php if (isset($claim)):
 
 $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow'];
-$autoThumbText = '';
-if ($claim->ClaimType == 1) { $autoThumbText = strtoupper(substr($claim->Name, 1, min( strlen($claim->Name), 10 ))); } else {
-    $str = str_replace(' ', '', (strlen(trim($claim->Title)) > 0) ? $claim->Title : $claim->Name);
-    $autoThumbText = strtoupper(mb_substr($str, 0, min( strlen($str), 10 )));
-}
-
+$autoThumbText = $claim->getAutoThumbText();
 $cost = 'Free';
 if (isset($claim->Price) && $claim->Price > 0) {
     $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
@@ -156,7 +151,7 @@ if (strlen(trim($desc)) == 0) {
                 $row++;
             }
 
-            $autoThumbText = '';
+            $autoThumbText = $claim->getAutoThumbText();
             $cost = '';
             if (isset($claim->Price) && $claim->Price > 0) {
                 $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
@@ -165,24 +160,7 @@ if (strlen(trim($desc)) == 0) {
             }
 
             // content type
-            $ctTag = null;
-            if (substr($claim->ContentType, 0, 5) === 'audio') {
-                $ctTag = 'audio';
-            } else if (substr($claim->ContentType, 0, 5) === 'video') {
-                $ctTag = 'video';
-            } else if (substr($claim->ContentType, 0, 5) === 'image') {
-                $ctTag = 'image';
-            }
-
-            if (!$ctTag && $claim->ClaimType == 1) {
-                $ctTag = 'identity';
-            }
-
-            if ($claim->ClaimType == 1) { $autoThumbText = strtoupper(substr($claim->Name, 1, min( strlen($claim->Name), 10 ))); } else {
-                $str = str_replace(' ', '', (strlen(trim($claim->Title)) > 0) ? $claim->Title : $claim->Name);
-                $autoThumbText = strtoupper(mb_substr($str, 0, min( strlen($str), 10 )));
-            }
-
+            $ctTag = $claim->getContentTag();
         ?>
         <div data-id="<?php echo $claim->ClaimId ?>" class="claim-grid-item<?php if ($idx % 3 == 0): ?> last-item<?php endif; ?><?php if ($last_row): ?> last-row<?php endif; ?>">
             <?php if (strlen(trim($cost)) > 0): ?>
@@ -274,7 +252,7 @@ if (strlen(trim($desc)) == 0) {
         if ($idx % 3 == 0) {
             $row++;
         }
-        $autoThumbText = '';
+        $autoThumbText = $claim->getAutoThumbText();
         $cost = '';
         if (isset($claim->Price) && $claim->Price > 0) {
             $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
@@ -283,24 +261,7 @@ if (strlen(trim($desc)) == 0) {
         }
 
         // content type
-        $ctTag = null;
-        if (substr($claim->ContentType, 0, 5) === 'audio') {
-            $ctTag = 'audio';
-        } else if (substr($claim->ContentType, 0, 5) === 'video') {
-            $ctTag = 'video';
-        } else if (substr($claim->ContentType, 0, 5) === 'image') {
-            $ctTag = 'image';
-        }
-
-        if (!$ctTag && $claim->ClaimType == 1) {
-            $ctTag = 'identity';
-        }
-
-        if ($claim->ClaimType == 1) { $autoThumbText = strtoupper(substr($claim->Name, 1, min( strlen($claim->Name), 10 ))); } else {
-            $str = str_replace(' ', '', (strlen(trim($claim->Title)) > 0) ? $claim->Title : $claim->Name);
-            $autoThumbText = strtoupper(mb_substr($str, 0, min( strlen($str), 10 )));
-        }
-
+        $ctTag = $claim->getContentTag();
     ?>
     <div data-id="<?php echo $claim->ClaimId ?>" class="claim-grid-item<?php if ($idx % 3 == 0): ?> last-item<?php endif; ?><?php if ($last_row): ?> last-row<?php endif; ?>">
         <?php if (strlen(trim($cost)) > 0): ?>
