@@ -88,6 +88,7 @@ border-radius: 0 8px 8px 0 }
 .claims-grid .claim-grid-item .link { font-size: 95%; font-weight: 300; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; line-height: 20px; height: 20px; margin-top: 6px }
 
 .claims-grid .claim-grid-item .label { font-size: 80%; color: #1e88e5 }
+.claims-grid .no-results {font-style: italic; width: 100%; height: 300px; text-align: center; font-size: 90%; color: grey; }
 .claims-grid .claim-grid-item .value { font-weight: 300; word-break: break-word; word-wrap: break-word; font-size: 95%; line-height: 24px; height: 24px }
 .claims-grid .claim-grid-item .half-width { width: 155px; float: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 12px }
 .claims-grid .claim-grid-item .spacer { height: 16px }
