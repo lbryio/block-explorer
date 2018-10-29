@@ -366,7 +366,7 @@ class MainController extends AppController {
             }
         } else {
             // finally, try exact claim name match
-            $claims = $this->Claims->find()->distinct(['Claims.ClaimId'])->where(['Name' => $criteria])->limit(10)->toArray();
+            $claims = $this->Claims->find()->distinct(['Claims.ClaimId'])->where(['Name' => $criteria])->order(['Claims.Created' => 'DESC'])->limit(10)->toArray();
             if (count($claims) == 1) {
                 return $this->redirect('/claims/' . $claims[0]->ClaimId);
             }
