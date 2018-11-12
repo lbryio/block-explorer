@@ -5,7 +5,7 @@ Version: 1.1.2
 
 ## Description
 
-Smoothly animates the `dataProvider`
+Smoothly animates the `dataProvider`.
 
 It works with serial, pie, XY, funnel, and radar.
 
@@ -96,13 +96,13 @@ http://www.apache.org/licenses/LICENSE-2.0
 ## Changelog
 
 ### 1.1.2
-* Fixing a bug with the minimum/maximum
+* Fixing a bug with the minimum/maximum.
 
 ### 1.1.1
-* It now automatically sets the minimum/maximum on the value axes while animating
+* It now automatically sets the minimum/maximum on the value axes while animating.
 
 ### 1.1.0
-* Adding in support for XY charts
+* Adding in support for XY charts.
 
 ### 1.0.0
-* Initial release
+* Initial release.

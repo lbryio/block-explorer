@@ -26,7 +26,7 @@ composer update
 * Create the directories, `tmp` and `logs` in the `block-explorer` folder if they have not been created yet, and make sure that they are writable by the web server.
 * Copy `config/app.default.php` to `config/app.php`. Edit the database connection values to correspond to your environment.
 * Copy `config/lbry.default.php` to `config/lbry.php`. Update the values for LBRY RPC URL and the Redis URL to correspond to your environment.
-* Configure your web server with the host root folder set to `<path to>/block-explorer/webroot` where `<path to>` is the absolute path to the configuraiton. Here is a sample nginx configuration. You can make changes to this configuration to correspond to your environment.
+* Configure your web server with the host root folder set to `<path to>/block-explorer/webroot` where `<path to>` is the absolute path to the configuration. Here is a sample nginx configuration. You can make changes to this configuration to correspond to your environment.
 ```
 server {
     listen        80;
@@ -68,7 +68,7 @@ Create claims found on the LBRY blockchain in the database. This requires the Py
 Get the current LBC price in USD and store the value in the `PriceHistory` table. This also caches the most recent price in Redis.
 
 #### forever.sh
-Run the `forevermempool` script, and restart if necessary. The `forevermempool` script checks the LBRY blockchain mempool every second and creates transactions found in the database. The script makes use of Redis for caching the pending transation IDs.
+Run the `forevermempool` script, and restart if necessary. The `forevermempool` script checks the LBRY blockchain mempool every second and creates transactions found in the database. The script makes use of Redis for caching the pending transaction IDs.
 
 
 ## Usage
