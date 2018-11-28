@@ -329,9 +329,6 @@ class MainController extends AppController {
 
     public function find() {
         $criteria = $this->request->query('q');
-        if ($criteria === null || strlen(trim($criteria)) == 0) {
-            return $this->redirect('/');
-        }
 
         $this->loadModel('Blocks');
         $this->loadModel('Claims');
@@ -354,7 +351,7 @@ class MainController extends AppController {
             // Claim ID
             $claim = $this->Claims->find()->select(['ClaimId'])->where(['ClaimId' => $criteria])->first();
             if ($claim) {
-                return $this->redirect('/claim/' . $claim->ClaimId);
+                return $this->redirect('/claims/' . $claim->ClaimId);
             }
         } else if (strlen(trim($criteria)) === 64) { // block or tx hash
             // Try block hash first
@@ -369,16 +366,16 @@ class MainController extends AppController {
             }
         } else {
             // finally, try exact claim name match
-            $claim = $this->Claims->find()->select(['ClaimId'])->where(['Name' => $criteria])->first();
-            if ($claim) {
-                return $this->redirect('/claims/' . $claim->ClaimId);
+            $claims = $this->Claims->find()->distinct(['Claims.ClaimId'])->where(['Name' => $criteria])->order(['Claims.Created' => 'DESC'])->limit(10)->toArray();
+            if (count($claims) == 1) {
+                return $this->redirect('/claims/' . $claims[0]->ClaimId);
+            }
+            else {
+                $this->set('claims', $claims);
             }
         }
-
-        // Not found, redirect to index
-        return $this->redirect('/');
     }
-
+    
     public function blocks($height = null) {
         $this->loadModel('Blocks');
 
