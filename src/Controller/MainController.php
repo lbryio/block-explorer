@@ -511,7 +511,7 @@ class MainController extends AppController {
             $priceRate = $priceInfo->price;
         }
         
-        $lbryAddresses = ['rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd', 'r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL', 'r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi', 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt', 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2', 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD', 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393', 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h'];
+        $lbryAddresses = ['rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd', 'r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL', 'r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi', 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt', 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2', 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD', 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393', 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc'];
         $totalBalance = 0;
         $maxBalance = 0;
         $minBalance = 0;
@@ -903,6 +903,7 @@ class MainController extends AppController {
                        $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393'])->first() +
                        $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH'])->first() +
                        $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc'])->first() +
+                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bCrboXVztuSbZzVToCWSsu1pEr2oxKHu9v'])->first() +
                        $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h'])->first();
 
         $reservedtotal = $reservedcommunity->Balance + $reservedoperational->Balance + $reservedinstitutional->Balance + $reservedaux->Balance;
