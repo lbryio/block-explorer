@@ -220,7 +220,9 @@ footer .content .page-time { position: absolute; right: 12px; bottom: 0px; paddi
 .stats-main h3 { font-weight: 300; margin: 0 0 12px 0 }
 
 .stats { width: 1000px; margin: 0 auto 48px auto; box-shadow: 0 2px 6px rgba(0,0,0,.175); border: 1px solid rgba(0,0,0,.15); padding: 24px; cursor: default }
-.stats .box { padding: 24px 0; border-right: 1px solid #ccc; float: left; text-align: center; width: 25% }
+.stats .box { padding: 24px 0; border-right: 1px solid #ccc; float: left; text-align: center }
+.stats .box-20 { width: 20% }
+.stats .box-30 { width: 30% }
 .stats .box .title { color: #1e88e5; font-size: 90% }
 .stats .box .value { font-size: 180%; font-weight: 300; margin-top: 8px }
 .stats .box.last { border-color: transparent }

@@ -127,22 +127,22 @@
         </div>
 
         <div class="stats">
-            <div class="box">
+            <div class="box box-20">
                 <div class="title">Block Height</div>
                 <div class="value"><?php echo $recentBlocks[0]->Height ?></div>
             </div>
 
-            <div class="box">
+            <div class="box box-30">
                 <div class="title">Difficulty</div>
                 <div class="value" title="<?php echo $recentBlocks[0]->Difficulty ?>"><?php echo number_format($recentBlocks[0]->Difficulty, 2, '.', '') ?></div>
             </div>
 
-            <div class="box">
+            <div class="box box-30">
                 <div class="title">Network</div>
                 <div class="value"><?php echo $hashRate ?></div>
             </div>
 
-            <div class="box last">
+            <div class="box box-20 last">
                 <div class="title">Price</div>
                 <div class="value"><?php echo $lbcUsdPrice ?></div>
             </div>
