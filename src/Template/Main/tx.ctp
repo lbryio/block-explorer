@@ -92,14 +92,14 @@
                     $setAddressIds = [];
                     foreach ($inputs as $in):
             ?>
-            <div id="input-<?php echo $in->Id ?>" class="input <?php if (isset($in['InputAddresses']) && count($in['InputAddresses']) > 0 && $in['InputAddresses'][0]->Address == $sourceAddress): ?>is-source<?php endif; ?>">
+            <div id="input-<?php echo $in->Id ?>" class="input <?php if (isset($in['InputAddresses']) && count($in['InputAddresses']) > 0 && $in->inputAddresses[0]->Address == $sourceAddress): ?>is-source<?php endif; ?>">
                 <?php if ($in['IsCoinbase']): ?>
                     <div>Block Reward (New Coins)</div>
                 <?php else: ?>
                     <?php if (strlen(trim($in->Value)) == 0): ?>
                     <div>Incomplete data</div>
                     <?php else:
-                            $addr = $in['InputAddresses'][0];
+                            $addr = $in->inputAddresses[0];
 
                             if (!isset($setAddressIds[$addr->Address])):
                                 $setAddressIds[$addr->Address] = 1; ?>
@@ -134,7 +134,7 @@
 
             <?php
             foreach ($outputs as $out): ?>
-            <div id="output-<?php echo $out->Vout ?>" class="output <?php if (isset($out['OutputAddresses']) && count($out['OutputAddresses']) > 0 && $out['OutputAddresses'][0]->Address == $sourceAddress): ?>is-source<?php endif; ?>">
+            <div id="output-<?php echo $out->Vout ?>" class="output <?php if (isset($out['OutputAddresses']) && count($out['OutputAddresses']) > 0 && $out->outputAddresses[0]->Address == $sourceAddress): ?>is-source<?php endif; ?>">
                 <div class="labels">
                     <?php if($out->Claim && ($out->IsClaim or $out->IsSupportClaim or $out->IsUpdateClaim)): ?><a class="view-claim" href="<?php echo $out->Claim->getExplorerLink() ?>">View</a><?php endif; ?>
                     <?php if($out->IsSupportClaim): ?><div class="support">SUPPORT</div><?php endif; ?>
@@ -145,7 +145,7 @@
                 <?php if (strlen(trim($out['Value'])) == 0): ?>
                 <div>Incomplete data</div>
                 <?php else:
-                        $addr = $out['OutputAddresses'][0];
+                        $addr = $out->outputAddresses[0];
 
                         if (!isset($setAddressIds[$addr->Address])):
                                 $setAddressIds[$addr->Address] = 1; ?>

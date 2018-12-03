@@ -110,7 +110,7 @@ if (strlen(trim($desc)) == 0) {
             <div class="desc">This is an identity claim.</div>
         <?php else: ?>
             <div class="title"><?php echo $claim->Title ?></div>
-            <div class="desc"><?php echo str_replace("\n", '<br />', $desc) ?></div>
+            <div class="desc"><?php echo str_replace("\n", '<br/>', $desc) ?></div>
 
             <div class="details">
                 <div class="label half-width">Author</div>

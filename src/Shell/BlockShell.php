@@ -1339,8 +1339,8 @@ print_r($response); print_r($json);
                     $inputs[] = [
                         'PrevoutHash' => $in['txid'],
                         'PrevoutN' => $in['vout'],
-                        'ScriptSigAsm' => $in['scriptSig']['asm'],
-                        'ScriptSigHex' => $in['scriptSig']['hex'],
+                        'ScriptSigAsm' => $in->scriptSig['asm'],
+                        'ScriptSigHex' => $in->scriptSig['hex'],
                         'Sequence' => $in['sequence']
                     ];
                 }
@@ -1350,16 +1350,16 @@ print_r($response); print_r($json);
                 $outputs[] = [
                     'Vout' => $out['vout'],
                     'Value' => bcdiv($out['value'], 100000000, 8),
-                    'Type' => isset($out['scriptPubKey']['type']) ? $out['scriptPubKey']['type'] : '',
-                    'ScriptPubKeyAsm' => isset($out['scriptPubKey']['asm']) ? $out['scriptPubKey']['asm'] : '',
-                    'ScriptPubKeyHex' => isset($out['scriptPubKey']['hex']) ? $out['scriptPubKey']['hex'] : '',
-                    'RequiredSignatures' => isset($out['scriptPubKey']['reqSigs']) ? $out['scriptPubKey']['reqSigs'] : '',
-                    'Hash160' => isset($out['scriptPubKey']['hash160']) ? $out['scriptPubKey']['hash160'] : '',
-                    'Addresses' => isset($out['scriptPubKey']['addresses']) ? json_encode($out['scriptPubKey']['addresses']) : null
+                    'Type' => isset($out->scriptPubKey['type']) ? $out->scriptPubKey['type'] : '',
+                    'ScriptPubKeyAsm' => isset($out->scriptPubKey['asm']) ? $out->scriptPubKey['asm'] : '',
+                    'ScriptPubKeyHex' => isset($out->scriptPubKey['hex']) ? $out->scriptPubKey['hex'] : '',
+                    'RequiredSignatures' => isset($out->scriptPubKey['reqSigs']) ? $out->scriptPubKey['reqSigs'] : '',
+                    'Hash160' => isset($out->scriptPubKey['hash160']) ? $out->scriptPubKey['hash160'] : '',
+                    'Addresses' => isset($out->scriptPubKey['addresses']) ? json_encode($out->scriptPubKey['addresses']) : null
                 ];
 
-                if (isset($out['scriptPubKey']['addresses'])) {
-                    foreach ($out['scriptPubKey']['addresses'] as $address) {
+                if (isset($out->scriptPubKey['addresses'])) {
+                    foreach ($out->scriptPubKey['addresses'] as $address) {
                         $addresses[$address] = $address;
                     }
                 }
@@ -1983,10 +1983,10 @@ print_r($response); print_r($json);
                 $return = $define[$tx_type];
                 if ($tx_type === 'p2pk') {
                     $return['hash160'] = self::hash160($data[$define[$tx_type]['data_index_for_hash']]);
-                    $return['addresses'][0] = self::hash160_to_address($return['hash160'], self::pubKeyAddress[0]);
+                    $return->addresses[0] = self::hash160_to_address($return['hash160'], self::pubKeyAddress[0]);
                 } else {
                     $return['hash160'] = $data[$define[$tx_type]['data_index_for_hash']];
-                    $return['addresses'][0] = self::hash160_to_address($return['hash160'], ($tx_type === 'p2sh') ? self::scriptAddress[0] : self::pubKeyAddress[0]); // TODO: Pay to claim transaction?
+                    $return->addresses[0] = self::hash160_to_address($return['hash160'], ($tx_type === 'p2sh') ? self::scriptAddress[0] : self::pubKeyAddress[0]); // TODO: Pay to claim transaction?
                 }
                 unset($return['data_index_for_hash']);
             }

@@ -1,4 +1,6 @@
 <?php
+namespace App\config;
+
 return [
     /**
      * Debug Level:

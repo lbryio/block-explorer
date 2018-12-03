@@ -59,8 +59,8 @@ $cakeDescription = 'CakePHP: the rapid development PHP framework';
         <div id="url-rewriting-warning" class="alert url-rewriting">
             <ul>
                 <li class="bullet problem">
-                    URL rewriting is not properly configured on your server.<br />
-                    1) <a target="_blank" href="http://book.cakephp.org/3.0/en/installation.html#url-rewriting">Help me configure it</a><br />
+                    URL rewriting is not properly configured on your server.<br/>
+                    1) <a target="_blank" href="http://book.cakephp.org/3.0/en/installation.html#url-rewriting">Help me configure it</a><br/>
                     2) <a target="_blank" href="http://book.cakephp.org/3.0/en/development/configuration.html#general-configuration">I don't / can't use URL rewriting</a>
                 </li>
             </ul>
@@ -139,7 +139,7 @@ $cakeDescription = 'CakePHP: the rapid development PHP framework';
             if (method_exists($connectionError, 'getAttributes')):
                 $attributes = $connectionError->getAttributes();
                 if (isset($errorMsg['message'])):
-                    $errorMsg .= '<br />' . $attributes['message'];
+                    $errorMsg .= '<br/>' . $attributes['message'];
                 endif;
             endif;
         }
@@ -148,7 +148,7 @@ $cakeDescription = 'CakePHP: the rapid development PHP framework';
         <?php if ($connected): ?>
             <li class="bullet success">CakePHP is able to connect to the database.</li>
         <?php else: ?>
-            <li class="bullet problem">CakePHP is NOT able to connect to the database.<br /><?= $errorMsg ?></li>
+            <li class="bullet problem">CakePHP is NOT able to connect to the database.<br/><?= $errorMsg ?></li>
         <?php endif; ?>
         </ul>
     </div>
@@ -188,7 +188,7 @@ $cakeDescription = 'CakePHP: the rapid development PHP framework';
     <div class="columns large-12 text-center">
         <h3 class="more">More about Cake</h3>
         <p>
-            CakePHP is a rapid development framework for PHP which uses commonly known design patterns like Front Controller and MVC.<br />
+            CakePHP is a rapid development framework for PHP which uses commonly known design patterns like Front Controller and MVC.<br/>
             Our primary goal is to provide a structured framework that enables PHP users at all levels to rapidly develop robust web applications, without any loss to flexibility.
         </p>
     </div>

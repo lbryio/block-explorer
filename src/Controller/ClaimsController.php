@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\AppController;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
 

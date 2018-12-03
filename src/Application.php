@@ -16,6 +16,7 @@
 namespace App;
 
 use Cake\Core\Configure;
+use Cake\Core\Plugin;
 use Cake\Error\Middleware\ErrorHandlerMiddleware;
 use Cake\Http\BaseApplication;
 use Cake\Routing\Middleware\AssetMiddleware;

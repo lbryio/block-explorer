@@ -113,7 +113,7 @@
 <div class="home-container">
     <div class="home-container-cell">
         <div class="main">
-            <div class="title">LBRY Block Explorer</div><br>
+            <div class="title">LBRY Block Explorer</div><br/>
             <form method="get" action="/find">
                 <input class="search-input" name="q" type="text" placeholder="Enter a block height or hash, claim id or name, transaction hash or address" />
                 <div class="ctls">

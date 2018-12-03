@@ -1,5 +1,7 @@
 <?php
 
+namespace App\config;
+
 return [
     'Lbry' => [
         'RpcUrl' => 'http://user:password@127.0.0.1:9245',
