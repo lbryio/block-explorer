@@ -68,7 +68,7 @@ class AppController extends Controller
         }
     }
 
-    protected function _jsonResponse($object = [], $statusCode = null)
+    protected function _jsonResponse($object = [], $statusCode = 200)
     {
         $this->response->withStatus($statusCode);
         $this->response->withType('json');
