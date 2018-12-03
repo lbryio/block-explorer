@@ -129,7 +129,7 @@ class MainController extends AppController {
             // paginate claims
             $offset = 0;
             $pageLimit = 96;
-            $page = intval($this->request->query('page'));
+            $page = intval($this->request->getQuery('page'));
 
             $conn = ConnectionManager::get('default');
             $stmt = $conn->execute('SELECT COUNT(Id) AS Total FROM Claims');
@@ -330,7 +330,7 @@ class MainController extends AppController {
     }
 
     public function find() {
-        $criteria = $this->request->query('q');
+        $criteria = $this->request->getQuery('q');
 
         $this->loadModel('Blocks');
         $this->loadModel('Claims');
@@ -385,7 +385,7 @@ class MainController extends AppController {
             // paginate blocks
             $offset = 0;
             $pageLimit = 50;
-            $page = intval($this->request->query('page'));
+            $page = intval($this->request->getQuery('page'));
 
             $conn = ConnectionManager::get('default');
             $stmt = $conn->execute('SELECT COUNT(Id) AS Total FROM Blocks');
@@ -453,7 +453,7 @@ class MainController extends AppController {
         $this->loadModel('Outputs');
         $this->loadModel('Claims');
         
-        $sourceAddress = $this->request->query('address');
+        $sourceAddress = $this->request->getQuery('address');
 
         $tx = $this->Transactions->find()->select(
             ['Id', 'BlockHash', 'InputCount', 'OutputCount', 'Hash', 'Value', 'TransactionTime', 'TransactionSize', 'Created', 'Version', 'LockTime', 'Raw'])->where(['Hash' => $hash])->first();
@@ -550,7 +550,7 @@ class MainController extends AppController {
         $offset = 0;
         $pageLimit = 50;
         $numTransactions = 0;
-        $page = intval($this->request->query('page'));
+        $page = intval($this->request->getQuery('page'));
 
         $canTag = false;
         $totalRecvAmount = 0;
@@ -583,7 +583,7 @@ class MainController extends AppController {
             $stmt = $conn->execute('SELECT COUNT(TransactionId) AS Total FROM TransactionsAddresses WHERE AddressId = ?', [$addressId]);
             $count = $stmt->fetch(\PDO::FETCH_OBJ);
             $numTransactions = $count->Total;
-            $all = $this->request->query('all');
+            $all = $this->request->getQuery('all');
             if ($all === 'true') {
                 $offset = 0;
                 $pageLimit = $numTransactions;
