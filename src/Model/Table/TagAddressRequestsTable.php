@@ -8,11 +8,9 @@ class TagAddressRequestsTable extends Table {
     public function initialize(array $config) {
         parent::initialize($config);
 
-        $this->primaryKey('Id');
-        $this->table('TagAddressRequests');
+        $this->setPrimaryKey('Id');
+        $this->setTable('TagAddressRequests');
 
         $this->addBehavior('SimpleAudit');
     }
 }
-
-?>

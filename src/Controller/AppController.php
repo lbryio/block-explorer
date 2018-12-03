@@ -36,6 +36,7 @@ class AppController extends Controller
      * e.g. `$this->loadComponent('Security');`
      *
      * @return void
+     * @throws \Exception
      */
     public function initialize()
     {
@@ -61,7 +62,7 @@ class AppController extends Controller
     public function beforeRender(Event $event)
     {
         if (!array_key_exists('_serialize', $this->viewVars) &&
-            in_array($this->response->type(), ['application/json', 'application/xml'])
+            in_array($this->response->getType(), ['application/json', 'application/xml'])
         ) {
             $this->set('_serialize', true);
         }
@@ -69,9 +70,9 @@ class AppController extends Controller
 
     protected function _jsonResponse($object = [], $statusCode = null)
     {
-        $this->response->statusCode($statusCode);
-        $this->response->type('json');
-        $this->response->body(json_encode($object));
+        $this->response->withStatus($statusCode);
+        $this->response->withType('json');
+        $this->response->withStringBody(json_encode($object));
     }
 
     protected function _jsonError($message, $statusCode = null) {

@@ -8,8 +8,8 @@ class ClaimsTable extends Table {
     public function initialize(array $config) {
         parent::initialize($config);
 
-        $this->primaryKey('Id');
-        $this->table('Claims');
+        $this->setPrimaryKey('Id');
+        $this->setTable('Claims');
 
         //$this->addBehavior('SimpleAudit');
         $this->addAssociations([
@@ -32,5 +32,3 @@ class ClaimsTable extends Table {
         ]);
     }
 }
-
-?>

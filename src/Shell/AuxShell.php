@@ -220,5 +220,3 @@ class AuxShell extends Shell {
         return $response;
     }
 }
-
-?>

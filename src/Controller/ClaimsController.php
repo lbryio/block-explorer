@@ -11,10 +11,10 @@ class ClaimsController extends AppController {
         $this->loadModel('Claims');
 
         $pageLimit = 48;
-        $beforeId = intval($this->request->query('before'));
-        $afterId = intval($this->request->query('after'));
-        $sort = trim($this->request->query('sort'));
-        $nsfw = trim($this->request->query('nsfw'));
+        $beforeId = intval($this->request->getQuery('before'));
+        $afterId = intval($this->request->getQuery('after'));
+        $sort = trim($this->request->getQuery('sort'));
+        $nsfw = trim($this->request->getQuery('nsfw'));
         switch ($sort) {
             case 'popular':
                 // TODO: sort by upvote/downvote score

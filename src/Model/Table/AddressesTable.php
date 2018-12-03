@@ -8,8 +8,8 @@ class AddressesTable extends Table {
     public function initialize(array $config) {
         parent::initialize($config);
 
-        $this->primaryKey('Id');
-        $this->table('Addresses');
+        $this->setPrimaryKey('Id');
+        $this->setTable('Addresses');
 
         $this->addBehavior('SimpleAudit');
     }

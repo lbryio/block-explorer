@@ -8,11 +8,9 @@ class ClaimStreamsTable extends Table {
     public function initialize(array $config) {
         parent::initialize($config);
 
-        $this->primaryKey('Id');
-        $this->table('ClaimStreams');
+        $this->setPrimaryKey('Id');
+        $this->setTable('ClaimStreams');
 
         //$this->addBehavior('SimpleAudit');
     }
 }
-
-?>
