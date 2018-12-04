@@ -20,6 +20,8 @@ class MainController extends AppController {
 
     const lbcPriceKey = 'lbc.price';
 
+    const txOutSetInfo = 'lbrcrd.tosi';
+
     const bittrexMarketUrl = 'https://bittrex.com/api/v1.1/public/getticker?market=BTC-LBC';
 
     const blockchainTickerUrl = 'https://blockchain.info/ticker';
@@ -697,17 +699,47 @@ class MainController extends AppController {
         }
     }
 
-    private function _gettxoutsetinfo() {
-        $req = ['method' => 'gettxoutsetinfo', 'params' => []];
-        try {
-            $res = json_decode(self::curl_json_post(self::$rpcurl, json_encode($req)));
-            if (!isset($res->result)) {
-                return 0;
+     protected function _gettxoutsetinfo() {
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        $txOutSetInfo = new \stdClass();
+        $txOutSetInfo->time = $now->format('c');
+
+        $shouldRefreshSet = false;
+        if (!$this->redis) {
+            $shouldRefreshSet = true;
+        } else {
+            if (!$this->redis->exists(self::txOutSetInfo)) {
+                $shouldRefreshSet = true;
+            } else {
+                $txOutSetInfo = json_decode($this->redis->get(self::txOutSetInfo));
+                $lastTOSIDt = new \DateTime($txOutSetInfo->time);
+                $diff = $now->diff($lastTOSIDt);
+                $diffMinutes = $diff->i;
+                if ($diffMinutes >= 15 || $txOutSetInfo->set == 'N/A') {
+                    $shouldRefreshSet = true;
+                }
             }
-            return $res->result;
-        } catch (\Exception $e) {
-            return 'N/A';
         }
+
+        if ($shouldRefreshSet) {
+
+            $req = ['method' => 'gettxoutsetinfo', 'params' => []];
+            try {
+                $res = json_decode(self::curl_json_post(self::$rpcurl, json_encode($req)));
+                if (!isset($res->result)) {
+                    $txOutSetInfo->tosi = 'N/A';
+                }
+                $txOutSetInfo->tosi = $res->result;
+            } catch (\Exception $e) {
+                $txOutSetInfo->tosi = 'N/A';
+            }
+            $txOutSetInfo->time = $now->format('c');
+            if ($this->redis) {
+                $this->redis->set(self::txOutSetInfo, json_encode($txOutSetInfo));
+            }
+        }
+
+        return (isset($txOutSetInfo->tosi)) ? $txOutSetInfo->tosi : 'N/A';
     }
 
     public function apistatus() {
@@ -937,5 +969,3 @@ class MainController extends AppController {
         return $response;
     }
 }
-
-?>
