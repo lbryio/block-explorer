@@ -13,6 +13,7 @@ use Cake\Log\Log;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\LabelAlignment;
 use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Response\QrCodeResponse;
 
 class MainController extends AppController {
 
@@ -377,7 +378,7 @@ class MainController extends AppController {
             }
         }
     }
-    
+
     public function blocks($height = null) {
         $this->loadModel('Blocks');
 
@@ -452,7 +453,7 @@ class MainController extends AppController {
         $this->loadModel('Inputs');
         $this->loadModel('Outputs');
         $this->loadModel('Claims');
-        
+
         $sourceAddress = $this->request->query('address');
 
         $tx = $this->Transactions->find()->select(
@@ -512,7 +513,7 @@ class MainController extends AppController {
         if (isset($priceInfo->price)) {
             $priceRate = $priceInfo->price;
         }
-        
+
         $lbryAddresses = ['rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd', 'r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL', 'r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi', 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt', 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2', 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD', 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393', 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc'];
         $totalBalance = 0;
         $maxBalance = 0;
@@ -559,12 +560,6 @@ class MainController extends AppController {
         $recentTxs = [];
 
         $tagRequestAmount = 0;
-        // Check for pending tag request
-        $this->loadModel('TagAddressRequests');
-        $pending = $this->TagAddressRequests->find()->where(['Address' => $addr, 'IsVerified <>' => 1])->first();
-        if (!$pending) {
-            $tagRequestAmount = '25.' . rand(11111111, 99999999);
-        }
 
         $address = $this->Addresses->find()->where(['Address' => $addr])->first();
         if (!$address) {
@@ -625,8 +620,6 @@ class MainController extends AppController {
 
         $this->set('offset', $offset);
         $this->set('canTag', $canTag);
-        $this->set('pending', $pending);
-        $this->set('tagRequestAmount', $tagRequestAmount);
         $this->set('address', $address);
         $this->set('totalReceived', $totalRecvAmount);
         $this->set('totalSent', $totalSentAmount);
@@ -649,15 +642,15 @@ class MainController extends AppController {
         $qrCode->setSize(300);
 
         // Set advanced options
-        $qrCode
-            ->setWriterByName('png')
-            ->setMargin(10)
-            ->setEncoding('UTF-8')
-            ->setErrorCorrectionLevel(ErrorCorrectionLevel::LOW)
-            ->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0])
-            ->setBackgroundColor(['r' => 255, 'g' => 255, 'b' => 255])
-            ->setLogoWidth(150)
-            ->setValidateResult(false);
+        $qrCode->setWriterByName('png');
+        $qrCode->setMargin(10);
+        $qrCode->setEncoding('UTF-8');
+        $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::LOW));
+        $qrCode->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0]);
+        $qrCode->setBackgroundColor(['r' => 255, 'g' => 255, 'b' => 255, 'a' => 0]);
+        $qrCode->setLogoWidth(150);
+        $qrCode->setValidateResult(false);
+
 
         header('Content-Type: '.$qrCode->getContentType());
         echo $qrCode->writeString();
