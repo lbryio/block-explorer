@@ -222,16 +222,16 @@ return [
             'className' => 'Cake\Database\Connection',
             'driver' => 'Cake\Database\Driver\Mysql',
             'persistent' => false,
-            'host' => 'localhost',
+            'host' => 'chainquery.lbry.io:3600',
             /**
              * CakePHP will use the default DB port based on the driver selected
              * MySQL on MAMP uses port 8889, MAMP users will want to uncomment
              * the following line and set the port accordingly
              */
             //'port' => 'non_standard_port_number',
-            'username' => 'my_app',
-            'password' => 'secret',
-            'database' => 'my_app',
+            'username' => 'marcdeb',
+            'password' => '3885fc6d0b71befe72a327f47f36c0911057',
+            'database' => 'lbry',
             'encoding' => 'utf8',
             'timezone' => 'UTC',
             'flags' => [],
@@ -257,7 +257,7 @@ return [
              */
             //'init' => ['SET GLOBAL innodb_stats_on_metadata = 0'],
 
-            'url' => env('DATABASE_URL', null),
+            'url' => env('DATABASE_URL', 'chainquery.lbry.io:3600'),
         ],
 
         /**

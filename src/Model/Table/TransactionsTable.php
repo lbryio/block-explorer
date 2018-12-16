@@ -8,8 +8,8 @@ class TransactionsTable extends Table {
     public function initialize(array $config) {
         parent::initialize($config);
 
-        $this->primaryKey('Id');
-        $this->table('Transactions');
+        $this->primaryKey('id');
+        $this->table('transaction');
 
         $this->addBehavior('SimpleAudit');
     }

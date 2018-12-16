@@ -8,19 +8,19 @@ class InputsTable extends Table {
     public function initialize(array $config) {
         parent::initialize($config);
 
-        $this->primaryKey('Id');
-        $this->table('Inputs');
+        $this->primaryKey('id');
+        $this->table('input');
 
         $this->addBehavior('SimpleAudit');
 
         $this->addAssociations([
             'belongsToMany' => [
-                'InputAddresses' => [
+                'input_addresses' => [
                     'className' => 'App\Model\Table\AddressesTable',
-                    'joinTable' => 'InputsAddresses',
-                    'foreignKey' => 'InputId',
-                    'targetForeignKey' => 'AddressId',
-                    'propertyName' => 'InputAddresses'
+                    'joinTable' => 'input_addresses',
+                    'foreignKey' => 'input_id',
+                    'targetForeignKey' => 'address_id',
+                    'propertyName' => 'input_addresses'
                 ]
             ]
         ]);

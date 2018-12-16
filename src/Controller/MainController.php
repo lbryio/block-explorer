@@ -14,6 +14,7 @@ use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\LabelAlignment;
 use Endroid\QrCode\QrCode;
 
+
 class MainController extends AppController {
 
     public static $rpcurl;
@@ -92,21 +93,23 @@ class MainController extends AppController {
         $lbcUsdPrice = $this->_getLatestPrice();
         $this->set('lbcUsdPrice', $lbcUsdPrice);
 
-        $blocks = $this->Blocks->find()->select(['Chainwork', 'Confirmations', 'Difficulty', 'Hash', 'Height', 'TransactionHashes', 'BlockTime', 'BlockSize'])->
-            order(['Height' => 'desc'])->limit(6)->toArray();
+        $blocks = $this->Blocks->find()->select(['chainwork', 'confirmations', 'difficulty', 'hash', 'height', 'transaction_hashes', 'block_time', 'block_size'])->order(['height' => 'desc'])->limit(6)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
-            $tx_hashes = json_decode($blocks[$i]->TransactionHashes);
-            $blocks[$i]->TransactionCount = count($tx_hashes);
+            $tx_hashes = json_decode($blocks[$i]->transaction_hashes, true);
+            $blocks[$i]->transaction_count = count($tx_hashes);
         }
 
         // hash rate
         $hashRate = $this->_formatHashRate($this->_gethashrate());
 
         // recent claims
-        $claims = $this->Claims->find()->select(['TransactionHash', 'Name', 'Vout', 'ClaimId', 'ClaimType', 'Author', 'Title', 'Description', 'ContentType',
-                                                 'IsNSFW', 'Language', 'ThumbnailUrl', 'Created'])->
-            distinct(['Claims.ClaimId'])->
-            contain(['Publisher' => ['fields' => ['Name']]])->order(['Claims.Created' => 'DESC'])->limit(5)->toArray();
+        $claims = $this->Claims->find()->select(['transaction_hash_id', 'name', 'vout', 'claim_id', 'claim_type', 'author', 'title', 'description', 'content_type', 'is_nsfw', 'language', 'thumbnail_url', 'created_at'])->
+            distinct(['Claims.claim_id'])->order(['Claims.created_at' => 'DESC'])->limit(5)->toArray();
+
+        foreach($claims as $claim) {
+            $publisher = $this->Claims->find()->select(['name'])->where(['claim_id' => $claim->publisher_id])->first();
+            $claim->publisher = $publisher;
+        }
 
         $this->set('recentBlocks', $blocks);
         $this->set('recentClaims', $claims);
@@ -399,10 +402,10 @@ class MainController extends AppController {
             }
 
             $offset = ($page - 1) * $pageLimit;
-            $currentBlock = $this->Blocks->find()->select(['Height'])->order(['Height' => 'DESC'])->first();
+            $currentBlock = $this->Blocks->find()->select(['height'])->order(['height' => 'DESC'])->first();
             $blocks = $this->Blocks->find()->select(
-                ['Height', 'Difficulty', 'TransactionHashes', 'BlockSize', 'Nonce', 'BlockTime']
-            )->offset($offset)->limit($pageLimit)->order(['Height' => 'DESC'])->toArray();
+                ['height', 'difficulty', 'transaction_hashes', 'block_size', 'nonce', 'block_time']
+            )->offset($offset)->limit($pageLimit)->order(['height' => 'DESC'])->toArray();
             $this->set('currentBlock', $currentBlock);
             $this->set('blocks', $blocks);
             $this->set('pageLimit', $pageLimit);
@@ -416,28 +419,13 @@ class MainController extends AppController {
                 return $this->redirect('/');
             }
 
-            $block = $this->Blocks->find()->where(['Height' => $height])->first();
+            $block = $this->Blocks->find()->where(['height' => $height])->first();
             if (!$block) {
                 return $this->redirect('/');
             }
 
-            try {
-                // update the block confirmations
-                $req = ['method' => 'getblock', 'params' => [$block->Hash]];
-                $response = self::curl_json_post(self::$rpcurl, json_encode($req));
-                $json = json_decode($response);
-                $rpc_block = $json->result;
-                if (isset($rpc_block->confirmations)) {
-                    $block->Confirmations = $rpc_block->confirmations;
-                    $conn = ConnectionManager::get('default');
-                    $conn->execute('UPDATE Blocks SET Confirmations = ? WHERE Id = ?', [$rpc_block->confirmations, $block->Id]);
-                }
-            } catch (\Exception $e) {
-                // try again next time
-            }
-
             // Get the basic block transaction info
-            $txs = $this->Transactions->find()->select(['InputCount', 'OutputCount', 'Hash', 'Value', 'Version'])->where(['BlockHash' => $block->Hash])->toArray();
+            $txs = $this->Transactions->find()->select(['input_count', 'output_count', 'hash', 'version'])->where(['block_hash_id' => $block->hash])->toArray();
 
             $this->set('block', $block);
             $this->set('blockTxs', $txs);
@@ -449,32 +437,27 @@ class MainController extends AppController {
         $this->loadModel('Transactions');
         $this->loadModel('Inputs');
         $this->loadModel('Outputs');
+        $this->loadModel('Addresses');
         $this->loadModel('Claims');
         
         $sourceAddress = $this->request->query('address');
 
         $tx = $this->Transactions->find()->select(
-            ['Id', 'BlockHash', 'InputCount', 'OutputCount', 'Hash', 'Value', 'TransactionTime', 'TransactionSize', 'Created', 'Version', 'LockTime', 'Raw'])->where(['Hash' => $hash])->first();
+            ['id', 'block_hash_id', 'input_count', 'output_count', 'hash', 'transaction_time', 'transaction_size', 'created_at', 'version', 'lock_time', 'raw'])->where(['hash' => $hash])->first();
         if (!$tx) {
             return $this->redirect('/');
         }
 
-        if ($tx->TransactionSize == 0) {
-            $tx->TransactionSize = (strlen($tx->Raw) / 2);
-            $conn = ConnectionManager::get('default');
-            $conn->execute('UPDATE Transactions SET TransactionSize = ? WHERE Id = ?', [$tx->TransactionSize, $tx->Id]);
-        }
-
-        $maxBlock = $this->Blocks->find()->select(['Height'])->order(['Height' => 'desc'])->first();
-        $block = $this->Blocks->find()->select(['Confirmations', 'Height'])->where(['Hash' => $tx->BlockHash])->first();
-        $confirmations = $block ? (($maxBlock->Height - $block->Height) + 1) : '0';
-        $inputs = $this->Inputs->find()->contain(['InputAddresses'])->where(['TransactionId' => $tx->Id])->order(['PrevoutN' => 'asc'])->toArray();
-        $outputs = $this->Outputs->find()->contain(['OutputAddresses', 'SpendInput' => ['fields' => ['Id', 'TransactionHash', 'PrevoutN', 'PrevoutHash']]])->where(['Outputs.TransactionId' => $tx->Id])->order(['Vout' => 'asc'])->toArray();
+        $block = $this->Blocks->find()->select(['confirmations', 'height'])->where(['hash' => $tx->block_hash_id])->first();
+        $confirmations = $block->confirmations;
+        $inputs = $this->Inputs->find()->where(['transaction_id' => $tx->id])->order(['prevout_n' => 'asc'])->toArray();
+        $inputAddresses = $this->Addresses->find()->where(['input_address_id'])->toArray();
+        $outputs = $this->Outputs->find()->where(['transaction_id' => $tx->id])->order(['vout' => 'asc'])->toArray();
         for ($i = 0; $i < count($outputs); $i++) {
-            $outputs[$i]->IsClaim = (strpos($outputs[$i]->ScriptPubKeyAsm, 'CLAIM') > -1);
-            $outputs[$i]->IsSupportClaim = (strpos($outputs[$i]->ScriptPubKeyAsm, 'SUPPORT_CLAIM') > -1);
-            $outputs[$i]->IsUpdateClaim = (strpos($outputs[$i]->ScriptPubKeyAsm, 'UPDATE_CLAIM') > -1);
-            $claim = $this->Claims->find()->where(['TransactionHash' => $tx->Hash, 'Vout' => $outputs[$i]->Vout])->first();
+            $outputs[$i]->IsClaim = (strpos($outputs[$i]->script_pub_key_asm, 'CLAIM') > -1);
+            $outputs[$i]->IsSupportClaim = (strpos($outputs[$i]->script_pub_key_asm, 'SUPPORT_CLAIM') > -1);
+            $outputs[$i]->IsUpdateClaim = (strpos($outputs[$i]->script_pub_key_asm, 'UPDATE_CLAIM') > -1);
+            $claim = $this->Claims->find()->where(['transaction_hash_id' => $tx->hash, 'vout' => $outputs[$i]->vout])->first();
             $outputs[$i]->Claim = $claim;
         }
 
@@ -482,10 +465,10 @@ class MainController extends AppController {
         $totalOut = 0;
         $fee = 0;
         foreach ($inputs as $in) {
-            $totalIn = bcadd($totalIn, $in->Value, 8);
+            $totalIn = bcadd($totalIn, $in->value, 8);
         }
         foreach ($outputs as $out) {
-            $totalOut = bcadd($totalOut, $out->Value, 8);
+            $totalOut = bcadd($totalOut, $out->value, 8);
         }
         $fee = bcsub($totalIn, $totalOut, 8);
 
