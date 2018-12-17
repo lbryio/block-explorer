@@ -96,9 +96,12 @@ class MainController extends AppController {
         $blocks = $this->Blocks->find()->select(['chainwork', 'confirmations', 'difficulty', 'hash', 'height', 'transaction_hashes', 'block_time', 'block_size'])->order(['height' => 'desc'])->limit(6)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
             $tx_hashes = json_decode($blocks[$i]->transaction_hashes, true);
-            $blocks[$i]->transaction_count = count($tx_hashes);
+            if(!empty($tx_hashes)) {
+                $blocks[$i]->transaction_count = count($tx_hashes);
+            } else {
+                $blocks[$i]->transaction_count = 0;
+            }
         }
-
         // hash rate
         $hashRate = $this->_formatHashRate($this->_gethashrate());
 
