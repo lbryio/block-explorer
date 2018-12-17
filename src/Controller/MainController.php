@@ -381,6 +381,8 @@ class MainController extends AppController {
     
     public function blocks($height = null) {
         $this->loadModel('Blocks');
+        $this->loadModel('Outputs');
+        $this->loadModel('Transactions');
 
         if ($height === null) {
             // paginate blocks
@@ -413,7 +415,6 @@ class MainController extends AppController {
             $this->set('numRecords', $numBlocks);
             $this->set('currentPage', $page);
         } else {
-            $this->loadModel('Transactions');
             $height = intval($height);
             if ($height < 0) {
                 return $this->redirect('/');
@@ -425,7 +426,8 @@ class MainController extends AppController {
             }
 
             // Get the basic block transaction info
-            $txs = $this->Transactions->find()->select(['input_count', 'output_count', 'hash', 'version'])->where(['block_hash_id' => $block->hash])->toArray();
+            $txs = $this->Transactions->find()->select(['id', 'input_count', 'output_count', 'hash', 'version'])->where(['block_hash_id' => $block->hash])->toArray();
+            
 
             $this->set('block', $block);
             $this->set('blockTxs', $txs);
@@ -444,6 +446,7 @@ class MainController extends AppController {
 
         $tx = $this->Transactions->find()->select(
             ['id', 'block_hash_id', 'input_count', 'output_count', 'hash', 'transaction_time', 'transaction_size', 'created_at', 'version', 'lock_time', 'raw'])->where(['hash' => $hash])->first();
+        $tx->value = $tx->value();
         if (!$tx) {
             return $this->redirect('/');
         }

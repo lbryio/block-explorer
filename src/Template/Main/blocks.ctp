@@ -29,13 +29,11 @@
     </div>
 
     <div class="block-nav">
-        <?php if (strlen(trim($block->previous_block_hash)) > 0): ?>
+        <?php if ($block->height > 0): ?>
         <a class="btn btn-prev" href="/blocks/<?php echo ($block->height - 1); ?>">&laquo; Previous Block</a>
         <?php endif; ?>
 
-        <?php if (strlen(trim($block->next_block_hash)) > 0): ?>
         <a class="btn btn-next" href="/blocks/<?php echo ($block->height + 1); ?>">Next Block &raquo;</a>
-        <?php endif; ?>
 
         <div class="clear"></div>
     </div>
