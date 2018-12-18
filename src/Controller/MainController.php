@@ -599,7 +599,7 @@ class MainController extends AppController {
         $conn = ConnectionManager::get('default');
 
         // get avg block sizes for the time period
-        $stmt = $conn->execute("SELECT AVG(BlockSize) AS AvgBlockSize, DATE_FORMAT(FROM_UNIXTIME(block_time), '$sqlDateFormat') AS TimePeriod " .
+        $stmt = $conn->execute("SELECT AVG(block_size) AS AvgBlockSize, DATE_FORMAT(FROM_UNIXTIME(block_time), '$sqlDateFormat') AS TimePeriod " .
                                "FROM block WHERE DATE_FORMAT(FROM_UNIXTIME(block_time), '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
         $avgBlockSizes = $stmt->fetchAll(\PDO::FETCH_OBJ);
         foreach ($avgBlockSizes as $size) {
@@ -610,8 +610,10 @@ class MainController extends AppController {
         }
 
         // get avg prices
-        $stmt = $conn->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(created_at, '$sqlDateFormat') AS TimePeriod " .
-                               "FROM PriceHistory WHERE DATE_FORMAT(created_at, '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
+        
+        $conn = ConnectionManager::get('localdb');
+        $stmt = $conn->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(Created, '$sqlDateFormat') AS TimePeriod " .
+                               "FROM PriceHistory WHERE DATE_FORMAT(Created, '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
         $avgPrices = $stmt->fetchAll(\PDO::FETCH_OBJ);
         foreach ($avgPrices as $price) {
             if (!isset($resultSet[$price->TimePeriod])) {
@@ -627,7 +629,7 @@ class MainController extends AppController {
         // Load 10 blocks
         $this->autoRender = false;
         $this->loadModel('Blocks');
-        $blocks = $this->Blocks->find()->select(['height' => 'Height', 'block_time' => 'BlockTime', 'transaction_hashes'])->order(['Height' => 'desc'])->limit(10)->toArray();
+        $blocks = $this->Blocks->find()->select(['Height' => 'height', 'BlockTime' => 'block_time', 'transaction_hashes'])->order(['Height' => 'desc'])->limit(10)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
             $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
             $blocks[$i]->TransactionCount = count($tx_hashes);
@@ -641,7 +643,7 @@ class MainController extends AppController {
         // Load 10 transactions
         $this->autoRender = false;
         $this->loadModel('Transactions');
-        $txs = $this->Transactions->find()->select(['id', 'hash' => 'Hash', 'input_count' => 'InputCount', 'output_count' => 'OutputCount', 'transaction_time' => 'TxTime'])->order(['TxTime' => 'desc'])->limit(10);
+        $txs = $this->Transactions->find()->select(['id', 'Hash' => 'hash', 'InputCount' => 'input_count', 'OutputCount' => 'output_count', 'TxTime' => 'transaction_time'])->order(['TxTime' => 'desc'])->limit(10);
         foreach($txs as $tx) {
             $tx->Value = $tx->value();
         }
@@ -675,12 +677,11 @@ class MainController extends AppController {
     public function apirecentblocks() {
         $this->autoRender = false;
         $this->loadModel('Blocks');
-        $blocks = $this->Blocks->find()->select(['difficulty' => 'Difficulty', 'hash' => 'Hash', 'height' => 'Height', 'transaction_hashes', 'block_time' => 'BlockTime', 'block_size' => 'BlockSize'])->
-            order(['height' => 'desc'])->limit(6)->toArray();
+        $blocks = $this->Blocks->find()->select(['Difficulty' => 'difficulty', 'Hash' => 'hash', 'Height' => 'height', 'transaction_hashes', 'BlockTime' => 'block_time', 'BlockSize' => 'block_size'])->order(['Height' => 'desc'])->limit(6)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
             $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
             $blocks[$i]->TransactionCount = count($tx_hashes);
-            $blocks[$i]->Difficulty = number_format($blocks[$i]->difficulty, 2, '.', '');
+            $blocks[$i]->Difficulty = number_format($blocks[$i]->Difficulty, 2, '.', '');
             unset($blocks[$i]->transaction_hashes);
         }
         return $this->_jsonResponse(['success' => true, 'blocks' => $blocks]);

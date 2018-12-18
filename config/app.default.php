@@ -271,9 +271,9 @@ return [
              * the following line and set the port accordingly
              */
             //'port' => '3306',
-            'username' => 'my_app',
-            'password' => 'secret',
-            'database' => 'my_app',
+            'username' => 'root',
+            //'password' => 'secret',
+            'database' => 'lbry',
             'encoding' => 'utf8',
             'timezone' => 'UTC',
             'flags' => [],
