@@ -627,10 +627,10 @@ class MainController extends AppController {
         // Load 10 blocks
         $this->autoRender = false;
         $this->loadModel('Blocks');
-        $blocks = $this->Blocks->find()->select(['height', 'block_time', 'transaction_hashes'])->order(['height' => 'desc'])->limit(10)->toArray();
+        $blocks = $this->Blocks->find()->select(['height' => 'Height', 'block_time' => 'BlockTime', 'transaction_hashes'])->order(['Height' => 'desc'])->limit(10)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
             $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
-            $blocks[$i]->transaction_count = count($tx_hashes);
+            $blocks[$i]->TransactionCount = count($tx_hashes);
             unset($blocks[$i]->transaction_hashes);
         }
 
@@ -641,7 +641,10 @@ class MainController extends AppController {
         // Load 10 transactions
         $this->autoRender = false;
         $this->loadModel('Transactions');
-        $txs = $this->Transactions->find()->select(['id', 'hash', 'input_count', 'output_count', 'transaction_time'])->order(['transaction_time' => 'desc'])->        limit(10);
+        $txs = $this->Transactions->find()->select(['id', 'hash' => 'Hash', 'input_count' => 'InputCount', 'output_count' => 'OutputCount', 'transaction_time' => 'TxTime'])->order(['TxTime' => 'desc'])->limit(10);
+        foreach($txs as $tx) {
+            $tx->Value = $tx->value();
+        }
 
         $this->_jsonResponse(['success' => true, 'txs' => $txs]);
     }
@@ -672,12 +675,12 @@ class MainController extends AppController {
     public function apirecentblocks() {
         $this->autoRender = false;
         $this->loadModel('Blocks');
-        $blocks = $this->Blocks->find()->select(['difficulty', 'hash', 'height', 'transaction_hashes', 'block_time', 'block_size'])->
+        $blocks = $this->Blocks->find()->select(['difficulty' => 'Difficulty', 'hash' => 'Hash', 'height' => 'Height', 'transaction_hashes', 'block_time' => 'BlockTime', 'block_size' => 'BlockSize'])->
             order(['height' => 'desc'])->limit(6)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
             $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
-            $blocks[$i]->transaction_count = count($tx_hashes);
-            $blocks[$i]->difficulty = number_format($blocks[$i]->difficulty, 2, '.', '');
+            $blocks[$i]->TransactionCount = count($tx_hashes);
+            $blocks[$i]->Difficulty = number_format($blocks[$i]->difficulty, 2, '.', '');
             unset($blocks[$i]->transaction_hashes);
         }
         return $this->_jsonResponse(['success' => true, 'blocks' => $blocks]);
