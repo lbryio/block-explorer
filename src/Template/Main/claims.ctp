@@ -75,7 +75,7 @@ if (strlen(trim($desc)) == 0) {
         </div>
 
         <div class="content">
-            <?php if ($claim->claim_type == 2): ?>
+            <?php if ($claim->claim_type == 1): ?>
             <div class="label">Published By</div>
             <div class="value">
                 <?php if (isset($claim->publisher)): ?>
@@ -92,7 +92,7 @@ if (strlen(trim($desc)) == 0) {
             <div class="label">Transaction ID</div>
             <div class="value"><a href="/tx/<?php echo $claim->transaction_hash_id ?>#output-<?php echo $claim->vout ?>"><?php echo $claim->transaction_hash_id ?></a></div>
 
-            <?php if ($claim->claim_type == 2): ?>
+            <?php if ($claim->claim_type == 1): ?>
             <div class="label half-width">Cost</div>
             <div class="label half-width">Safe for Work</div>
 
@@ -120,8 +120,10 @@ if (strlen(trim($desc)) == 0) {
                 <div class="value half-width"><?php echo strlen(trim($claim->author)) > 0 ? $claim->author : '<em>Unspecified</em>' ?></div>
                 <div class="value half-width"><?php echo strlen(trim($claim->content_type)) > 0 ? $claim->content_type : '<em>Unspecified</em>' ?></div>
 
+                <!--
                 <div class="label half-width">License</div>
-                <div class="label half-width">Language</div>
+                -->
+                <div class="label">Language</div>
 
                 <!--
                 <div class="value half-width"<?php if(strlen(trim($claim->license)) > 0): ?> title="<?php echo $claim->license ?>"<?php endif; ?>>
