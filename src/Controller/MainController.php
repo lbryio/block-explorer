@@ -729,13 +729,13 @@ class MainController extends AppController {
         }
 
         // check if the tag is taken
-        $addrTag = $this->Addresses->find()->select(['Id'])->where(['LOWER(Tag)' => strtolower($entity->Tag)])->first();
+        $addrTag = $this->Addresses->find()->select(['id'])->where(['LOWER(Tag)' => strtolower($entity->Tag)])->first();
         if ($addrTag) {
             return $this->_jsonError('Oops! The tag is already taken. Please specify a different tag.', 400);
         }
 
         // check for existing verification
-        $exist = $this->TagAddressRequests->find()->select(['Id'])->where(['Address' => $base58address, 'IsVerified' => 0])->first();
+        $exist = $this->TagAddressRequests->find()->select(['id'])->where(['Address' => $base58address, 'IsVerified' => 0])->first();
         if ($exist) {
             return $this->_jsonError('Oops! There is a pending tag verification for this address.', 400);
         }
@@ -755,16 +755,23 @@ class MainController extends AppController {
         if (!isset($base58address)) {
             return $this->_jsonError('Base58 address not specified.', 400);
         }
-
-        // TODO: Add unconfirmed_balance to response
-        $result = $this->Addresses->find()->select(['Balance'])->where(['Address' => $base58address])->first();
-        if (!$result) {
-            // Return 0 for address that does not exist?
-            $result = new \stdClass();
-            $result->Balance = 0;
+        
+        $address = $this->Addresses->find()->select(['id'])->where(['address' => $base58address])->first();
+        if (!$address) {
+            return $this->_jsonError('Could not find address.', 400);
         }
-
-        return $this->_jsonResponse(['success' => true, ['balance' => ['confirmed' => $result->Balance, 'unconfirmed' => 0]]]);
+        $conn = ConnectionManager::get('default');
+        $stmt = $conn->execute(sprintf(
+                'SELECT TA.debit_amount, TA.credit_amount, ' .
+                'FROM transaction_address TA' .
+                'WHERE TA.address_id = ?'), [$address->id]);
+        $transaction_addresses = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        $balance = 0;
+        foreach($transaction_addresses as $ta) {
+            $balance += $ta->credit_amount;
+            $balance -= $ta->debit_amount;
+        } 
+        return $this->_jsonResponse(['success' => true, ['balance' => ['confirmed' => $balance, 'unconfirmed' => 0]]]);
     }
 
     public function apiaddrutxo($base58address = null) {
