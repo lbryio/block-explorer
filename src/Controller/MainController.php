@@ -95,12 +95,8 @@ class MainController extends AppController {
 
         $blocks = $this->Blocks->find()->select(['chainwork', 'confirmations', 'difficulty', 'hash', 'height', 'transaction_hashes', 'block_time', 'block_size'])->order(['height' => 'desc'])->limit(6)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
-            $tx_hashes = json_decode($blocks[$i]->transaction_hashes, true);
-            if(!empty($tx_hashes)) {
-                $blocks[$i]->transaction_count = count($tx_hashes);
-            } else {
-                $blocks[$i]->transaction_count = 0;
-            }
+            $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
+            $blocks[$i]->transaction_count = count($tx_hashes);
         }
         // hash rate
         $hashRate = $this->_formatHashRate($this->_gethashrate());
@@ -238,7 +234,7 @@ class MainController extends AppController {
         $conn = ConnectionManager::get('default');
         $blocks = $this->Blocks->find()->select(['height', 'block_time', 'transaction_hashes'])->order(['height' => 'desc'])->limit(10)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
-            $tx_hashes = json_decode($blocks[$i]->transaction_hashes);
+            $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
             $blocks[$i]->transaction_count = count($tx_hashes);
         }
 
@@ -311,7 +307,7 @@ class MainController extends AppController {
             $page = intval($this->request->query('page'));
 
             $conn = ConnectionManager::get('default');
-            $stmt = $conn->execute('SELECT COUNT(Id) AS Total FROM Blocks');
+            $stmt = $conn->execute('SELECT COUNT(id) AS Total FROM Blocks');
             $count = $stmt->fetch(\PDO::FETCH_OBJ);
             $numBlocks = $count->Total;
 
@@ -592,8 +588,8 @@ class MainController extends AppController {
         $conn = ConnectionManager::get('default');
 
         // get avg block sizes for the time period
-        $stmt = $conn->execute("SELECT AVG(BlockSize) AS AvgBlockSize, DATE_FORMAT(FROM_UNIXTIME(BlockTime), '$sqlDateFormat') AS TimePeriod " .
-                               "FROM Blocks WHERE DATE_FORMAT(FROM_UNIXTIME(BlockTime), '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
+        $stmt = $conn->execute("SELECT AVG(BlockSize) AS AvgBlockSize, DATE_FORMAT(FROM_UNIXTIME(block_time), '$sqlDateFormat') AS TimePeriod " .
+                               "FROM block WHERE DATE_FORMAT(FROM_UNIXTIME(block_time), '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
         $avgBlockSizes = $stmt->fetchAll(\PDO::FETCH_OBJ);
         foreach ($avgBlockSizes as $size) {
             if (!isset($resultSet[$size->TimePeriod])) {
@@ -603,8 +599,8 @@ class MainController extends AppController {
         }
 
         // get avg prices
-        $stmt = $conn->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(Created, '$sqlDateFormat') AS TimePeriod " .
-                               "FROM PriceHistory WHERE DATE_FORMAT(Created, '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
+        $stmt = $conn->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(created_at, '$sqlDateFormat') AS TimePeriod " .
+                               "FROM PriceHistory WHERE DATE_FORMAT(created_at, '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
         $avgPrices = $stmt->fetchAll(\PDO::FETCH_OBJ);
         foreach ($avgPrices as $price) {
             if (!isset($resultSet[$price->TimePeriod])) {
@@ -617,26 +613,24 @@ class MainController extends AppController {
     }
     
     public function apirealtimeblocks() {
-        // load 10 blocks
+        // Load 10 blocks
         $this->autoRender = false;
         $this->loadModel('Blocks');
-        $blocks = $this->Blocks->find()->select(['Height', 'BlockTime', 'TransactionHashes'])->order(['Height' => 'desc'])->limit(10)->toArray();
+        $blocks = $this->Blocks->find()->select(['height', 'block_time', 'transaction_hashes'])->order(['height' => 'desc'])->limit(10)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
-            $tx_hashes = json_decode($blocks[$i]->TransactionHashes);
-            $blocks[$i]->TransactionCount = count($tx_hashes);
-            unset($blocks[$i]->TransactionHashes);
+            $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
+            $blocks[$i]->transaction_count = count($tx_hashes);
+            unset($blocks[$i]->transaction_hashes);
         }
 
         $this->_jsonResponse(['success' => true, 'blocks' => $blocks]);
     }
 
     public function apirealtimetx() {
-        // load 10 transactions
+        // Load 10 transactions
         $this->autoRender = false;
-        $conn = ConnectionManager::get('default');
-        $stmt = $conn->execute('SELECT T.Hash, T.InputCount, T.OutputCount, T.Value, IFNULL(T.TransactionTime, T.CreatedTime) AS TxTime ' .
-                               'FROM Transactions T ORDER BY CreatedTime DESC LIMIT 10');
-        $txs = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        $this->loadModel('Transactions');
+        $txs = $this->Transactions->find()->select(['id', 'hash', 'input_count', 'output_count', 'transaction_time'])->order(['transaction_time' => 'desc'])->        limit(10);
 
         $this->_jsonResponse(['success' => true, 'txs' => $txs]);
     }
@@ -648,9 +642,9 @@ class MainController extends AppController {
         // Get the max height block
         $height = 0;
         $difficulty = 0;
-        $highestBlock = $this->Blocks->find()->select(['Height', 'Difficulty'])->order(['Height' => 'desc'])->first();
-        $height = $highestBlock->Height;
-        $difficulty = $highestBlock->Difficulty;
+        $highestBlock = $this->Blocks->find()->select(['height', 'difficulty'])->order(['height' => 'desc'])->first();
+        $height = $highestBlock->height;
+        $difficulty = $highestBlock->difficulty;
         $lbcUsdPrice = $this->_getLatestPrice();
 
         // Calculate hash rate
@@ -667,13 +661,13 @@ class MainController extends AppController {
     public function apirecentblocks() {
         $this->autoRender = false;
         $this->loadModel('Blocks');
-        $blocks = $this->Blocks->find()->select(['Difficulty', 'Hash', 'Height', 'TransactionHashes', 'BlockTime', 'BlockSize'])->
-            order(['Height' => 'desc'])->limit(6)->toArray();
+        $blocks = $this->Blocks->find()->select(['difficulty', 'hash', 'height', 'transaction_hashes', 'block_time', 'block_size'])->
+            order(['height' => 'desc'])->limit(6)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
-            $tx_hashes = json_decode($blocks[$i]->TransactionHashes);
-            $blocks[$i]->TransactionCount = count($tx_hashes);
-            $blocks[$i]->Difficulty = number_format($blocks[$i]->Difficulty, 2, '.', '');
-            unset($blocks[$i]->TransactionHashes);
+            $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
+            $blocks[$i]->transaction_count = count($tx_hashes);
+            $blocks[$i]->difficulty = number_format($blocks[$i]->difficulty, 2, '.', '');
+            unset($blocks[$i]->transaction_hashes);
         }
         return $this->_jsonResponse(['success' => true, 'blocks' => $blocks]);
     }
