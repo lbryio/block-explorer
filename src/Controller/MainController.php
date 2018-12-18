@@ -220,19 +220,15 @@ class MainController extends AppController {
         $this->loadModel('Transactions');
 
         // load 10 blocks and transactions
-        $conn = ConnectionManager::get('default');
         $blocks = $this->Blocks->find()->select(['height', 'block_time', 'transaction_hashes'])->order(['height' => 'desc'])->limit(10)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
             $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
             $blocks[$i]->transaction_count = count($tx_hashes);
         }
 
-        $stmt = $conn->execute('SELECT T.id, T.hash, T.input_count, T.output_count, IFNULL(T.transaction_time, T.created_at) AS TxTime ' .
-                               'FROM  transaction T ORDER BY created_at DESC LIMIT 10');
-        $txs = $stmt->fetchAll(\PDO::FETCH_OBJ);
-
+        $transactions = $this->Transactions->find()->select(['id', 'hash', 'input_count', 'output_count', 'transaction_time', 'created_at'])->order(['created_at' => 'desc'])->limit(10)->toArray();
         $this->set('blocks', $blocks);
-        $this->set('txs', $txs);
+        $this->set('txs', $transactions);
     }
 
     public function find() {

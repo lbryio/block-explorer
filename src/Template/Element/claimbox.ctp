@@ -59,8 +59,9 @@ $ctTag = $claim->getContentTag();
         <div class="label half-width">Author</div>
         <div class="label half-width">License</div>
         
-        <!--
+        
         <div class="value half-width" title="<?php echo strlen(trim($claim->author)) > 0 ? $claim->author : '<em>Unspecified</em>' ?>"><?php echo strlen(trim($claim->author)) > 0 ? $claim->author : '<em>Unspecified</em>' ?></div>
+        <!--
         <div class="value half-width" title="<?php echo strlen(trim($claim->license)) > 0 ? $claim->license : '' ?>">
             <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
             <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
