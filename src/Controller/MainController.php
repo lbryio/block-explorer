@@ -256,38 +256,38 @@ class MainController extends AppController {
 
         if (is_numeric($criteria)) {
             $height = (int) $criteria;
-            $block = $this->Blocks->find()->select(['Id'])->where(['Height' => $height])->first();
+            $block = $this->Blocks->find()->select(['id'])->where(['height' => $height])->first();
             if ($block) {
                 return $this->redirect('/blocks/' . $height);
             }
         } else if (strlen(trim($criteria)) === 34) {
             // Address
-            $address = $this->Addresses->find()->select(['Id', 'Address'])->where(['Address' => $criteria])->first();
+            $address = $this->Addresses->find()->select(['id', 'address'])->where(['address' => $criteria])->first();
             if ($address) {
-                return $this->redirect('/address/' . $address->Address);
+                return $this->redirect('/address/' . $address->address);
             }
         } else if (strlen(trim($criteria)) === 40) {
             // Claim ID
-            $claim = $this->Claims->find()->select(['ClaimId'])->where(['ClaimId' => $criteria])->first();
+            $claim = $this->Claims->find()->select(['claim_id'])->where(['claim_id' => $criteria])->first();
             if ($claim) {
-                return $this->redirect('/claims/' . $claim->ClaimId);
+                return $this->redirect('/claims/' . $claim->claim_id);
             }
         } else if (strlen(trim($criteria)) === 64) { // block or tx hash
             // Try block hash first
-            $block = $this->Blocks->find()->select(['Height'])->where(['Hash' => $criteria])->first();
+            $block = $this->Blocks->find()->select(['height'])->where(['hash' => $criteria])->first();
             if ($block) {
-                return $this->redirect('/blocks/' . $block->Height);
+                return $this->redirect('/blocks/' . $block->height);
             } else {
-                $tx = $this->Transactions->find()->select(['Hash'])->where(['Hash' => $criteria])->first();
+                $tx = $this->Transactions->find()->select(['hash'])->where(['hash' => $criteria])->first();
                 if ($tx) {
-                    return $this->redirect('/tx/' . $tx->Hash);
+                    return $this->redirect('/tx/' . $tx->hash);
                 }
             }
         } else {
             // finally, try exact claim name match
-            $claims = $this->Claims->find()->distinct(['Claims.ClaimId'])->where(['Name' => $criteria])->order(['Claims.Created' => 'DESC'])->limit(10)->toArray();
+            $claims = $this->Claims->find()->distinct(['claim_id'])->where(['name' => $criteria])->order(['created_at' => 'DESC'])->limit(10)->toArray();
             if (count($claims) == 1) {
-                return $this->redirect('/claims/' . $claims[0]->ClaimId);
+                return $this->redirect('/claims/' . $claims[0]->claim_id);
             }
             else {
                 $this->set('claims', $claims);
@@ -371,7 +371,7 @@ class MainController extends AppController {
         $confirmations = $block->confirmations;
         $inputs = $this->Inputs->find()->where(['transaction_id' => $tx->id])->order(['prevout_n' => 'asc'])->toArray();
         foreach($inputs as $input) {
-            $inputAddresses = $this->Addresses->find()->where(['id' => 'input_address_id'])->toArray();
+            $inputAddresses = $this->Addresses->find()->select(['id', 'address'])->where(['id' => $input->input_address_id])->toArray();
             $input->input_addresses = $inputAddresses;
         }
         
@@ -387,7 +387,7 @@ class MainController extends AppController {
             $outputs[$i]->IsClaim = (strpos($outputs[$i]->script_pub_key_asm, 'CLAIM') > -1);
             $outputs[$i]->IsSupportClaim = (strpos($outputs[$i]->script_pub_key_asm, 'SUPPORT_CLAIM') > -1);
             $outputs[$i]->IsUpdateClaim = (strpos($outputs[$i]->script_pub_key_asm, 'UPDATE_CLAIM') > -1);
-            $claim = $this->Claims->find()->where(['transaction_hash_id' => $tx->hash, 'vout' => $outputs[$i]->vout])->first();
+            $claim = $this->Claims->find()->select(['id', 'claim_id', 'vout', 'transaction_hash_id'])->where(['transaction_hash_id' => $tx->hash, 'vout' => $outputs[$i]->vout])->first();
             $outputs[$i]->Claim = $claim;
         }
 
