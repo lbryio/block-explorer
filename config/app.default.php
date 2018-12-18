@@ -228,10 +228,10 @@ return [
              * MySQL on MAMP uses port 8889, MAMP users will want to uncomment
              * the following line and set the port accordingly
              */
-            'port' => '3306',
-            'username' => 'marcdeb',
-            'password' => '3885fc6d0b71befe72a327f47f36c0911057',
-            'database' => 'chainquery',
+            'port' => '3000',
+            'username' => 'username',
+            'password' => 'secret',
+            'database' => 'my_db',
             'encoding' => 'utf8',
             'timezone' => 'UTC',
             'flags' => [],
