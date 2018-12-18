@@ -370,9 +370,20 @@ class MainController extends AppController {
         $block = $this->Blocks->find()->select(['confirmations', 'height'])->where(['hash' => $tx->block_hash_id])->first();
         $confirmations = $block->confirmations;
         $inputs = $this->Inputs->find()->where(['transaction_id' => $tx->id])->order(['prevout_n' => 'asc'])->toArray();
-        $inputAddresses = $this->Addresses->find()->where(['input_address_id'])->toArray();
+        foreach($inputs as $input) {
+            $inputAddresses = $this->Addresses->find()->where(['id' => 'input_address_id'])->toArray();
+            $input->input_addresses = $inputAddresses;
+        }
+        
         $outputs = $this->Outputs->find()->where(['transaction_id' => $tx->id])->order(['vout' => 'asc'])->toArray();
         for ($i = 0; $i < count($outputs); $i++) {
+            $spend_input = $this->Inputs->find()->select(['transaction_hash', 'id'])->where(['id' => $outputs[$i]->spent_by_input_id])->first();
+            $outputs[$i]->spend_input = $spend_input;
+            
+            $output_address = trim($outputs[$i]->address_list, '[""]');
+            $address = $this->Addresses->find()->select(['address'])->where(['address' => $output_address])->first();
+            $outputs[$i]->output_addresses = [$address];
+            
             $outputs[$i]->IsClaim = (strpos($outputs[$i]->script_pub_key_asm, 'CLAIM') > -1);
             $outputs[$i]->IsSupportClaim = (strpos($outputs[$i]->script_pub_key_asm, 'SUPPORT_CLAIM') > -1);
             $outputs[$i]->IsUpdateClaim = (strpos($outputs[$i]->script_pub_key_asm, 'UPDATE_CLAIM') > -1);

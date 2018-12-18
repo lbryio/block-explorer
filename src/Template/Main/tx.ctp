@@ -92,14 +92,14 @@
                     $setAddressIds = [];
                     foreach ($inputs as $in):
             ?>
-            <div id="input-<?php echo $in->id ?>" class="input <?php if (isset($in['InputAddresses']) && count($in['InputAddresses']) > 0 && $in['InputAddresses'][0]->address == $sourceAddress): ?>is-source<?php endif; ?>">
+            <div id="input-<?php echo $in->id ?>" class="input <?php if (isset($in->input_addresses) && count($in->input_addresses) > 0 && $in->input_addresses[0]->address == $sourceAddress): ?>is-source<?php endif; ?>">
                 <?php if ($in->is_coinbase): ?>
                     <div>Block Reward (New Coins)</div>
                 <?php else: ?>
                     <?php if (strlen(trim($in->value)) == 0): ?>
                     <div>Incomplete data</div>
                     <?php else:
-                            $addr = $in['InputAddresses'][0];
+                            $addr = $in->input_addresses[0];
 
                             if (!isset($setAddressIds[$addr->address])):
                                 $setAddressIds[$addr->address] = 1; ?>
@@ -108,6 +108,7 @@
                     <div><span class="value"><?php echo $this->Amount->format($in->value) ?> LBC</span> from</div>
                     <div class="address"><a href="/address/<?php echo $addr->address ?>"><?php echo $addr->address ?></a>
                     (<a class="output-link" href="/tx/<?php echo $in->prevout_hash ?>#output-<?php echo $in->prevout_n ?>">output</a>)
+                    
                     <?php  if (isset($addr->Tag) && strlen(trim($addr->Tag)) > 0): ?>
                     <div class="tag">
                         <?php if (strlen(trim($addr->TagUrl)) > 0): ?><a href="<?php echo $addr->TagUrl ?>" target="_blank" rel="nofollow"><?php echo $addr->Tag ?></a><?php else: echo $addr->Tag; endif; ?>
@@ -134,7 +135,7 @@
 
             <?php
             foreach ($outputs as $out): ?>
-            <div id="output-<?php echo $out->Vout ?>" class="output <?php if (isset($out['OutputAddresses']) && count($out['OutputAddresses']) > 0 && $out['OutputAddresses'][0]->address == $sourceAddress): ?>is-source<?php endif; ?>">
+            <div id="output-<?php echo $out->vout ?>" class="output <?php if (isset($out->output_addresses) && count($out->output_addresses) > 0 && $out->output_addresses[0]->address == $sourceAddress): ?>is-source<?php endif; ?>">
                 <div class="labels">
                     <?php if($out->Claim && ($out->IsClaim or $out->IsSupportClaim or $out->IsUpdateClaim)): ?><a class="view-claim" href="<?php echo $out->Claim->getExplorerLink() ?>">View</a><?php endif; ?>
                     <?php if($out->IsSupportClaim): ?><div class="support">SUPPORT</div><?php endif; ?>
@@ -142,19 +143,19 @@
                     <?php if($out->IsClaim): ?><div class="claim">CLAIM</div><?php endif; ?>
                 </div>
 
-                <?php if (strlen(trim($out['Value'])) == 0): ?>
+                <?php if (strlen(trim($out->value)) == 0): ?>
                 <div>Incomplete data</div>
                 <?php else:
-                        $addr = $out['OutputAddresses'][0];
+                        $addr = $out->output_addresses[0];
 
-                        if (!isset($setAddressIds[$addr->Address])):
-                                $setAddressIds[$addr->Address] = 1; ?>
-                <a id="<?php echo $addr->Address ?>"></a>
+                        if (!isset($setAddressIds[$addr->address])):
+                                $setAddressIds[$addr->address] = 1; ?>
+                <a id="<?php echo $addr->address ?>"></a>
                 <?php   endif; ?>
-                <div><span class="value"><?php echo $this->Amount->format($out['Value']) ?> LBC</span> to</div>
-                <div class="address"><a href="/address/<?php echo $addr->Address ?>"><?php echo $addr->address ?></a>
+                <div><span class="value"><?php echo $this->Amount->format($out->value) ?> LBC</span> to</div>
+                <div class="address"><a href="/address/<?php echo $addr->address ?>"><?php echo $addr->address ?></a>
 
-                <?php if ($out->is_spent): ?>(<a href="/tx/<?php echo $out->spend_input->transaction_hash_id ?>#input-<?php echo $out->spend_input->id ?>">spent</a>)<?php else: ?>(unspent)<?php endif; ?>
+                <?php if ($out->is_spent): ?>(<a href="/tx/<?php echo $out->spend_input->transaction_hash ?>#input-<?php echo $out->spend_input->id ?>">spent</a>)<?php else: ?>(unspent)<?php endif; ?>
 
                 <?php if (isset($addr->Tag) && strlen(trim($addr->Tag)) > 0): ?>
                 <div class="tag">
