@@ -76,9 +76,11 @@
 
             <div class="label">NameClaimRoot</div> <div class="value"><?php echo $block->name_claim_root ?></div>
 
+            <!-- 
             <div class="spacer"></div>
 
-            <div class="label">Target</div> <div class="value"><?php echo '$block->Target' ?></div>
+            <div class="label">Target</div> <div class="value"><?php echo $block->Target ?></div>
+            -->
 
             <div class="spacer"></div>
 

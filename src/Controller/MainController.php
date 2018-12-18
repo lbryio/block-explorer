@@ -597,7 +597,6 @@ class MainController extends AppController {
         $resultSet = [];
 
         $conn = ConnectionManager::get('default');
-
         // get avg block sizes for the time period
         $stmt = $conn->execute("SELECT AVG(block_size) AS AvgBlockSize, DATE_FORMAT(FROM_UNIXTIME(block_time), '$sqlDateFormat') AS TimePeriod " .
                                "FROM block WHERE DATE_FORMAT(FROM_UNIXTIME(block_time), '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
@@ -611,8 +610,8 @@ class MainController extends AppController {
 
         // get avg prices
         
-        $conn = ConnectionManager::get('localdb');
-        $stmt = $conn->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(Created, '$sqlDateFormat') AS TimePeriod " .
+        $conn_local = ConnectionManager::get('localdb');
+        $stmt = $conn_local->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(Created, '$sqlDateFormat') AS TimePeriod " .
                                "FROM PriceHistory WHERE DATE_FORMAT(Created, '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
         $avgPrices = $stmt->fetchAll(\PDO::FETCH_OBJ);
         foreach ($avgPrices as $price) {

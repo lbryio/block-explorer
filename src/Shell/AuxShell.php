@@ -127,7 +127,7 @@ class AuxShell extends Shell {
     public function pricehistory() {
         self::lock('pricehistory');
 
-        $conn = ConnectionManager::get('default');
+        $conn = ConnectionManager::get('localdb');
         $redis = new \Predis\Client(Configure::read('Redis.Url'));
 
         try {
