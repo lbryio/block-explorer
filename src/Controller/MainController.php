@@ -292,7 +292,7 @@ class MainController extends AppController {
             $page = intval($this->request->query('page'));
 
             $conn = ConnectionManager::get('default');
-            $stmt = $conn->execute('SELECT COUNT(id) AS Total FROM Blocks');
+            $stmt = $conn->execute('SELECT COUNT(id) AS Total FROM block');
             $count = $stmt->fetch(\PDO::FETCH_OBJ);
             $numBlocks = $count->Total;
 

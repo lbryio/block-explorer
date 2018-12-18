@@ -181,10 +181,10 @@
         <tbody>
             <?php foreach ($blocks as $block): ?>
             <tr>
-                <td class="right"><a href="/blocks/<?php echo $block->height ?>"><?php echo $block->Height ?></a></td>
-                <td class="pad-left"><?php echo number_format($block->d0ifficulty, 8, '.', '') ?></td>
+                <td class="right"><a href="/blocks/<?php echo $block->height ?>"><?php echo $block->height ?></a></td>
+                <td class="pad-left"><?php echo number_format($block->difficulty, 8, '.', '') ?></td>
                 <td class="right"><?php echo number_format((($currentBlock->height - $block->height) + 1), 0, '', ',') ?></td>
-                <td class="right"><?php echo count(json_decode($block->transaction_hashes)) ?></td>
+                <td class="right"><?php echo count(preg_split('#,#', $block->transaction_hashes)) ?></td>
                 <td class="right"><?php echo round($block->block_size / 1024, 2) . 'KB' ?></td>
                 <td class="right pad-left"><?php echo $block->nonce ?></td>
                 <td class="pad-left"><?php echo \DateTime::createFromFormat('U', $block->block_time)->format('d M Y H:i:s') ?> UTC</td>
