@@ -183,7 +183,8 @@
         <div class="recent-claims">
             <h3>Recent Claims</h3>
             <a class="claim-explorer-link" href="/claims">Claims Explorer</a>
-            <?php $idx = 0; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow']; foreach ($recentClaims as $claim):
+            <?php $idx = 0; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow']; 
+            foreach ($recentClaims as $claim):
                 $idx++;
                 $autoThumbText = $claim->getAutoThumbText();
                 $link = $claim->name;
@@ -226,7 +227,7 @@
                     <?php endif; ?>
                 </div>
 
-                <a class="tx-link" href="/tx/<?php echo $claim->transaction_hash ?>#output-<?php echo $claim->vout ?>" target="_blank">Transaction</a>
+                <a class="tx-link" href="/tx/<?php echo $claim->transaction_hash_id ?>#output-<?php echo $claim->vout ?>" target="_blank">Transaction</a>
             </div>
             <?php endforeach; ?>
 

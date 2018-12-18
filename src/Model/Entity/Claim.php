@@ -3,12 +3,16 @@
 namespace App\Model\Entity;
 
 use Cake\ORM\Entity;
+use Cake\ORM\TableRegistry;
 
 class Claim extends Entity {
     function getLbryLink() {
         $link = $this->name;
-        if (isset($this->Publisher->Name)) {
-            $link = $this->Publisher->Name . '/' . $link;
+        $ClaimModel = TableRegistry::get('Claims');
+        $publisher = $ClaimModel->find()->select(['name'])->where(['claim_id' => $this->publisher_id])->first();
+        
+        if (isset($publisher->name)) {
+            $link = $publisher->name . '/' . $link;
         }
         $link = 'lbry://' . $link;
         return $link;

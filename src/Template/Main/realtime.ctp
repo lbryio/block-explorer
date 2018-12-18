@@ -128,10 +128,10 @@
 
             <tbody>
                 <?php foreach ($blocks as $block): ?>
-                <tr data-height="<?php echo $block->Height ?>" data-time="<?php echo $block->BlockTime ?>">
-                    <td><a href="/blocks/<?php echo $block->Height ?>" target="_blank"><?php echo $block->Height ?></a></td>
-                    <td><?php echo \Carbon\Carbon::createFromTimestamp($block->BlockTime)->diffForHumans(); ?></td>
-                    <td class="right"><?php echo $block->TransactionCount ?></td>
+                <tr data-height="<?php echo $block->height ?>" data-time="<?php echo $block->block_time ?>">
+                    <td><a href="/blocks/<?php echo $block->height ?>" target="_blank"><?php echo $block->height ?></a></td>
+                    <td><?php echo \Carbon\Carbon::createFromTimestamp($block->block_time)->diffForHumans(); ?></td>
+                    <td class="right"><?php echo $block->transaction_count ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -156,9 +156,9 @@
                 <tr data-hash="<?php echo $tx->Hash ?>" data-time="<?php echo $tx->TxTime ?>">
                     <td class="w200"><div><a href="/tx/<?php echo $tx->Hash ?>" target="_blank"><?php echo $tx->Hash ?></a></div></td>
                     <td><?php echo \Carbon\Carbon::createFromTimestamp($tx->TxTime)->diffForHumans(); ?></td>
-                    <td class="right"><?php echo $tx->InputCount ?></td>
-                    <td class="right"><?php echo $tx->OutputCount ?></td>
-                    <td class="right"><?php echo number_format($tx->Value, 8, '.', '') ?> LBC</td>
+                    <td class="right"><?php echo $tx->input_count ?></td>
+                    <td class="right"><?php echo $tx->output_count ?></td>
+                    <td class="right"><?php echo number_format($tx->value(), 8, '.', '') ?> LBC</td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
