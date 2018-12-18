@@ -147,13 +147,7 @@ class MainController extends AppController {
             }
 
             $offset = ($page - 1) * $pageLimit;
-            $claims = $this->Claims->find()->distinct(['claim_id'])->order(['created_at' => 'DESC'])->offset($offset)->limit($pageLimit)->toArray();
-            foreach($claims as $claim) {
-                if(isset($claim->publisher_id)) {
-                    $publisher = $this->Claims->find()->select(['name'])->where(['claim_id' => $claim->publisher_id])->first();
-                    $claim->publisher = $publisher;
-                }
-            }
+            $claims = $this->Claims->find()->distinct(['Claims.claim_id'])->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->order(['Claims.created_at' => 'DESC'])->offset($offset)->limit($pageLimit)->toArray();
             
             for ($i = 0; $i < count($claims); $i++) {
                 if ($canConvert && $claims[$i]->fee > 0 && $claims[$i]->fee_currency == 'USD') {
@@ -177,9 +171,7 @@ class MainController extends AppController {
             $this->set('currentPage', $page);
             $this->set('claims', $claims);
         } else {
-            $claim = $this->Claims->find()->where(['claim_id' => $id])->order(['created_at' => 'DESC'])->first();
-            $publisher = $this->Claims->find()->select(['name'])->where(['claim_id' => $claim->publisher_id])->first();
-            $claim->publisher = $publisher;
+            $claim = $this->Claims->find()->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->where(['Claims.claim_id' => $id])->order(['Claims.created_at' => 'DESC'])->first();
             
             if (!$claim) {
                 return $this->redirect('/');
@@ -202,8 +194,7 @@ class MainController extends AppController {
             $moreClaims = [];
             if (isset($claim->publisher) || $claim->claim_type == 1) {
                 // find more claims for the publisher
-                $moreClaims = $this->Claims->find()->where(['claim_type' => 2, 'id <>' => $claim->id, 'publisher_id' => isset($claim->publisher) ? $claim->publisher_id : $claim->claim_id])->
-                    limit(9)->order(['fee' => 'DESC', 'RAND()' => 'DESC'])->toArray();
+                $moreClaims = $this->Claims->find()->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->where(['Claims.claim_type' => 2, 'Claims.id <>' => $claim->id, 'Claims.publisher_id' => isset($claim->publisher) ? $claim->publisher_id : $claim->claim_id])->limit(9)->order(['Claims.fee' => 'DESC', 'RAND()' => 'DESC'])->toArray();
                 for ($i = 0; $i < count($moreClaims); $i++) {
                     if ($canConvert && $moreClaims[$i]->fee > 0 && $moreClaims[$i]->fee_currency == 'USD') {
                         $moreClaims[$i]->price = $moreClaims[$i]->fee / $priceInfo->price;
@@ -783,7 +774,7 @@ class MainController extends AppController {
         }
 
         $arr = explode(',', $base58address);
-        $addresses = $this->Addresses->find()->select(['Id'])->where(['Address IN' => $arr])->toArray();
+        $addresses = $this->Addresses->find()->select(['id'])->where(['address IN' => $arr])->toArray();
         if (count($addresses) == 0) {
             return $this->_jsonError('No base58 address matching the specified parameter was found.', 404);
         }
@@ -791,33 +782,33 @@ class MainController extends AppController {
         $addressIds = [];
         $params = [];
         foreach ($addresses as $address) {
-            $addressIds[] = $address->Id;
+            $addressIds[] = $address->id;
             $params[] = '?';
         }
 
         // Get the unspent outputs for the address
         $conn = ConnectionManager::get('default');
         $stmt = $conn->execute(sprintf(
-                               'SELECT T.Hash AS TransactionHash, O.Vout, O.Value, O.Addresses, O.ScriptPubKeyAsm, O.ScriptPubKeyHex, O.Type, O.RequiredSignatures, B.Confirmations ' .
-                               'FROM Transactions T ' .
-                               'JOIN Outputs O ON O.TransactionId = T.Id ' .
-                               'JOIN Blocks B ON B.Hash = T.BlockHash ' .
-                               'WHERE O.Id IN (SELECT OutputId FROM OutputsAddresses WHERE AddressId IN (%s)) AND O.IsSpent <> 1 ORDER BY T.TransactionTime ASC', implode(',', $params)), $addressIds);
+                               'SELECT T.hash AS transaction_hash, O.vout, O.value, O.address_list, O.script_pub_key_asm, O.script_pub_key_hex, O._type, O.required_signatures, B.confirmations ' .
+                               'FROM transaction T ' .
+                               'JOIN output O ON O.transaction_id = T.id ' .
+                               'JOIN block B ON B.hash = T.block_hash_id ' .
+                               'WHERE O.id IN (SELECT id FROM output O2 WHERE address_id IN (%s)) AND O.is_spent <> 1 ORDER BY T.transaction_time ASC', implode(',', $params)), $addressIds);
         $outputs = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
         $utxo = [];
         foreach ($outputs as $out) {
             $utxo[] = [
-                'transaction_hash' => $out->TransactionHash,
-                'output_index' => $out->Vout,
-                'value' => (int) bcmul($out->Value, 100000000),
-                'addresses' => json_decode($out->Addresses),
-                'script' => $out->ScriptPubKeyAsm,
-                'script_hex' => $out->ScriptPubKeyHex,
-                'script_type' => $out->Type,
-                'required_signatures' => (int) $out->RequiredSignatures,
+                'transaction_hash' => $out->transaction_hash,
+                'output_index' => $out->vout,
+                'value' => (int) bcmul($out->value, 100000000),
+                'addresses' => json_decode($out->address_list),
+                'script' => $out->script_pub_key_asm,
+                'script_hex' => $out->script_pub_key_hex,
+                'script_type' => $out->type,
+                'required_signatures' => (int) $out->required_signatures,
                 'spent' => false,
-                'confirmations' => (int) $out->Confirmations
+                'confirmations' => (int) $out->confirmations
             ];
         }
 

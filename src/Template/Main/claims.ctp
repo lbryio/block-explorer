@@ -79,7 +79,7 @@ if (strlen(trim($desc)) == 0) {
             <div class="label">Published By</div>
             <div class="value">
                 <?php if (isset($claim->publisher)): ?>
-                    <a href="lbry://<?php echo $claim->publisher->name ?>"><?php echo $claim->publisher->name ?></a>
+                    <a href="lbry://<?php echo $claim->publisher ?>"><?php echo $claim->publisher ?></a>
                 <?php else: ?>
                     <em>Anonymous</em>
                 <?php endif; ?>
