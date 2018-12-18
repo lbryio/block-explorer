@@ -171,7 +171,7 @@ class MainController extends AppController {
             $this->set('currentPage', $page);
             $this->set('claims', $claims);
         } else {
-            $claim = $this->Claims->find()->select($this->Claims)->select(['Claims__publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->where(['Claims.claim_id' => $id])->order(['Claims.created_at' => 'DESC'])->first();
+            $claim = $this->Claims->find()->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->where(['Claims.claim_id' => $id])->order(['Claims.created_at' => 'DESC'])->first();
             if (!$claim) {
                 return $this->redirect('/');
             }
@@ -193,7 +193,7 @@ class MainController extends AppController {
             $moreClaims = [];
             if (isset($claim->publisher) || $claim->claim_type == 1) {
                 // find more claims for the publisher
-                $moreClaims = $this->Claims->find()->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->where(['Claims.claim_type' => 2, 'Claims.id <>' => $claim->id, 'Claims.publisher_id' => isset($claim->publisher) ? $claim->publisher_id : $claim->claim_id])->limit(9)->order(['Claims.fee' => 'DESC', 'RAND()' => 'DESC'])->toArray();
+                $moreClaims = $this->Claims->find()->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->where(['Claims.claim_type' => 1, 'Claims.id <>' => $claim->id, 'Claims.publisher_id' => isset($claim->publisher) ? $claim->publisher_id : $claim->claim_id])->limit(9)->order(['Claims.fee' => 'DESC', 'RAND()' => 'DESC'])->toArray();
                 for ($i = 0; $i < count($moreClaims); $i++) {
                     if ($canConvert && $moreClaims[$i]->fee > 0 && $moreClaims[$i]->fee_currency == 'USD') {
                         $moreClaims[$i]->price = $moreClaims[$i]->fee / $priceInfo->price;
@@ -210,7 +210,6 @@ class MainController extends AppController {
                     }
                 }
             }
-
             $this->set('claim', $claim);
             $this->set('moreClaims', $moreClaims);
         }
