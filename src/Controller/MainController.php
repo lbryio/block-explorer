@@ -134,7 +134,7 @@ class MainController extends AppController {
             $page = intval($this->request->query('page'));
 
             $conn = ConnectionManager::get('default');
-            $stmt = $conn->execute('SELECT COUNT(Id) AS Total FROM claim');
+            $stmt = $conn->execute('SELECT COUNT(id) AS Total FROM claim');
             $count = $stmt->fetch(\PDO::FETCH_OBJ);
             $numClaims = $count->Total;
 
@@ -156,7 +156,7 @@ class MainController extends AppController {
             }
             
             for ($i = 0; $i < count($claims); $i++) {
-                if ($canConvert && $claims[$i]->Fee > 0 && $claims[$i]->fee_currency == 'USD') {
+                if ($canConvert && $claims[$i]->fee > 0 && $claims[$i]->fee_currency == 'USD') {
                     $claims[$i]->price = $claims[$i]->fee / $priceInfo->price;
                 }
                 
@@ -477,11 +477,11 @@ class MainController extends AppController {
             $tagRequestAmount = '25.' . rand(11111111, 99999999);
         }
 
-        $address = $this->Addresses->find()->where(['Address' => $addr])->first();
+        $address = $this->Addresses->find()->where(['address' => $addr])->first();
         if (!$address) {
             if (strlen($addr) === 34) {
                 $address = new \stdClass();
-                $address->Address = $addr;
+                $address->address = $addr;
             } else {
                 return $this->redirect('/');
             }
@@ -489,11 +489,11 @@ class MainController extends AppController {
             $conn = ConnectionManager::get('default');
 
             $canTag = true;
-            $addressId = $address->Id;
-
-            $stmt = $conn->execute('SELECT COUNT(TransactionId) AS Total FROM TransactionsAddresses WHERE AddressId = ?', [$addressId]);
-            $count = $stmt->fetch(\PDO::FETCH_OBJ);
-            $numTransactions = $count->Total;
+            $addressId = $address->id;
+            
+            $stmt = $conn->execute('SELECT * FROM transaction_address WHERE address_id = ?', [$addressId]);
+            $transactionAddresses = $stmt->fetch(\PDO::FETCH_OBJ);
+            $numTransactions = count($transactionAddresses);
             $all = $this->request->query('all');
             if ($all === 'true') {
                 $offset = 0;
@@ -512,26 +512,25 @@ class MainController extends AppController {
                 $offset = ($page - 1) * $pageLimit;
             }
 
-            $stmt = $conn->execute('SELECT A.TotalReceived, A.TotalSent, A.Balance FROM Addresses A WHERE A.Id = ?', [$address->Id]);
-            $totals = $stmt->fetch(\PDO::FETCH_OBJ);
-
-            $currentBlock = $this->Blocks->find()->select(['Height'])->order(['Height' => 'desc'])->first();
-            $currentHeight = $currentBlock ? intval($currentBlock->Height) : 0;
+            $currentBlock = $this->Blocks->find()->select(['height'])->order(['height' => 'desc'])->first();
+            $currentHeight = $currentBlock ? intval($currentBlock->height) : 0;
 
             $stmt = $conn->execute(sprintf(
-                'SELECT T.Id, T.Hash, T.InputCount, T.OutputCount, T.Value, ' .
-                '    TA.DebitAmount, TA.CreditAmount, ' .
-                '    B.Height, (CASE WHEN B.Height IS NOT NULL THEN ((' . $currentHeight . ' - B.Height) + 1) ELSE NULL END) AS Confirmations, ' .
-                '    IFNULL(T.TransactionTime, T.CreatedTime) AS TxTime ' .
-                'FROM Transactions T ' .
-                'LEFT JOIN Blocks B ON T.BlockHash = B.Hash ' .
-                'RIGHT JOIN (SELECT TransactionId, DebitAmount, CreditAmount FROM TransactionsAddresses ' .
-                '            WHERE AddressId = ? ORDER BY TransactionTime DESC LIMIT %d, %d) TA ON TA.TransactionId = T.Id', $offset, $pageLimit), [$addressId]);
+                'SELECT T.id, T.hash, T.input_count, T.output_count' .
+                '    TA.debit_amount, TA.credit_amount, ' .
+                '    B.height, B.confirmations, ' .
+                '    IFNULL(T.transaction_time, T.created_at) AS transaction_time ' .
+                'FROM transaction T ' .
+                'LEFT JOIN block B ON T.block_hash_id = B.hash ' .
+                'RIGHT JOIN (SELECT transaction_id, debit_amount, credit_amount FROM transaction_address ' .
+                '            WHERE address_id = ? ORDER BY transaction_time DESC LIMIT %d, %d) TA ON TA.transaction_id = T.id', $offset, $pageLimit), [$addressId]);
             $recentTxs = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
-            $totalRecvAmount = $totals->TotalReceived == 0 ? '0' : $totals->TotalReceived + 0;
-            $totalSentAmount = $totals->TotalSent == 0 ? '0' : $totals->TotalSent + 0;
-            $balanceAmount = $totals->Balance == 0 ? '0' : $totals->Balance + 0;
+            foreach($transactionAddresses as $ta) {
+                $totalRecvAmount += $ta->credit_amount + 0;
+                $totalSentAmount += $ta->debit_amount + 0;
+            }
+            $balanceAmount = $totalSentAmount - $totalRecvAmount;
         }
 
         $this->set('offset', $offset);

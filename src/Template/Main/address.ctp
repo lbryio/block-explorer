@@ -1,4 +1,4 @@
-<?php $this->assign('title', 'Address ' . $address->Address) ?>
+<?php $this->assign('title', 'Address ' . $address->address) ?>
 
 <?php $this->start('script') ?>
 <script type="text/javascript">
@@ -40,7 +40,7 @@
 
             var btnClose = $('.btn-close');
             $.ajax({
-                url: '/api/v1/address/<?php echo $address->Address ?>/tag',
+                url: '/api/v1/address/<?php echo $address->address ?>/tag',
                 type: 'post',
                 dataType: 'json',
                 data: req,
@@ -87,7 +87,7 @@
 
 <div class="address-head">
     <h3>LBRY Address</h3>
-    <h4><?php echo $address->Address ?></h4>
+    <h4><?php echo $address->address ?></h4>
     <?php if (isset($address->Tag) && strlen(trim($address->Tag)) > 0): ?>
         <?php if (strlen(trim($address->TagUrl)) > 0): ?><a href="<?php echo $address->TagUrl ?>" target="_blank" rel="nofollow"><?php echo $address->Tag ?></a><?php else: echo $address->Tag; endif; ?>
     <?php endif; ?>
@@ -95,7 +95,7 @@
 
 <div class="address-subhead">
     <div class="address-qr">
-        <img src="/qr/lbry%3A<?php echo $address->Address ?>" alt="lbry:<?php echo $address->Address ?>" />
+        <img src="/qr/lbry%3A<?php echo $address->address ?>" alt="lbry:<?php echo $address->address ?>" />
     </div>
 
     <div class="address-summary">
@@ -152,14 +152,14 @@
 
             <?php foreach ($recentTxs as $tx): ?>
             <tr>
-                <td class="w125"><?php if ($tx->Height === null): ?><em>Unconfirmed</em><?php else: ?><a href="/blocks/<?php echo $tx->Height ?>"><?php echo $tx->Height ?></a><?php endif; ?></td>
-                <td class="w250"><div><a href="/tx/<?php echo $tx->Hash ?>?address=<?php echo $address->Address ?>#<?php echo $address->Address ?>"><?php echo $tx->Hash ?></a></div></td>
-                <td><?php echo \DateTime::createFromFormat('U', $tx->TxTime)->format('d M Y H:i:s') . ' UTC'; ?></td>
-                <td class="right"><?php echo number_format($tx->Confirmations, 0, '', ',') ?></td>
-                <td class="right"><?php echo $tx->InputCount ?></td>
-                <td class="right"><?php echo $tx->OutputCount ?></td>
-                <td class="right<?php echo ' ' . ($tx->DebitAmount > 0 && $tx->CreditAmount > 0 ? 'diff' : ($tx->DebitAmount > 0 ? 'debit' : 'credit')) ?>">
-                    <?php echo number_format($tx->CreditAmount - $tx->DebitAmount, 8, '.', ',') ?> LBC
+                <td class="w125"><?php if ($tx->height === null): ?><em>Unconfirmed</em><?php else: ?><a href="/blocks/<?php echo $tx->height ?>"><?php echo $tx->height ?></a><?php endif; ?></td>
+                <td class="w250"><div><a href="/tx/<?php echo $tx->Hash ?>?address=<?php echo $address->address ?>#<?php echo $address->address ?>"><?php echo $tx->Hash ?></a></div></td>
+                <td><?php echo \DateTime::createFromFormat('U', $tx->transaction_time)->format('d M Y H:i:s') . ' UTC'; ?></td>
+                <td class="right"><?php echo number_format($tx->confirmations, 0, '', ',') ?></td>
+                <td class="right"><?php echo $tx->input_count ?></td>
+                <td class="right"><?php echo $tx->output_count ?></td>
+                <td class="right<?php echo ' ' . ($tx->debit_amount > 0 && $tx->credit_amount > 0 ? 'diff' : ($tx->debit_amount > 0 ? 'debit' : 'credit')) ?>">
+                    <?php echo number_format($tx->credit_amount - $tx->debit_amount, 8, '.', ',') ?> LBC
                 </td>
             </tr>
             <?php endforeach; ?>
