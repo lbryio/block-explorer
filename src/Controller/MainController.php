@@ -362,18 +362,19 @@ class MainController extends AppController {
         }
         
         $outputs = $this->Outputs->find()->select($this->Outputs)->select(['spend_input_hash' => 'I.transaction_hash', 'spend_input_id' => 'I.id'])->where(['Outputs.transaction_id' => $tx->id])->leftJoin(['I' => 'input'], ['I.id = Outputs.spent_by_input_id'])->order(['Outputs.vout' => 'asc'])->toArray();
-        for ($i = 0; $i < count($outputs); $i++) {
-            debug($outputs[$i]);
-            $output_address = trim($outputs[$i]->address_list, '[""]');
-            debug($output_address);
-            $address = $this->Addresses->find()->select(['address'])->where(['address' => $output_address])->first();
-            $outputs[$i]->output_addresses = [$address];
-            
+        for ($i = 0; $i < count($outputs); $i++) {            
             $outputs[$i]->IsClaim = (strpos($outputs[$i]->script_pub_key_asm, 'CLAIM') > -1);
             $outputs[$i]->IsSupportClaim = (strpos($outputs[$i]->script_pub_key_asm, 'SUPPORT_CLAIM') > -1);
             $outputs[$i]->IsUpdateClaim = (strpos($outputs[$i]->script_pub_key_asm, 'UPDATE_CLAIM') > -1);
-            $claim = $this->Claims->find()->select(['id', 'claim_id', 'vout', 'transaction_hash_id'])->where(['transaction_hash_id' => $tx->hash, 'vout' => $outputs[$i]->vout])->first();
+            $claim = $this->Claims->find()->select(['id', 'claim_id', 'claim_address', 'vout', 'transaction_hash_id'])->where(['transaction_hash_id' => $tx->hash, 'vout' => $outputs[$i]->vout])->first();
             $outputs[$i]->Claim = $claim;
+            
+            $output_address = trim($outputs[$i]->address_list, '[""]');
+             if(!$output_address && $claim) {
+                $output_address = $claim->claim_address;
+            }
+            $address = $this->Addresses->find()->select(['address'])->where(['address' => $output_address])->first();
+            $outputs[$i]->output_addresses = [$address];
         }
 
         $totalIn = 0;
