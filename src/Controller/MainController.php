@@ -102,13 +102,7 @@ class MainController extends AppController {
         $hashRate = $this->_formatHashRate($this->_gethashrate());
 
         // recent claims
-        $claims = $this->Claims->find()->select(['transaction_hash_id', 'name', 'vout', 'claim_id', 'claim_type', 'author', 'title', 'description', 'content_type', 'is_nsfw', 'language', 'thumbnail_url', 'created_at', 'publisher_id'])->
-            distinct(['Claims.claim_id'])->order(['Claims.created_at' => 'DESC'])->limit(5)->toArray();
-
-        foreach($claims as $claim) {
-            $publisher = $this->Claims->find()->select(['name'])->where(['claim_id' => $claim->publisher_id])->first();
-            $claim->publisher = $publisher;
-        }
+        $claims = $this->Claims->find()->distinct(['Claims.claim_id'])->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->order(['Claims.created_at' => 'DESC'])->limit(5)->toArray();
 
         $this->set('recentBlocks', $blocks);
         $this->set('recentClaims', $claims);
@@ -227,6 +221,7 @@ class MainController extends AppController {
         }
 
         $transactions = $this->Transactions->find()->select(['Transactions.id', 'Transactions.hash', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.transaction_time', 'Transactions.created_at'])->select(['value' => 'sum(O.value)'])->leftJoin(['O' => 'output'], ['O.transaction_id = Transactions.id'])->order(['Transactions.created_at' => 'desc'])->limit(10)->toArray();
+        
         $this->set('blocks', $blocks);
         $this->set('txs', $transactions);
     }

@@ -189,9 +189,9 @@
                 $autoThumbText = $claim->getAutoThumbText();
                 $link = $claim->name;
                 $rawLink = $claim->name;
-                if (isset($claim->publisher->name)) {
-                    $link = urlencode($claim->publisher->name) . '/' . $link;
-                    $rawLink = $claim->publisher->name . '/' . $link;
+                if (isset($claim->publisher)) {
+                    $link = urlencode($claim->publisher) . '/' . $link;
+                    $rawLink = $claim->publisher . '/' . $link;
                 }
                 $link = 'lbry://' . $link;
                 $rawLink = 'lbry://' . $rawLink;
