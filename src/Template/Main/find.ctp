@@ -54,7 +54,7 @@
         if ($idx % 3 == 0) {
             $row++;
         }
-        echo $this->element('claimbox', array('claim' => $claim));
+        echo $this->element('claimbox', array('claim' => $claim, 'idx' => $idx, 'last_row' => $last_row));
         $idx++; 
         endforeach; ?>
     <?php else: ?>
