@@ -327,9 +327,7 @@ class MainController extends AppController {
             }
 
             // Get the basic block transaction info
-            $txs = $this->Transactions->find()->select(['id', 'input_count', 'output_count', 'hash', 'version'])->where(['block_hash_id' => $block->hash])->toArray();
-            
-
+            $txs = $this->Transactions->find()->select(['Transactions.id', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.hash', 'Transactions.version'])->select(['value' => 'sum(O.value)'])->leftJoin(['O' => 'output'], ['O.transaction_id = Transactions.id'])->where(['Transactions.block_hash_id' => $block->hash])->toArray();
             $this->set('block', $block);
             $this->set('blockTxs', $txs);
         }
@@ -400,7 +398,7 @@ class MainController extends AppController {
         $this->loadModel('Addresses');
 
         // exclude bHW58d37s1hBjj3wPBkn5zpCX3F8ZW3uWf (genesis block)
-        $richList = $this->Addresses->find()->where(['Address <>' => 'bHW58d37s1hBjj3wPBkn5zpCX3F8ZW3uWf'])->order(['Balance' => 'DESC'])->limit(500)->toArray();
+        $richList = $this->Addresses->find()->where(['address <>' => 'bHW58d37s1hBjj3wPBkn5zpCX3F8ZW3uWf'])->order(['Balance' => 'DESC'])->limit(500)->toArray();
 
         $priceRate = 0;
         //$priceInfo = json_decode($this->redis->get(self::lbcPriceKey));
@@ -456,11 +454,11 @@ class MainController extends AppController {
 
         $tagRequestAmount = 0;
         // Check for pending tag request
-        $this->loadModel('TagAddressRequests');
-        $pending = $this->TagAddressRequests->find()->where(['Address' => $addr, 'IsVerified <>' => 1])->first();
-        if (!$pending) {
-            $tagRequestAmount = '25.' . rand(11111111, 99999999);
-        }
+        //$this->loadModel('TagAddressRequests');
+        //$pending = $this->TagAddressRequests->find()->where(['Address' => $addr, 'IsVerified <>' => 1])->first();
+        //if (!$pending) {
+        //    $tagRequestAmount = '25.' . rand(11111111, 99999999);
+        //}
 
         $address = $this->Addresses->find()->where(['address' => $addr])->first();
         if (!$address) {
