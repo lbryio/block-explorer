@@ -1,8 +1,8 @@
 <?php
 $autoThumbText = $claim->getAutoThumbText();
 $cost = '';
-if (isset($claim->Price) && $claim->Price > 0) {
-    $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
+if (isset($claim->price) && $claim->price > 0) {
+    $cost = $this->Amount->formatCurrency($claim->price) . ' LBC';
 } else if (isset($claim->fee) && strtolower($claim->fee_currency) === 'lbc') {
     $cost = $this->Amount->formatCurrency($claim->fee) . ' LBC';
 }
