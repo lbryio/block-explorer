@@ -731,6 +731,7 @@ class MainController extends AppController {
     public function apiaddrbalance($base58address = null) {
         $this->autoRender = false;
         $this->loadModel('Addresses');
+        $this->loadModel('TransactionAddress');
 
         if (!isset($base58address)) {
             return $this->_jsonError('Base58 address not specified.', 400);
@@ -740,12 +741,8 @@ class MainController extends AppController {
         if (!$address) {
             return $this->_jsonError('Could not find address.', 400);
         }
-        $conn = ConnectionManager::get('default');
-        $stmt = $conn->execute(sprintf(
-                'SELECT TA.debit_amount, TA.credit_amount, ' .
-                'FROM transaction_address TA' .
-                'WHERE TA.address_id = ?'), [$address->id]);
-        $transaction_addresses = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        
+        $transaction_addresses = $this->TransactionAddress->find()->where(['address_id' => $address->id])->toArray();
         $balance = 0;
         foreach($transaction_addresses as $ta) {
             $balance += $ta->credit_amount;
