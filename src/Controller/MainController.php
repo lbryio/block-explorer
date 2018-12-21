@@ -775,11 +775,11 @@ class MainController extends AppController {
         // Get the unspent outputs for the address
         $conn = ConnectionManager::get('default');
         $stmt = $conn->execute(sprintf(
-                               'SELECT T.hash AS transaction_hash, O.vout, O.value, O.address_list, O.script_pub_key_asm, O.script_pub_key_hex, O._type, O.required_signatures, B.confirmations ' .
+                               'SELECT T.hash AS transaction_hash, O.vout, O.value, O.address_list, O.script_pub_key_asm, O.script_pub_key_hex, O.type, O.required_signatures, B.confirmations ' .
                                'FROM transaction T ' .
                                'JOIN output O ON O.transaction_id = T.id ' .
                                'JOIN block B ON B.hash = T.block_hash_id ' .
-                               'WHERE O.id IN (SELECT id FROM output O2 WHERE address_id IN (%s)) AND O.is_spent <> 1 ORDER BY T.transaction_time ASC', implode(',', $params)), $addressIds);
+                               'WHERE O.id IN (SELECT O2.id FROM output O2 WHERE address_id IN (%s)) AND O.is_spent <> 1 ORDER BY T.transaction_time ASC', implode(',', $params)), $addressIds);
         $outputs = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
         $utxo = [];
@@ -806,32 +806,17 @@ class MainController extends AppController {
         $this->loadModel('Addresses');
 
         $circulating = 0;
-        $reservedcommunity = 0;
-        $reservedoperational = 0;
-        $reservedinstitutional = 0;
-        $reservedtotal = 0;
-        $circulating = 0;
-
         $txoutsetinfo = $this->_gettxoutsetinfo();
-        $reservedcommunity = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd'])->first();
-        $reservedoperational = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL'])->first();
-        $reservedinstitutional = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi'])->first();
-        //aux is the address of hot wallets and where some of the LBRY operational fund are, but not sold on market.
-        $reservedaux = $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt'])->first() +
-                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2'])->first() +
-                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD'])->first() +
-                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz'])->first() +
-                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc'])->first() +
-                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393'])->first() +
-                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH'])->first() +
-                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc'])->first() +
-                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bCrboXVztuSbZzVToCWSsu1pEr2oxKHu9v'])->first() +
-                       $this->Addresses->find()->select(['Balance'])->where(['Address =' => 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h'])->first();
+        
+        $reservedcommunity = ['rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd'];
+        $reservedoperational = ['r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL'];
+        $reservedinstitutional = ['r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi'];
+        $reservedaux = ['bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt', 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2', 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD', 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393', 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH', 'bCrboXVztuSbZzVToCWSsu1pEr2oxKHu9v', 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h'];
+        $allAddresses = array_merge($reservedcommunity, $reservedoperational, $reservedinstitutional, $reservedaux);
+        
+        $reservedtotal = $this->Addresses->find()->select(['id'])->select(['credit_amount' => 'sum(TA.credit_amount)', 'debit_amount' => 'sum(TA.debit_amount)'])->leftJoin(['TA' => 'transaction_address'], ['TA.address_id = Addresses.id'])->where(['Addresses.address IN' => $allAddresses])->first();
 
-        $reservedtotal = $reservedcommunity->Balance + $reservedoperational->Balance + $reservedinstitutional->Balance + $reservedaux->Balance;
-
-
-         $circulating = $txoutsetinfo->total_amount - $reservedtotal;
+        $circulating = $txoutsetinfo->total_amount - ($reservedtotal->credit_amount - $reservedtotal->debit_amount);
 
         return $this->_jsonResponse(['success' => true, 'utxosupply' => ['total' => $txoutsetinfo->total_amount, 'circulating' => $circulating]]);
     }
