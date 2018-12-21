@@ -155,7 +155,7 @@
                 <div><span class="value"><?php echo $this->Amount->format($out->value) ?> LBC</span> to</div>
                 <div class="address"><a href="/address/<?php echo $addr->address ?>"><?php echo $addr->address ?></a>
 
-                <?php if ($out->is_spent): ?>(<a href="/tx/<?php if(isset($out->spend_input)) { echo $out->spend_input->transaction_hash; } ?>#input-<?php if(isset($out->spend_input)) {echo $out->spend_input->id; } ?>">spent</a>)<?php else: ?>(unspent)<?php endif; ?>
+                <?php if ($out->is_spent): ?>(<a href="/tx/<?php if(isset($out->spend_input_id)) { echo $out->spend_input_hash; } ?>#input-<?php if(isset($out->spend_input_id)) {echo $out->spend_input_id; } ?>">spent</a>)<?php else: ?>(unspent)<?php endif; ?>
 
                 <?php if (isset($addr->Tag) && strlen(trim($addr->Tag)) > 0): ?>
                 <div class="tag">

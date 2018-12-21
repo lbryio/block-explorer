@@ -153,7 +153,7 @@
             <?php foreach ($recentTxs as $tx): ?>
             <tr>
                 <td class="w125"><?php if ($tx->height === null): ?><em>Unconfirmed</em><?php else: ?><a href="/blocks/<?php echo $tx->height ?>"><?php echo $tx->height ?></a><?php endif; ?></td>
-                <td class="w250"><div><a href="/tx/<?php echo $tx->Hash ?>?address=<?php echo $address->address ?>#<?php echo $address->address ?>"><?php echo $tx->Hash ?></a></div></td>
+                <td class="w250"><div><a href="/tx/<?php echo $tx->hash ?>?address=<?php echo $address->address ?>#<?php echo $address->address ?>"><?php echo $tx->hash ?></a></div></td>
                 <td><?php echo \DateTime::createFromFormat('U', $tx->transaction_time)->format('d M Y H:i:s') . ' UTC'; ?></td>
                 <td class="right"><?php echo number_format($tx->confirmations, 0, '', ',') ?></td>
                 <td class="right"><?php echo $tx->input_count ?></td>

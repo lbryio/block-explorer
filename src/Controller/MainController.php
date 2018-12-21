@@ -212,6 +212,7 @@ class MainController extends AppController {
     public function realtime() {
         $this->loadModel('Blocks');
         $this->loadModel('Transactions');
+        $this->loadModel('Outputs');
 
         // load 10 blocks and transactions
         $blocks = $this->Blocks->find()->select(['height', 'block_time', 'transaction_hashes'])->order(['height' => 'desc'])->limit(10)->toArray();
@@ -360,12 +361,11 @@ class MainController extends AppController {
             $input->input_addresses = $inputAddresses;
         }
         
-        $outputs = $this->Outputs->find()->where(['transaction_id' => $tx->id])->order(['vout' => 'asc'])->toArray();
+        $outputs = $this->Outputs->find()->select($this->Outputs)->select(['spend_input_hash' => 'I.transaction_hash', 'spend_input_id' => 'I.id'])->where(['Outputs.transaction_id' => $tx->id])->leftJoin(['I' => 'input'], ['I.id = Outputs.spent_by_input_id'])->order(['Outputs.vout' => 'asc'])->toArray();
         for ($i = 0; $i < count($outputs); $i++) {
-            $spend_input = $this->Inputs->find()->select(['transaction_hash', 'id'])->where(['id' => $outputs[$i]->spent_by_input_id])->first();
-            $outputs[$i]->spend_input = $spend_input;
-            
+            debug($outputs[$i]);
             $output_address = trim($outputs[$i]->address_list, '[""]');
+            debug($output_address);
             $address = $this->Addresses->find()->select(['address'])->where(['address' => $output_address])->first();
             $outputs[$i]->output_addresses = [$address];
             
@@ -438,6 +438,7 @@ class MainController extends AppController {
         $this->loadModel('Transactions');
         $this->loadModel('Inputs');
         $this->loadModel('Outputs');
+        $this->loadModel('TransactionAddress');
 
         if (!$addr) {
             return $this->redirect('/');
@@ -474,11 +475,9 @@ class MainController extends AppController {
             $conn = ConnectionManager::get('default');
 
             $canTag = true;
-            $addressId = $address->id;
-            
-            $stmt = $conn->execute('SELECT * FROM transaction_address WHERE address_id = ?', [$addressId]);
-            $transactionAddresses = $stmt->fetch(\PDO::FETCH_OBJ);
+            $transactionAddresses = $this->TransactionAddress->find()->where(['address_id' => $address->id])->toArray();
             $numTransactions = count($transactionAddresses);
+            
             $all = $this->request->query('all');
             if ($all === 'true') {
                 $offset = 0;
@@ -496,31 +495,28 @@ class MainController extends AppController {
 
                 $offset = ($page - 1) * $pageLimit;
             }
-
-            $currentBlock = $this->Blocks->find()->select(['height'])->order(['height' => 'desc'])->first();
-            $currentHeight = $currentBlock ? intval($currentBlock->height) : 0;
-
+            
             $stmt = $conn->execute(sprintf(
-                'SELECT T.id, T.hash, T.input_count, T.output_count' .
+                'SELECT T.id, T.hash, T.input_count, T.output_count, T.block_hash_id, ' .
                 '    TA.debit_amount, TA.credit_amount, ' .
                 '    B.height, B.confirmations, ' .
                 '    IFNULL(T.transaction_time, T.created_at) AS transaction_time ' .
                 'FROM transaction T ' .
                 'LEFT JOIN block B ON T.block_hash_id = B.hash ' .
                 'RIGHT JOIN (SELECT transaction_id, debit_amount, credit_amount FROM transaction_address ' .
-                '            WHERE address_id = ? ORDER BY transaction_time DESC LIMIT %d, %d) TA ON TA.transaction_id = T.id', $offset, $pageLimit), [$addressId]);
+                '            WHERE address_id = ?) TA ON TA.transaction_id = T.id ' .
+                'ORDER BY transaction_time DESC LIMIT %d, %d', $offset, $pageLimit), [$address->id]);
             $recentTxs = $stmt->fetchAll(\PDO::FETCH_OBJ);
 
             foreach($transactionAddresses as $ta) {
                 $totalRecvAmount += $ta->credit_amount + 0;
                 $totalSentAmount += $ta->debit_amount + 0;
             }
-            $balanceAmount = $totalSentAmount - $totalRecvAmount;
+            $balanceAmount = $totalRecvAmount - $totalSentAmount;
         }
 
         $this->set('offset', $offset);
         $this->set('canTag', $canTag);
-        $this->set('pending', $pending);
         $this->set('tagRequestAmount', $tagRequestAmount);
         $this->set('address', $address);
         $this->set('totalReceived', $totalRecvAmount);
@@ -580,6 +576,18 @@ class MainController extends AppController {
 
         $resultSet = [];
 
+        // get avg prices
+        $conn_local = ConnectionManager::get('localdb');
+        $stmt = $conn_local->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(Created, '$sqlDateFormat') AS TimePeriod " .
+                               "FROM PriceHistory WHERE DATE_FORMAT(Created, '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
+        $avgPrices = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        foreach ($avgPrices as $price) {
+            if (!isset($resultSet[$price->TimePeriod])) {
+                $resultSet[$price->TimePeriod] = [];
+            }
+            $resultSet[$price->TimePeriod]['AvgUSD'] = (float) $price->AvgUSD;
+        }
+        
         $conn = ConnectionManager::get('default');
         // get avg block sizes for the time period
         $stmt = $conn->execute("SELECT AVG(block_size) AS AvgBlockSize, DATE_FORMAT(FROM_UNIXTIME(block_time), '$sqlDateFormat') AS TimePeriod " .
@@ -590,19 +598,6 @@ class MainController extends AppController {
                 $resultSet[$size->TimePeriod] = [];
             }
             $resultSet[$size->TimePeriod]['AvgBlockSize'] = (float) $size->AvgBlockSize;
-        }
-
-        // get avg prices
-        
-        $conn_local = ConnectionManager::get('localdb');
-        $stmt = $conn_local->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(Created, '$sqlDateFormat') AS TimePeriod " .
-                               "FROM PriceHistory WHERE DATE_FORMAT(Created, '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
-        $avgPrices = $stmt->fetchAll(\PDO::FETCH_OBJ);
-        foreach ($avgPrices as $price) {
-            if (!isset($resultSet[$price->TimePeriod])) {
-                $resultSet[$price->TimePeriod] = [];
-            }
-            $resultSet[$price->TimePeriod]['AvgUSD'] = (float) $price->AvgUSD;
         }
 
         return $this->_jsonResponse(['success' => true, 'data' => $resultSet]);
