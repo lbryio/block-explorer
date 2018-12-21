@@ -579,9 +579,9 @@ class MainController extends AppController {
 
         // get avg prices
         $conn_local = ConnectionManager::get('localdb');
-        $stmt = $conn_local->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(Created, '$sqlDateFormat') AS TimePeriod " .
+        $stmt_price = $conn_local->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(Created, '$sqlDateFormat') AS TimePeriod " .
                                "FROM PriceHistory WHERE DATE_FORMAT(Created, '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
-        $avgPrices = $stmt->fetchAll(\PDO::FETCH_OBJ);
+        $avgPrices = $stmt_price->fetchAll(\PDO::FETCH_OBJ);
         foreach ($avgPrices as $price) {
             if (!isset($resultSet[$price->TimePeriod])) {
                 $resultSet[$price->TimePeriod] = [];

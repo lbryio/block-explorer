@@ -218,7 +218,7 @@ return [
      * See vendor\cakephp\cakephp\src\Database\Driver for complete list
      */
     'Datasources' => [
-        'default' => [
+        'default' => [ // Chainquery database connection
             'className' => 'Cake\Database\Connection',
             'driver' => 'Cake\Database\Driver\Mysql',
             'persistent' => false,
@@ -260,7 +260,7 @@ return [
             'url' => env('DATABASE_URL', 'chainquery.lbry.io:3600'),
         ],
         
-        'localdb' => [
+        'localdb' => [ // Local db for price history
             'className' => 'Cake\Database\Connection',
             'driver' => 'Cake\Database\Driver\Mysql',
             'persistent' => false,
