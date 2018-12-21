@@ -226,7 +226,7 @@ class MainController extends AppController {
             $blocks[$i]->transaction_count = count($tx_hashes);
         }
 
-        $transactions = $this->Transactions->find()->select(['id', 'hash', 'input_count', 'output_count', 'transaction_time', 'created_at'])->order(['created_at' => 'desc'])->limit(10)->toArray();
+        $transactions = $this->Transactions->find()->select(['Transactions.id', 'Transactions.hash', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.transaction_time', 'Transactions.created_at'])->select(['value' => 'sum(O.value)'])->leftJoin(['O' => 'output'], ['O.transaction_id = Transactions.id'])->order(['Transactions.created_at' => 'desc'])->limit(10)->toArray();
         $this->set('blocks', $blocks);
         $this->set('txs', $transactions);
     }
@@ -344,8 +344,7 @@ class MainController extends AppController {
         $sourceAddress = $this->request->query('address');
 
         $tx = $this->Transactions->find()->select(
-            ['id', 'block_hash_id', 'input_count', 'output_count', 'hash', 'transaction_time', 'transaction_size', 'created_at', 'version', 'lock_time', 'raw'])->where(['hash' => $hash])->first();
-        $tx->value = $tx->value();
+            ['Transactions.id', 'Transactions.block_hash_id', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.hash', 'Transactions.transaction_time', 'Transactions.transaction_size', 'Transactions.created_at', 'Transactions.version', 'Transactions.lock_time', 'Transactions.raw'])->select(['value' => 'sum(O.value)'])->leftJoin(['O' => 'output'], ['O.transaction_id = Transactions.id'])->where(['Transactions.hash' => $hash])->first();
         if (!$tx) {
             return $this->redirect('/');
         }

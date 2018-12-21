@@ -158,7 +158,7 @@
                     <td><?php echo $tx->created_at->diffForHumans(); ?></td>
                     <td class="right"><?php echo $tx->input_count ?></td>
                     <td class="right"><?php echo $tx->output_count ?></td>
-                    <td class="right"><?php echo number_format($tx->value(), 8, '.', '') ?> LBC</td>
+                    <td class="right"><?php echo number_format($tx->value, 8, '.', '') ?> LBC</td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
