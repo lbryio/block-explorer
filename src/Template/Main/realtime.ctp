@@ -153,7 +153,7 @@
 
             <tbody>
                 <?php foreach ($txs as $tx): ?>
-                <tr data-hash="<?php echo $tx->Hash ?>" data-time="<?php echo $tx->transaction_time ?>">
+                <tr data-hash="<?php echo $tx->hash ?>" data-time="<?php echo $tx->transaction_time ?>">
                     <td class="w200"><div><a href="/tx/<?php echo $tx->hash ?>" target="_blank"><?php echo $tx->hash ?></a></div></td>
                     <td><?php echo $tx->created_at->diffForHumans(); ?></td>
                     <td class="right"><?php echo $tx->input_count ?></td>

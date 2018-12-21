@@ -220,7 +220,15 @@ class MainController extends AppController {
             $blocks[$i]->transaction_count = count($tx_hashes);
         }
 
-        $transactions = $this->Transactions->find()->select(['Transactions.id', 'Transactions.hash', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.transaction_time', 'Transactions.created_at'])->select(['value' => 'sum(O.value)'])->leftJoin(['O' => 'output'], ['O.transaction_id = Transactions.id'])->order(['Transactions.created_at' => 'desc'])->limit(10)->toArray();
+        $transactions = $this->Transactions->find()->select(['Transactions.id', 'Transactions.hash', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.transaction_time', 'Transactions.created_at'])->order(['Transactions.created_at' => 'desc'])->limit(10)->toArray();
+        foreach($transactions as $tx) {
+            $value = 0;
+            $outputs = $this->Outputs->find()->where(['transaction_id' => $tx->id])->toArray();
+            foreach($outputs as $output) {
+                $value += $output->value;
+            }
+            $tx->value = $value;
+        }
         
         $this->set('blocks', $blocks);
         $this->set('txs', $transactions);

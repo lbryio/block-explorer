@@ -8,11 +8,8 @@ use Cake\ORM\TableRegistry;
 class Claim extends Entity {
     function getLbryLink() {
         $link = $this->name;
-        $ClaimModel = TableRegistry::get('Claims');
-        $publisher = $ClaimModel->find()->select(['name'])->where(['claim_id' => $this->publisher_id])->first();
-        
-        if (isset($publisher->name)) {
-            $link = $publisher->name . '/' . $link;
+        if (isset($this->publisher)) {
+            $link = $this->publisher . '/' . $link;
         }
         $link = 'lbry://' . $link;
         return $link;
