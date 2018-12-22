@@ -102,7 +102,8 @@ class MainController extends AppController {
         $hashRate = $this->_formatHashRate($this->_gethashrate());
 
         // recent claims
-        $claims = $this->Claims->find()->distinct(['Claims.claim_id'])->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->order(['Claims.created_at' => 'DESC'])->limit(5)->toArray();
+        //$claims = $this->Claims->find()->distinct(['Claims.claim_id'])->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->order(['Claims.created_at' => 'DESC'])->limit(5)->toArray();
+        $claims = $this->Claims->find()->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->order(['Claims.created_at' => 'DESC'])->limit(5)->toArray();
 
         $this->set('recentBlocks', $blocks);
         $this->set('recentClaims', $claims);
@@ -141,8 +142,9 @@ class MainController extends AppController {
             }
 
             $offset = ($page - 1) * $pageLimit;
-            $claims = $this->Claims->find()->distinct(['Claims.claim_id'])->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->order(['Claims.created_at' => 'DESC'])->offset($offset)->limit($pageLimit)->toArray();
-            
+            //$claims = $this->Claims->find()->distinct(['Claims.claim_id'])->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->order(['Claims.created_at' => 'DESC'])->offset($offset)->limit($pageLimit)->toArray();
+            $claims = $this->Claims->find()->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->order(['Claims.created_at' => 'DESC'])->offset($offset)->limit($pageLimit)->toArray();
+
             for ($i = 0; $i < count($claims); $i++) {
                 if ($canConvert && $claims[$i]->fee > 0 && $claims[$i]->fee_currency == 'USD') {
                     $claims[$i]->price = $claims[$i]->fee / $priceInfo->price;
