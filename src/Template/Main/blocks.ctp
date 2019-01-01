@@ -112,7 +112,7 @@
                             <td class="w300"><div><a href="/tx/<?php echo $tx->hash ?>"><?php echo $tx->hash ?></a></div></td>
                             <td class="right"><?php echo $tx->input_count ?></td>
                             <td class="right"><?php echo $tx->output_count ?></td>
-                            <td class="right"><div title="<?php echo $tx->value ?> LBC"><?php echo $this->Amount->formatCurrency($tx->value()) ?> LBC</div></td>
+                            <td class="right"><div title="<?php echo $tx->value ?> LBC"><?php echo $this->Amount->formatCurrency($tx->value) ?> LBC</div></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>

@@ -47,7 +47,7 @@
 <div class="tx-summary">
     <div class="box p25">
         <div class="title">Amount (LBC)</div>
-        <div class="value"><?php echo $this->Amount->format($tx->value()) ?></div>
+        <div class="value"><?php echo $this->Amount->format($tx->value) ?></div>
     </div>
 
     <div class="box p15">

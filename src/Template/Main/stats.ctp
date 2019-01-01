@@ -47,8 +47,8 @@
                 <?php $rank = 0; foreach ($richList as $item): $rank++; ?>
                 <tr>
                     <td class="right topvalign"><?php echo $rank ?></td>
-                    <td class="topvalign"><a href="/address/<?php echo $item->Address ?>" target="_blank"><?php echo $item->Address ?></a>
-                    <?php if(in_array($item->Address, $lbryAddresses)): ?>
+                    <td class="topvalign"><a href="/address/<?php echo $item->address ?>" target="_blank"><?php echo $item->address ?></a>
+                    <?php if(in_array($item->address, $lbryAddresses)): ?>
                     <span class="lbry-address">
                         <img src="/img/lbry.png" height="18px" width="18px" title="Address owned by LBRY Inc."/>
                     </span>
@@ -58,16 +58,14 @@
                         <?php if (strlen(trim($item->TagUrl)) > 0): ?><a href="<?php echo $item->TagUrl ?>" target="_blank" rel="nofollow"><?php echo $tiem->Tag ?></a><?php else: echo $item->Tag; endif; ?>
                     </div>
                     <?php endif; ?></td>
-                    <td class="right topvalign"><?php echo number_format($item->Balance, 8, '.', ',') ?></td>
-                    <td class="right topvalign">$<?php echo number_format(bcmul($item->Balance, $rate, 8), 2, '.', ',') ?></td>
-                    <td class="med-pad-left topvalign"><?php echo $item->FirstSeen->format('d M Y H:i:s') . ' UTC'; ?></td>
+                    <td class="right topvalign"><?php echo number_format($item->balance, 8, '.', ',') ?></td>
+                    <td class="right topvalign">$<?php echo number_format(bcmul($item->balance, $rate, 8), 2, '.', ',') ?></td>
+                    <td class="med-pad-left topvalign"><?php echo $item->first_seen->format('d M Y H:i:s') . ' UTC'; ?></td>
                     <td class="w150 center top500-percent-cell"><div class="top500-percent" style="width: <?php echo $item->MinMaxPercent ?>%"></div><div class="text"><?php echo number_format($item->Top500Percent, 5, '.', '') ?>%</div></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
     </div>
-
     <div class="clear"></div>
-
 </div>

@@ -223,15 +223,7 @@ class MainController extends AppController {
             $blocks[$i]->transaction_count = count($tx_hashes);
         }
 
-        $transactions = $this->Transactions->find()->select(['Transactions.id', 'Transactions.hash', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.transaction_time', 'Transactions.created_at'])->order(['Transactions.created_at' => 'desc'])->limit(10)->toArray();
-        foreach($transactions as $tx) {
-            $value = 0;
-            $outputs = $this->Outputs->find()->where(['transaction_id' => $tx->id])->toArray();
-            foreach($outputs as $output) {
-                $value += $output->value;
-            }
-            $tx->value = $value;
-        }
+        $transactions = $this->Transactions->find()->select(['Transactions.id', 'Transactions.hash', 'Transactions.value', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.transaction_time', 'Transactions.created_at'])->order(['Transactions.created_at' => 'desc'])->limit(10)->toArray();
         
         $this->set('blocks', $blocks);
         $this->set('txs', $transactions);
@@ -333,7 +325,7 @@ class MainController extends AppController {
             }
 
             // Get the basic block transaction info
-            $txs = $this->Transactions->find()->select(['Transactions.id', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.hash', 'Transactions.version'])->select(['value' => 'sum(O.value)'])->leftJoin(['O' => 'output'], ['O.transaction_id = Transactions.id'])->where(['Transactions.block_hash_id' => $block->hash])->toArray();
+            $txs = $this->Transactions->find()->select(['Transactions.id', 'Transactions.value', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.hash', 'Transactions.version'])->where(['Transactions.block_hash_id' => $block->hash])->toArray();
             $this->set('block', $block);
             $this->set('blockTxs', $txs);
         }
@@ -349,8 +341,7 @@ class MainController extends AppController {
         
         $sourceAddress = $this->request->query('address');
 
-        $tx = $this->Transactions->find()->select(
-            ['Transactions.id', 'Transactions.block_hash_id', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.hash', 'Transactions.transaction_time', 'Transactions.transaction_size', 'Transactions.created_at', 'Transactions.version', 'Transactions.lock_time', 'Transactions.raw'])->select(['value' => 'sum(O.value)'])->leftJoin(['O' => 'output'], ['O.transaction_id = Transactions.id'])->where(['Transactions.hash' => $hash])->first();
+        $tx = $this->Transactions->find()->where(['Transactions.hash' => $hash])->first();
         if (!$tx) {
             return $this->redirect('/');
         }
@@ -403,13 +394,14 @@ class MainController extends AppController {
         $this->loadModel('Addresses');
 
         // exclude bHW58d37s1hBjj3wPBkn5zpCX3F8ZW3uWf (genesis block)
-        $richList = $this->Addresses->find()->where(['address <>' => 'bHW58d37s1hBjj3wPBkn5zpCX3F8ZW3uWf'])->order(['Balance' => 'DESC'])->limit(500)->toArray();
+        $richList = $this->Addresses->find()->where(['address <>' => 'bHW58d37s1hBjj3wPBkn5zpCX3F8ZW3uWf'])->order(['balance' => 'DESC'])->limit(500)->toArray();
 
         $priceRate = 0;
-        //$priceInfo = json_decode($this->redis->get(self::lbcPriceKey));
-        $priceInfo->price = 0.05;
-        if (isset($priceInfo->price)) {
-            $priceRate = $priceInfo->price;
+        if(isset($this->redis)) {
+            $priceInfo = json_decode($this->redis->get(self::lbcPriceKey));
+            if (isset($priceInfo->price)) {
+                $priceRate = $priceInfo->price;
+            }
         }
         
         $lbryAddresses = ['rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd', 'r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL', 'r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi', 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt', 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2', 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD', 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393', 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc'];
@@ -417,15 +409,15 @@ class MainController extends AppController {
         $maxBalance = 0;
         $minBalance = 0;
         foreach ($richList as $item) {
-            $totalBalance = bcadd($totalBalance, $item->Balance, 8);
-            $minBalance = $minBalance == 0 ? $item->Balance : min($minBalance, $item->Balance);
-            $maxBalance = max($maxBalance, $item->Balance);
+            $totalBalance = bcadd($totalBalance, $item->balance, 8);
+            $minBalance = $minBalance == 0 ? $item->balance : min($minBalance, $item->balance);
+            $maxBalance = max($maxBalance, $item->balance);
         }
         for ($i = 0; $i < count($richList); $i++) {
             $item = $richList[$i];
-            $percentage = bcdiv($item->Balance, $totalBalance, 8) * 100;
+            $percentage = bcdiv($item->balance, $totalBalance, 8) * 100;
             $richList[$i]->Top500Percent = $percentage;
-            $richList[$i]->MinMaxPercent = bcdiv($item->Balance, $maxBalance, 8) * 100;
+            $richList[$i]->MinMaxPercent = bcdiv($item->balance, $maxBalance, 8) * 100;
         }
 
         $this->set('richList', $richList);
@@ -624,10 +616,7 @@ class MainController extends AppController {
         // Load 10 transactions
         $this->autoRender = false;
         $this->loadModel('Transactions');
-        $txs = $this->Transactions->find()->select(['id', 'Hash' => 'hash', 'InputCount' => 'input_count', 'OutputCount' => 'output_count', 'TxTime' => 'transaction_time'])->order(['TxTime' => 'desc'])->limit(10);
-        foreach($txs as $tx) {
-            $tx->Value = $tx->value();
-        }
+        $txs = $this->Transactions->find()->select(['id', 'Value' => 'value', 'Hash' => 'hash', 'InputCount' => 'input_count', 'OutputCount' => 'output_count', 'TxTime' => 'transaction_time'])->order(['TxTime' => 'desc'])->limit(10);
 
         $this->_jsonResponse(['success' => true, 'txs' => $txs]);
     }
@@ -740,18 +729,12 @@ class MainController extends AppController {
             return $this->_jsonError('Base58 address not specified.', 400);
         }
         
-        $address = $this->Addresses->find()->select(['id'])->where(['address' => $base58address])->first();
+        $address = $this->Addresses->find()->select(['id', 'balance'])->where(['address' => $base58address])->first();
         if (!$address) {
             return $this->_jsonError('Could not find address.', 400);
         }
         
-        $transaction_addresses = $this->TransactionAddress->find()->where(['address_id' => $address->id])->toArray();
-        $balance = 0;
-        foreach($transaction_addresses as $ta) {
-            $balance += $ta->credit_amount;
-            $balance -= $ta->debit_amount;
-        } 
-        return $this->_jsonResponse(['success' => true, ['balance' => ['confirmed' => $balance, 'unconfirmed' => 0]]]);
+        return $this->_jsonResponse(['success' => true, ['balance' => ['confirmed' => $address->balance, 'unconfirmed' => 0]]]);
     }
 
     public function apiaddrutxo($base58address = null) {
@@ -817,9 +800,9 @@ class MainController extends AppController {
         $reservedaux = ['bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt', 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2', 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD', 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393', 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH', 'bCrboXVztuSbZzVToCWSsu1pEr2oxKHu9v', 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h'];
         $allAddresses = array_merge($reservedcommunity, $reservedoperational, $reservedinstitutional, $reservedaux);
         
-        $reservedtotal = $this->Addresses->find()->select(['id'])->select(['credit_amount' => 'sum(TA.credit_amount)', 'debit_amount' => 'sum(TA.debit_amount)'])->leftJoin(['TA' => 'transaction_address'], ['TA.address_id = Addresses.id'])->where(['Addresses.address IN' => $allAddresses])->first();
+        $reservedtotal = $this->Addresses->find()->select(['id', 'balance' => 'SUM(balance)'])->where(['Addresses.address IN' => $allAddresses])->first();
 
-        $circulating = $txoutsetinfo->total_amount - ($reservedtotal->credit_amount - $reservedtotal->debit_amount);
+        $circulating = $txoutsetinfo->total_amount - ($reservedtotal->balance);
 
         return $this->_jsonResponse(['success' => true, 'utxosupply' => ['total' => $txoutsetinfo->total_amount, 'circulating' => $circulating]]);
     }
