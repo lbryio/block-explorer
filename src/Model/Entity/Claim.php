@@ -29,7 +29,7 @@ class Claim extends Entity {
             $ctTag = 'image';
         }
     
-        if (!$ctTag && $this->claim_type == 1) {
+        if (!$ctTag && $this->claim_type == 2) {
             $ctTag = 'identity';
         }
         return $ctTag;
@@ -37,11 +37,11 @@ class Claim extends Entity {
     
     function getAutoThumbText() {
         $autoThumbText = '';
-        if ($this->claim_type == 1) { 
-            $autoThumbText = strtoupper(substr($this->name, 1, min( strlen($this->name), 3 ))); 
+        if ($this->claim_type == 2) {
+            $autoThumbText = strtoupper(substr($this->name, 1, min(strlen($this->name), 10)));
         } else {
             $str = (strlen(trim($this->title)) > 0) ? $this->title : $this->name;
-            $autoThumbText = strtoupper(substr($str, 0, min (strlen($str), 2 )));
+            $autoThumbText = strtoupper(substr($str, 0, min(strlen($str), 5)));
         }
         return $autoThumbText;
     }

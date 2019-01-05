@@ -572,6 +572,7 @@ class MainController extends AppController {
         $resultSet = [];
 
         // get avg prices
+        /*
         $conn_local = ConnectionManager::get('localdb');
         $stmt_price = $conn_local->execute("SELECT AVG(USD) AS AvgUSD, DATE_FORMAT(Created, '$sqlDateFormat') AS TimePeriod " .
                                "FROM PriceHistory WHERE DATE_FORMAT(Created, '$sqlDateFormat') >= ? GROUP BY TimePeriod ORDER BY TimePeriod ASC", [$start->format($dateFormat)]);
@@ -582,6 +583,7 @@ class MainController extends AppController {
             }
             $resultSet[$price->TimePeriod]['AvgUSD'] = (float) $price->AvgUSD;
         }
+        */
         
         $conn = ConnectionManager::get('default');
         // get avg block sizes for the time period
