@@ -16,6 +16,9 @@ $ctTag = $claim->getContentTag();
     <?php endif; ?>
 
     <div class="tags">
+        <?php if ($claim->bid_state == 'Controlling'): ?>
+        <div class="bid-state">Controlling</div>
+        <?php endif; ?>
         <?php if ($ctTag): ?>
         <div class="content-type"><?php echo strtoupper($ctTag) ?></div>
         <?php endif; ?>
@@ -56,12 +59,12 @@ $ctTag = $claim->getContentTag();
 
         <div class="clear spacer"></div>
 
-        <div class="label half-width">Author</div>
-        <div class="label half-width">License</div>
+        <!--<div class="label half-width">Author</div>
+        <div class="label half-width">License</div>-->
         
         
-        <div class="value half-width" title="<?php echo strlen(trim($claim->author)) > 0 ? $claim->author : '<em>Unspecified</em>' ?>"><?php echo strlen(trim($claim->author)) > 0 ? $claim->author : '<em>Unspecified</em>' ?></div>
-        <!--
+        <!--<div class="value half-width" title="<?php echo strlen(trim($claim->author)) > 0 ? $claim->author : '<em>Unspecified</em>' ?>"><?php echo strlen(trim($claim->author)) > 0 ? $claim->author : '<em>Unspecified</em>' ?></div>
+        
         <div class="value half-width" title="<?php echo strlen(trim($claim->license)) > 0 ? $claim->license : '' ?>">
             <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
             <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
