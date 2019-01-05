@@ -74,7 +74,7 @@ CREATE TABLE `Addresses`
     `TotalReceived` DECIMAL(18,8) DEFAULT 0 NOT NULL,
     `TotalSent` DECIMAL(18,8) DEFAULT 0 NOT NULL,
     `Balance` DECIMAL(18,8) AS (`TotalReceived` - `TotalSent`) PERSISTENT,
-    `Tag` VARCHAR(30) NOT NULL,
+    `Tag` VARCHAR(30),
     `TagUrl` VARCHAR(200),
     `Created` DATETIME NOT NULL,
     `Modified` DATETIME NOT NULL,

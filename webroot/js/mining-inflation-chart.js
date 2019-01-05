@@ -86,7 +86,6 @@ function buildChartData(blockData) {
 		if(i % skip == 0) { // Only push 1/<skip> of all blocks to optimize data loading
 			chartData.push({
 				date: new Date(blockTime * 1000),
-				date: new Date(blockTime * 1000),
 				AvailableSupply: supply,
 				RewardLBC: reward,
 				InflationRate: inflationRate,
@@ -99,7 +98,7 @@ function buildChartData(blockData) {
 
 function loadChartData() {
 	var api_url = "https://chainquery.lbry.io/api/sql?query=";
-	var query = "SELECT id, block_time FROM block";
+	var query = "SELECT height, block_time FROM block WHERE confirmations > 0 ORDER BY height";
 	var url = api_url + query;
   var loadProgress = $('.mining-inflation-chart-container .load-progress');
   $.ajax({
