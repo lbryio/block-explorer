@@ -145,7 +145,6 @@ class MainController extends AppController {
             }
 
             $offset = ($page - 1) * $pageLimit;
-            //$claims = $this->Claims->find()->distinct(['Claims.claim_id'])->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->order(['Claims.created_at' => 'DESC'])->offset($offset)->limit($pageLimit)->toArray();
             $claims = $this->Claims->find()->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->order(['Claims.created_at' => 'DESC'])->offset($offset)->limit($pageLimit)->toArray();
 
             for ($i = 0; $i < count($claims); $i++) {
@@ -533,12 +532,11 @@ class MainController extends AppController {
         $qrCode->setWriterByName('png');
         $qrCode->setMargin(10);
         $qrCode->setEncoding('UTF-8');
-        $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::LOW));
+        $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::HIGH));
         $qrCode->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0]);
         $qrCode->setBackgroundColor(['r' => 255, 'g' => 255, 'b' => 255, 'a' => 0]);
         $qrCode->setLogoWidth(150);
         $qrCode->setValidateResult(false);
-
 
         header('Content-Type: '.$qrCode->getContentType());
         echo $qrCode->writeString();
@@ -903,18 +901,18 @@ class MainController extends AppController {
         }
     }
 
-    private function _gettxoutsetinfo() {
-        $req = ['method' => 'gettxoutsetinfo', 'params' => []];
-        try {
-            $res = json_decode(self::curl_json_post(self::$rpcurl, json_encode($req)));
-            if (!isset($res->result)) {
-                return 0;
-            }
-            return $res->result;
-        } catch (\Exception $e) {
-            return 'N/A';
-        }
-    }
+    // private function _gettxoutsetinfo() {
+        // $req = ['method' => 'gettxoutsetinfo', 'params' => []];
+        // try {
+            // $res = json_decode(self::curl_json_post(self::$rpcurl, json_encode($req)));
+            // if (!isset($res->result)) {
+                // return 0;
+            // }
+            // return $res->result;
+        // } catch (\Exception $e) {
+            // return 'N/A';
+        // }
+    // }
 
     private static function curl_json_post($url, $data, $headers = []) {
         $ch = curl_init();
