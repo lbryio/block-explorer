@@ -435,7 +435,7 @@ class MainController extends AppController {
         $this->loadModel('Transactions');
         $this->loadModel('Inputs');
         $this->loadModel('Outputs');
-        $this->loadModel('TransactionAddress');
+        $this->loadModel('TransactionAddresses');
 
         if (!$addr) {
             return $this->redirect('/');
@@ -465,7 +465,7 @@ class MainController extends AppController {
             $conn = ConnectionManager::get('default');
 
             $canTag = true;
-            $transactionAddresses = $this->TransactionAddress->find()->where(['address_id' => $address->id])->toArray();
+            $transactionAddresses = $this->TransactionAddresses->find()->where(['address_id' => $address->id])->toArray();
             $numTransactions = count($transactionAddresses);
             
             $all = $this->request->query('all');
@@ -761,7 +761,6 @@ class MainController extends AppController {
     public function apiaddrbalance($base58address = null) {
         $this->autoRender = false;
         $this->loadModel('Addresses');
-        $this->loadModel('TransactionAddress');
 
         if (!isset($base58address)) {
             return $this->_jsonError('Base58 address not specified.', 400);

@@ -24,5 +24,4 @@ class ClaimsTable extends Table {
         ]);
     }
 }
-
 ?>
