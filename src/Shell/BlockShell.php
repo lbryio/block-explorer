@@ -274,6 +274,7 @@ class BlockShell extends Shell {
         self::unlock('buildindex');
     }
 
+    // TODO: Refactor for unique claim identification by claim_id instead of using the claim name.
     protected function _getclaimfortxout($pubkeyasm, $tx_hash, $vout, $tx_time = null) {
         $claim_data = null;
         $claim_stream_data = null;
@@ -295,6 +296,10 @@ class BlockShell extends Shell {
         if ($json) {
             $claim = json_decode($json);
             if ($claim) {
+                if (strpos($claim_name, '#') !== false) {
+                    $claim_name = substr($claim_name, 0, strpos($claim_name, '#'));
+                }
+
                 $req = ['method' => 'getvalueforname', 'params' => [$claim_name]];
                 $json = null;
                 try {
