@@ -8,8 +8,8 @@ class InputsTable extends Table {
     public function initialize(array $config) {
         parent::initialize($config);
 
-        $this->primaryKey('id');
-        $this->table('input');
+        $this->setPrimaryKey('id');
+        $this->setTable('input');
 
         $this->addBehavior('SimpleAudit');
 
