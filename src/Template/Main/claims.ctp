@@ -41,13 +41,13 @@
 $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow'];
 $autoThumbText = $claim->getAutoThumbText();
 $cost = 'Free';
-if (isset($claim->Price) && $claim->Price > 0) {
-    $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
-} else if (isset($claim->Fee) && strtolower($claim->FeeCurrency) === 'lbc') {
-    $cost = $this->Amount->formatCurrency($claim->Fee) . ' LBC';
+if (isset($claim->price) && $claim->price > 0) {
+    $cost = $this->Amount->formatCurrency($claim->price) . ' LBC';
+} else if (isset($claim->fee) && strtolower($claim->fee_currency) === 'lbc') {
+    $cost = $this->Amount->formatCurrency($claim->fee) . ' LBC';
 }
 
-$desc = $claim->Description;
+$desc = $claim->description;
 if (strlen(trim($desc)) == 0) {
     $desc = '<em>No description available.</em>';
 } else {
@@ -57,29 +57,29 @@ if (strlen(trim($desc)) == 0) {
 
 ?>
 
-<?php $this->assign('title', 'Claim &bull; ' . $claim->Name) ?>
+<?php $this->assign('title', 'Claim &bull; ' . $claim->name) ?>
 
 <div class="claims-head">
-    <h3><a href="/claims">LBRY Claims</a> &bull; <?php echo $claim->Name ?></h3>
-    <h4><?php echo $claim->ClaimId ?></h4>
+    <h3><a href="/claims">LBRY Claims</a> &bull; <?php echo $claim->name ?></h3>
+    <h4><?php echo $claim->claim_id ?></h4>
 </div>
 
 <div class="claims-body">
     <div class="claim-info">
         <div data-autothumb="<?php echo $autoThumbText ?>" class="thumbnail <?php echo $a[mt_rand(0, count($a) - 1)] ?>">
-            <?php if (!$claim->IsNSFW && strlen(trim($claim->ThumbnailUrl)) > 0): ?>
-                <img src="<?php echo htmlspecialchars($claim->ThumbnailUrl) ?>" alt="" />
+            <?php if (!$claim->is_nsfw && strlen(trim($claim->thumbnail_url)) > 0): ?>
+                <img src="<?php echo htmlspecialchars($claim->thumbnail_url) ?>" alt="" />
             <?php else: ?>
                 <div class="autothumb"><?php echo $autoThumbText ?></div>
             <?php endif; ?>
         </div>
 
         <div class="content">
-            <?php if ($claim->ClaimType == 2): ?>
+            <?php if ($claim->claim_type == 1): ?>
             <div class="label">Published By</div>
             <div class="value">
-                <?php if (isset($claim->Publisher)): ?>
-                    <a href="lbry://<?php echo $claim->Publisher->Name ?>"><?php echo $claim->Publisher->Name ?></a>
+                <?php if (isset($claim->publisher)): ?>
+                    <a href="lbry://<?php echo $claim->publisher ?>"><?php echo $claim->publisher ?></a>
                 <?php else: ?>
                     <em>Anonymous</em>
                 <?php endif; ?>
@@ -87,17 +87,17 @@ if (strlen(trim($desc)) == 0) {
             <?php endif; ?>
 
             <div class="label">Created On</div>
-            <div class="value"><?php echo \DateTime::createFromFormat('U', $claim->TransactionTime > 0 ? $claim->TransactionTime : $claim->Created->format('U'))->format('j M Y H:i:s') ?> UTC</div>
+            <div class="value"><?php echo \DateTime::createFromFormat('U', $claim->transaction_time > 0 ? $claim->transaction_time : $claim->created_at->format('U'))->format('j M Y H:i:s') ?> UTC</div>
 
             <div class="label">Transaction ID</div>
-            <div class="value"><a href="/tx/<?php echo $claim->TransactionHash ?>#output-<?php echo $claim->Vout ?>"><?php echo $claim->TransactionHash ?></a></div>
+            <div class="value"><a href="/tx/<?php echo $claim->transaction_hash_id ?>#output-<?php echo $claim->vout ?>"><?php echo $claim->transaction_hash_id ?></a></div>
 
-            <?php if ($claim->ClaimType == 2): ?>
+            <?php if ($claim->claim_type == 1): ?>
             <div class="label half-width">Cost</div>
             <div class="label half-width">Safe for Work</div>
 
             <div class="value half-width"><?php echo $cost ?></div>
-            <div class="value half-width"><?php echo $claim->IsNSFW ? 'No' : 'Yes' ?></div>
+            <div class="value half-width"><?php echo $claim->is_nsfw ? 'No' : 'Yes' ?></div>
 
             <div class="clear"></div>
             <?php endif; ?>
@@ -105,11 +105,11 @@ if (strlen(trim($desc)) == 0) {
     </div>
 
     <div class="claim-metadata">
-        <?php if ($claim->ClaimType == 1): ?>
+        <?php if ($claim->claim_type == 2): ?>
             <div class="title">Identity Claim</div>
             <div class="desc">This is an identity claim.</div>
         <?php else: ?>
-            <div class="title"><?php echo $claim->Title ?></div>
+            <div class="title"><?php echo $claim->title ?></div>
             <div class="desc"><?php echo str_replace("\n", '<br />', $desc) ?></div>
 
             <div class="details">
@@ -117,18 +117,22 @@ if (strlen(trim($desc)) == 0) {
                 <div class="label half-width">Content Type</div>
 
 
-                <div class="value half-width"><?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?></div>
-                <div class="value half-width"><?php echo strlen(trim($claim->ContentType)) > 0 ? $claim->ContentType : '<em>Unspecified</em>' ?></div>
+                <div class="value half-width"><?php echo strlen(trim($claim->author)) > 0 ? $claim->author : '<em>Unspecified</em>' ?></div>
+                <div class="value half-width"><?php echo strlen(trim($claim->content_type)) > 0 ? $claim->content_type : '<em>Unspecified</em>' ?></div>
 
+                <!--
                 <div class="label half-width">License</div>
-                <div class="label half-width">Language</div>
+                -->
+                <div class="label">Language</div>
 
-                <div class="value half-width"<?php if(strlen(trim($claim->License)) > 0): ?> title="<?php echo $claim->License ?>"<?php endif; ?>>
-                    <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
+                <!--
+                <div class="value half-width"<?php if(strlen(trim($claim->license)) > 0): ?> title="<?php echo $claim->license ?>"<?php endif; ?>>
+                    <?php if (strlen(trim($claim->license_url)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
                     <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
                     <?php if (strlen(trim($claim->LicenseUrl))): ?></a><?php endif; ?>
                 </div>
-                <div class="value half-width"><?php echo strlen(trim($claim->Language)) > 0 ? ($claim->Language == 'en' ? 'English' : '') : '<em>Unspecified</em>' ?></div>
+                -->
+                <div class="value half-width"><?php echo strlen(trim($claim->language)) > 0 ? ($claim->language == 'en' ? 'English' : '') : '<em>Unspecified</em>' ?></div>
             </div>
         <?php endif; ?>
         <a href="<?php echo $claim->getLbryLink() ?>" class="open-lbry-link">Open in LBRY</a>
@@ -140,7 +144,7 @@ if (strlen(trim($desc)) == 0) {
     <?php if (count($moreClaims) > 0): ?>
 
     <div class="more-claims">
-        <h4><?php echo isset($claim->Publisher) ? 'More from the publisher' : 'Published by this identity' ?></h4>
+        <h4><?php echo isset($claim->publisher) ? 'More from the publisher' : 'Published by this identity' ?></h4>
 
         <div class="claims-grid">
         <?php $idx = 1; $row = 1; $rowCount = ceil(count($moreClaims) / 3);
@@ -150,80 +154,9 @@ if (strlen(trim($desc)) == 0) {
             if ($idx % 3 == 0) {
                 $row++;
             }
-
-            $autoThumbText = $claim->getAutoThumbText();
-            $cost = '';
-            if (isset($claim->Price) && $claim->Price > 0) {
-                $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
-            } else if (isset($claim->Fee) && strtolower($claim->FeeCurrency) === 'lbc') {
-                $cost = $this->Amount->formatCurrency($claim->Fee) . ' LBC';
-            }
-
-            // content type
-            $ctTag = $claim->getContentTag();
-        ?>
-        <div data-id="<?php echo $claim->ClaimId ?>" class="claim-grid-item<?php if ($idx % 3 == 0): ?> last-item<?php endif; ?><?php if ($last_row): ?> last-row<?php endif; ?>">
-            <?php if (strlen(trim($cost)) > 0): ?>
-                <div class="price-tag"><?php echo $cost ?></div>
-            <?php endif; ?>
-
-            <div class="tags">
-                <?php if ($ctTag): ?>
-                <div class="content-type"><?php echo strtoupper($ctTag) ?></div>
-                <?php endif; ?>
-                <?php if ($claim->IsNSFW): ?>
-                <div class="nsfw">NSFW</div>
-                <?php endif; ?>
-            </div>
-
-            <div data-autothumb="<?php echo $autoThumbText ?>" class="thumbnail <?php echo $a[mt_rand(0, count($a) - 1)] ?>">
-                <?php if (!$claim->IsNSFW && strlen(trim($claim->ThumbnailUrl)) > 0): ?>
-                    <img src="<?php echo htmlspecialchars($claim->ThumbnailUrl) ?>" alt="" />
-                <?php else: ?>
-                    <div class="autothumb"><?php echo $autoThumbText ?></div>
-                <?php endif; ?>
-            </div>
-
-            <div class="metadata">
-                <div class="title" title="<?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '') ?>"><?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '<em>No Title</em>') ?></div>
-                <div class="link" title="<?php echo $claim->getLbryLink() ?>"><a href="<?php echo $claim->getLbryLink() ?>" rel="nofollow"><?php echo $claim->getLbryLink() ?></a></div>
-
-                <div class="desc"><?php echo strlen(trim($claim->Description)) > 0 ? $claim->Description : '<em>No description available</em>' ?></div>
-
-                <div class="label half-width">Transaction</div>
-                <div class="label half-width">Created</div>
-
-                <div class="value half-width"><a href="/tx/<?php echo $claim->TransactionHash ?>#output-<?php echo $claim->Vout ?>" title="<?php echo $claim->TransactionHash ?>"><?php echo $claim->TransactionHash ?></a></div>
-                <div class="value half-width" title="<?php echo $claim->Created->format('j M Y H:i:s') ?> UTC">
-                    <?php echo \Carbon\Carbon::createFromTimestamp($claim->Created->format('U'))->diffForHumans(); ?>
-                </div>
-
-                <div class="clear spacer"></div>
-
-                <?php if ($claim->ClaimType == 2): ?>
-                <div class="label half-width">Content Type</div>
-                <div class="label half-width">Language</div>
-
-                <div class="value half-width" title="<?php echo $claim->ContentType ?>"><?php echo $claim->ContentType ?></div>
-                <div class="value half-width" title="<?php echo $claim->Language == 'en' ? 'English' : $claim->Language ?>"><?php echo $claim->Language == 'en' ? 'English' : $claim->Language ?></div>
-
-                <div class="clear spacer"></div>
-
-                <div class="label half-width">Author</div>
-                <div class="label half-width">License</div>
-
-                <div class="value half-width" title="<?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?>"><?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?></div>
-                <div class="value half-width" title="<?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '' ?>">
-                    <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
-                    <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
-                    <?php if (strlen(trim($claim->LicenseUrl))): ?></a><?php endif; ?>
-                </div>
-                <?php endif; ?>
-
-            </div>
-        </div>
-        <?php $idx++; endforeach; ?>
-
+            echo $this->element('claimbox', array('claim' => $claim, 'idx' => $idx, 'last_row' => $last_row));
+            $idx++; 
+            endforeach; ?>
         <div class="clear"></div>
     </div>
     </div>
@@ -252,78 +185,9 @@ if (strlen(trim($desc)) == 0) {
         if ($idx % 3 == 0) {
             $row++;
         }
-        $autoThumbText = $claim->getAutoThumbText();
-        $cost = '';
-        if (isset($claim->Price) && $claim->Price > 0) {
-            $cost = $this->Amount->formatCurrency($claim->Price) . ' LBC';
-        } else if (isset($claim->Fee) && strtolower($claim->FeeCurrency) === 'lbc') {
-            $cost = $this->Amount->formatCurrency($claim->Fee) . ' LBC';
-        }
-
-        // content type
-        $ctTag = $claim->getContentTag();
-    ?>
-    <div data-id="<?php echo $claim->ClaimId ?>" class="claim-grid-item<?php if ($idx % 3 == 0): ?> last-item<?php endif; ?><?php if ($last_row): ?> last-row<?php endif; ?>">
-        <?php if (strlen(trim($cost)) > 0): ?>
-        <div class="price-tag"><?php echo $cost ?></div>
-        <?php endif; ?>
-
-        <div class="tags">
-            <?php if ($ctTag): ?>
-            <div class="content-type"><?php echo strtoupper($ctTag) ?></div>
-            <?php endif; ?>
-            <?php if ($claim->IsNSFW): ?>
-            <div class="nsfw">NSFW</div>
-            <?php endif; ?>
-        </div>
-
-        <div data-autothumb="<?php echo $autoThumbText ?>" class="thumbnail <?php echo $a[mt_rand(0, count($a) - 1)] ?>">
-            <?php if (!$claim->IsNSFW && strlen(trim($claim->ThumbnailUrl)) > 0): ?>
-                <img src="<?php echo htmlspecialchars($claim->ThumbnailUrl) ?>" alt="" />
-            <?php else: ?>
-                <div class="autothumb"><?php echo $autoThumbText ?></div>
-            <?php endif; ?>
-        </div>
-
-        <div class="metadata">
-            <div class="title" title="<?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '') ?>"><?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '<em>No Title</em>') ?></div>
-            <div class="link" title="<?php echo $claim->getLbryLink() ?>"><a href="<?php echo $claim->getLbryLink() ?>" rel="nofollow"><?php echo $claim->getLbryLink() ?></a></div>
-
-            <div class="desc"><?php echo strlen(trim($claim->Description)) > 0 ? $claim->Description : '<em>No description available</em>' ?></div>
-
-            <div class="label half-width">Transaction</div>
-            <div class="label half-width">Created</div>
-
-            <div class="value half-width"><a href="/tx/<?php echo $claim->TransactionHash ?>#output-<?php echo $claim->Vout ?>" title="<?php echo $claim->TransactionHash ?>"><?php echo $claim->TransactionHash ?></a></div>
-            <div class="value half-width" title="<?php echo $claim->Created->format('j M Y H:i:s') ?> UTC">
-                <?php echo \Carbon\Carbon::createFromTimestamp($claim->TransactionTime > 0 ? $claim->TransactionTime : $claim->Created->format('U'))->diffForHumans(); ?>
-            </div>
-
-            <div class="clear spacer"></div>
-
-            <?php if ($claim->ClaimType == 2): ?>
-            <div class="label half-width">Content Type</div>
-            <div class="label half-width">Language</div>
-
-            <div class="value half-width" title="<?php echo $claim->ContentType ?>"><?php echo $claim->ContentType ?></div>
-            <div class="value half-width" title="<?php echo $claim->Language == 'en' ? 'English' : $claim->Language ?>"><?php echo $claim->Language == 'en' ? 'English' : $claim->Language ?></div>
-
-            <div class="clear spacer"></div>
-
-            <div class="label half-width">Author</div>
-            <div class="label half-width">License</div>
-
-            <div class="value half-width" title="<?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?>"><?php echo strlen(trim($claim->Author)) > 0 ? $claim->Author : '<em>Unspecified</em>' ?></div>
-            <div class="value half-width" title="<?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '' ?>">
-                <?php if (strlen(trim($claim->LicenseUrl)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
-                <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
-                <?php if (strlen(trim($claim->LicenseUrl))): ?></a><?php endif; ?>
-            </div>
-            <?php endif; ?>
-        </div>
-    </div>
-    <?php $idx++; endforeach; ?>
-
+        echo $this->element('claimbox', array('claim' => $claim, 'idx' => $idx, 'last_row' => $last_row));
+        $idx++;
+        endforeach; ?>
     <div class="clear"></div>
 </div>
 

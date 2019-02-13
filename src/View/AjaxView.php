@@ -15,7 +15,7 @@
 namespace App\View;
 
 use Cake\Event\EventManager;
-use Cake\Network\Request;
+use Cake\Http\ServerRequest;
 use Cake\Network\Response;
 
 /**

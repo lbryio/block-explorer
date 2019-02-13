@@ -8,8 +8,8 @@ class PriceHistoryTable extends Table {
     public function initialize(array $config) {
         parent::initialize($config);
 
-        $this->primaryKey('Id');
-        $this->table('PriceHistory');
+        $this->setPrimaryKey('Id');
+        $this->setTable('PriceHistory');
     }
 }
 

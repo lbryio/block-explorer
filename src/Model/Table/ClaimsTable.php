@@ -8,29 +8,20 @@ class ClaimsTable extends Table {
     public function initialize(array $config) {
         parent::initialize($config);
 
-        $this->primaryKey('Id');
-        $this->table('Claims');
+        $this->setPrimaryKey('id');
+        $this->setTable('claim');
 
         //$this->addBehavior('SimpleAudit');
         $this->addAssociations([
             'belongsTo' => [
-                'Publisher' => [
+                'publisher' => [
                     'className' => 'App\Model\Table\ClaimsTable',
-                    'foreignKey' => 'PublisherId',
-                    'bindingKey' => 'ClaimId',
-                    'propertyName' => 'Publisher'
-                ]
-            ],
-            'hasOne' => [
-                'Stream' => [
-                    'className' => 'App\Model\Table\ClaimStreamsTable',
-                    'foreignKey' => 'Id',
-                    'bindingKey' => 'Id',
-                    'propertyName' => 'Stream'
+                    'foreignKey' => 'publisher_id',
+                    'bindingKey' => 'claim_id',
+                    'propertyName' => 'publisher'
                 ]
             ]
         ]);
     }
 }
-
 ?>

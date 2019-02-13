@@ -129,12 +129,12 @@
         <div class="stats">
             <div class="box box-20">
                 <div class="title">Block Height</div>
-                <div class="value"><?php echo $recentBlocks[0]->Height ?></div>
+                <div class="value"><?php echo $recentBlocks[0]->height ?></div>
             </div>
 
             <div class="box box-30">
                 <div class="title">Difficulty</div>
-                <div class="value" title="<?php echo $recentBlocks[0]->Difficulty ?>"><?php echo number_format($recentBlocks[0]->Difficulty, 2, '.', '') ?></div>
+                <div class="value" title="<?php echo $recentBlocks[0]->difficulty ?>"><?php echo number_format($recentBlocks[0]->difficulty, 2, '.', '') ?></div>
             </div>
 
             <div class="box box-30">
@@ -167,13 +167,13 @@
 
                 <tbody>
                     <?php foreach ($recentBlocks as $block): ?>
-                    <tr data-height="<?php echo $block->Height ?>" data-time="<?php echo $block->BlockTime ?>">
-                        <td><a href="/blocks/<?php echo $block->Height ?>"><?php echo $block->Height ?></a></td>
-                        <td><?php echo \Carbon\Carbon::createFromTimestamp($block->BlockTime)->diffForHumans(); ?></td>
-                        <td class="right"><?php echo round($block->BlockSize / 1024, 2) . 'KB' ?></td>
-                        <td class="right"><?php echo $block->TransactionCount ?></td>
-                        <td class="right"><?php echo number_format($block->Difficulty, 2, '.', '') ?></td>
-                        <td class="last-cell"><?php echo DateTime::createFromFormat('U', $block->BlockTime)->format('d M Y H:i:s') . ' UTC' ?></td>
+                    <tr data-height="<?php echo $block->height ?>" data-time="<?php echo $block->block_time ?>">
+                        <td><a href="/blocks/<?php echo $block->height ?>"><?php echo $block->height ?></a></td>
+                        <td><?php echo \Carbon\Carbon::createFromTimestamp($block->block_time)->diffForHumans(); ?></td>
+                        <td class="right"><?php echo round($block->block_size / 1024, 2) . 'KB' ?></td>
+                        <td class="right"><?php echo $block->transaction_count ?></td>
+                        <td class="right"><?php echo number_format($block->difficulty, 2, '.', '') ?></td>
+                        <td class="last-cell"><?php echo DateTime::createFromFormat('U', $block->block_time)->format('d M Y H:i:s') . ' UTC' ?></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -183,14 +183,15 @@
         <div class="recent-claims">
             <h3>Recent Claims</h3>
             <a class="claim-explorer-link" href="/claims">Claims Explorer</a>
-            <?php $idx = 0; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow']; foreach ($recentClaims as $claim):
+            <?php $idx = 0; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow']; 
+            foreach ($recentClaims as $claim):
                 $idx++;
                 $autoThumbText = $claim->getAutoThumbText();
-                $link = $claim->Name;
-                $rawLink = $claim->Name;
-                if (isset($claim->Publisher->Name)) {
-                    $link = urlencode($claim->Publisher->Name) . '/' . $link;
-                    $rawLink = $claim->Publisher->Name . '/' . $link;
+                $link = $claim->name;
+                $rawLink = $claim->name;
+                if (isset($claim->publisher)) {
+                    $link = urlencode($claim->publisher) . '/' . $link;
+                    $rawLink = $claim->publisher . '/' . $link;
                 }
                 $link = 'lbry://' . $link;
                 $rawLink = 'lbry://' . $rawLink;
@@ -198,35 +199,35 @@
                 // content type
                 $ctTag = $claim->getContentTag();
             ?>
-            <div data-id="<?php echo $claim->ClaimId ?>" class="claim-box<?php if ($idx == 5): ?> last<?php endif; ?>">
+            <div data-id="<?php echo $claim->claim_id ?>" class="claim-box<?php if ($idx == 5): ?> last<?php endif; ?>">
                 <div class="tags">
                     <?php if ($ctTag): ?>
                     <div class="content-type"><?php echo strtoupper($ctTag) ?></div>
                     <?php endif; ?>
-                    <?php if ($claim->IsNSFW): ?>
+                    <?php if ($claim->is_nsfw): ?>
                     <div class="nsfw">NSFW</div>
                     <?php endif; ?>
                 </div>
 
                 <div data-autothumb="<?php echo $autoThumbText ?>" class="thumbnail <?php echo $a[mt_rand(0, count($a) - 1)] ?>">
-                    <?php if (!$claim->IsNSFW && strlen(trim($claim->ThumbnailUrl)) > 0): ?>
-                        <img src="<?php echo strip_tags($claim->ThumbnailUrl) ?>" alt="" />
+                    <?php if (!$claim->is_nsfw && strlen(trim($claim->thumbnail_url)) > 0): ?>
+                        <img src="<?php echo strip_tags($claim->thumbnail_url) ?>" alt="" />
                     <?php else: ?>
                         <div class="autothumb"><?php echo $autoThumbText ?></div>
                     <?php endif; ?>
                 </div>
 
                 <div class="metadata">
-                    <div class="title" title="<?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : ''); ?>"><?php echo $claim->ClaimType == 1 ? $claim->Name : ((strlen(trim($claim->Title)) > 0) ? $claim->Title : '<em>No Title</em>') ?></div>
+                    <div class="title" title="<?php echo $claim->claim_type == 1 ? $claim->name : ((strlen(trim($claim->title)) > 0) ? $claim->title : ''); ?>"><?php echo $claim->claim_type == 1 ? $claim->name : ((strlen(trim($claim->title)) > 0) ? $claim->title : '<em>No Title</em>') ?></div>
                     <div class="link" title="<?php echo $rawLink ?>"><a href="<?php echo $link ?>"><?php echo $rawLink ?></a></div>
 
                     <div class="clear"></div>
-                    <?php if ($claim->ClaimType == 2 && strlen(trim($claim->Description)) > 0): ?>
-                    <div class="desc"><?php echo $claim->Description ?></div>
+                    <?php if ($claim->claim_type == 2 && strlen(trim($claim->description)) > 0): ?>
+                    <div class="desc"><?php echo $claim->description ?></div>
                     <?php endif; ?>
                 </div>
 
-                <a class="tx-link" href="/tx/<?php echo $claim->TransactionHash ?>#output-<?php echo $claim->Vout ?>" target="_blank">Transaction</a>
+                <a class="tx-link" href="/tx/<?php echo $claim->transaction_hash_id ?>#output-<?php echo $claim->vout ?>" target="_blank">Transaction</a>
             </div>
             <?php endforeach; ?>
 

@@ -14,22 +14,22 @@
 
 <div class="tx-head">
     <h3>LBRY Transaction</h3>
-    <h4><?php echo $tx->Hash ?></h4>
+    <h4><?php echo $tx->hash ?></h4>
 </div>
 
 <div class="tx-time">
     <div class="created-time">
         <h3 title="Represents the time this transaction was created on the explorer">Time Created</h3>
-        <div><?php echo $tx->Created->format('j M Y H:i:s') . ' UTC '; ?></div>
+        <div><?php echo $tx->created_at->format('j M Y H:i:s') . ' UTC '; ?></div>
     </div>
 
     <div class="conf-time">
         <h3 title="The time the first confirmation of this transaction happened on the blockchain">Block Time</h3>
-        <div><?php echo ($tx->TransactionTime == null || strlen(trim($tx->TransactionTime)) == 0) ? '<em>Not yet confirmed</em>' :
-            \DateTime::createFromFormat('U', $tx->TransactionTime)->format('j M Y H:i:s') . ' UTC' ?>
+        <div><?php echo ($tx->transaction_time == null || strlen(trim($tx->transaction_time)) == 0) ? '<em>Not yet confirmed</em>' :
+            \DateTime::createFromFormat('U', $tx->transaction_time)->format('j M Y H:i:s') . ' UTC' ?>
 
-            <?php if ($tx->TransactionTime > $tx->Created->getTimestamp()):
-                $diffSeconds = $tx->TransactionTime - $tx->Created->getTimestamp();
+            <?php if ($tx->transaction_time > $tx->created_at->getTimestamp()):
+                $diffSeconds = $tx->transaction_time - $tx->created_at->getTimestamp();
                 if ($diffSeconds <= 60) {
                     echo sprintf(' (+%s second%s)', $diffSeconds, $diffSeconds == 1 ? '' : 's');
                 } else {
@@ -47,15 +47,15 @@
 <div class="tx-summary">
     <div class="box p25">
         <div class="title">Amount (LBC)</div>
-        <div class="value"><?php echo $this->Amount->format($tx->Value) ?></div>
+        <div class="value"><?php echo $this->Amount->format($tx->value) ?></div>
     </div>
 
     <div class="box p15">
         <div class="title">Block Height</div>
-        <?php if (!isset($tx->BlockHash) || strlen(trim($tx->BlockHash)) === 0): ?>
+        <?php if (!isset($tx->block_hash_id) || strlen(trim($tx->block_hash_id)) === 0): ?>
         <div class="value" title="Unconfirmed">Unconf.</div>
         <?php else: ?>
-        <div class="value" title="<?php echo $tx->BlockHash ?>"><a href="/blocks/<?php echo $block->Height ?>"><?php echo $block->Height ?></a></div>
+        <div class="value" title="<?php echo $tx->block_hash_id ?>"><a href="/blocks/<?php echo $block->height ?>"><?php echo $block->height ?></a></div>
         <?php endif; ?>
     </div>
 
@@ -66,17 +66,17 @@
 
     <div class="box p15">
         <div class="title">Size (bytes)</div>
-        <div class="value"><?php echo number_format($tx->TransactionSize, 0, '', ',') ?></div>
+        <div class="value"><?php echo number_format($tx->transaction_size, 0, '', ',') ?></div>
     </div>
 
     <div class="box p15">
         <div class="title">Inputs</div>
-        <div class="value"><?php echo $tx->InputCount ?></div>
+        <div class="value"><?php echo $tx->input_count ?></div>
     </div>
 
     <div class="box p15 last">
         <div class="title">Outputs</div>
-        <div class="value"><?php echo $tx->OutputCount ?></div>
+        <div class="value"><?php echo $tx->output_count ?></div>
     </div>
 
     <div class="clear"></div>
@@ -86,28 +86,29 @@
     <h3>Details</h3>
     <div class="tx-details-layout">
         <div class="inputs">
-            <div class="subtitle"><?php echo $tx->InputCount ?> input<?php echo $tx->InputCount === 1 ? '' : 's'; ?></div>
+            <div class="subtitle"><?php echo $tx->input_count ?> input<?php echo $tx->input_count === 1 ? '' : 's'; ?></div>
 
             <?php
                     $setAddressIds = [];
                     foreach ($inputs as $in):
             ?>
-            <div id="input-<?php echo $in->Id ?>" class="input <?php if (isset($in['InputAddresses']) && count($in['InputAddresses']) > 0 && $in['InputAddresses'][0]->Address == $sourceAddress): ?>is-source<?php endif; ?>">
-                <?php if ($in['IsCoinbase']): ?>
+            <div id="input-<?php echo $in->id ?>" class="input <?php if (isset($in->input_addresses) && count($in->input_addresses) > 0 && $in->input_addresses[0]->address == $sourceAddress): ?>is-source<?php endif; ?>">
+                <?php if ($in->is_coinbase): ?>
                     <div>Block Reward (New Coins)</div>
                 <?php else: ?>
-                    <?php if (strlen(trim($in->Value)) == 0): ?>
+                    <?php if (strlen(trim($in->value)) == 0): ?>
                     <div>Incomplete data</div>
                     <?php else:
-                            $addr = $in['InputAddresses'][0];
+                            $addr = $in->input_addresses[0];
 
-                            if (!isset($setAddressIds[$addr->Address])):
-                                $setAddressIds[$addr->Address] = 1; ?>
-                    <a id="<?php echo $addr->Address ?>"></a>
+                            if (!isset($setAddressIds[$addr->address])):
+                                $setAddressIds[$addr->address] = 1; ?>
+                    <a id="<?php echo $addr->address ?>"></a>
                     <?php   endif; ?>
-                    <div><span class="value"><?php echo $this->Amount->format($in['Value']) ?> LBC</span> from</div>
-                    <div class="address"><a href="/address/<?php echo $addr->Address ?>"><?php echo $addr->Address ?></a>
-                    (<a class="output-link" href="/tx/<?php echo $in->PrevoutHash ?>#output-<?php echo $in->PrevoutN ?>">output</a>)
+                    <div><span class="value"><?php echo $this->Amount->format($in->value) ?> LBC</span> from</div>
+                    <div class="address"><a href="/address/<?php echo $addr->address ?>"><?php echo $addr->address ?></a>
+                    (<a class="output-link" href="/tx/<?php echo $in->prevout_hash ?>#output-<?php echo $in->prevout_n ?>">output</a>)
+                    
                     <?php  if (isset($addr->Tag) && strlen(trim($addr->Tag)) > 0): ?>
                     <div class="tag">
                         <?php if (strlen(trim($addr->TagUrl)) > 0): ?><a href="<?php echo $addr->TagUrl ?>" target="_blank" rel="nofollow"><?php echo $addr->Tag ?></a><?php else: echo $addr->Tag; endif; ?>
@@ -125,7 +126,7 @@
         </div>
 
         <div class="outputs">
-            <div class="subtitle"><?php echo $tx->OutputCount ?> output<?php echo $tx->OutputCount === 1 ? '' : 's'; ?>
+            <div class="subtitle"><?php echo $tx->output_count ?> output<?php echo $tx->output_count === 1 ? '' : 's'; ?>
 
             <?php if ($fee > 0): ?>
             <span class="fee"><span class="label">Fee</span> <span class="value"><?php echo $this->Amount->format($fee) ?> LBC</span></span>
@@ -134,7 +135,7 @@
 
             <?php
             foreach ($outputs as $out): ?>
-            <div id="output-<?php echo $out->Vout ?>" class="output <?php if (isset($out['OutputAddresses']) && count($out['OutputAddresses']) > 0 && $out['OutputAddresses'][0]->Address == $sourceAddress): ?>is-source<?php endif; ?>">
+            <div id="output-<?php echo $out->vout ?>" class="output <?php if (isset($out->output_addresses) && count($out->output_addresses) > 0 && $out->output_addresses[0]->address == $sourceAddress): ?>is-source<?php endif; ?>">
                 <div class="labels">
                     <?php if($out->Claim && ($out->IsClaim or $out->IsSupportClaim or $out->IsUpdateClaim)): ?><a class="view-claim" href="<?php echo $out->Claim->getExplorerLink() ?>">View</a><?php endif; ?>
                     <?php if($out->IsSupportClaim): ?><div class="support">SUPPORT</div><?php endif; ?>
@@ -142,19 +143,19 @@
                     <?php if($out->IsClaim): ?><div class="claim">CLAIM</div><?php endif; ?>
                 </div>
 
-                <?php if (strlen(trim($out['Value'])) == 0): ?>
+                <?php if (strlen(trim($out->value)) == 0): ?>
                 <div>Incomplete data</div>
                 <?php else:
-                        $addr = $out['OutputAddresses'][0];
+                        $addr = $out->output_addresses[0];
 
-                        if (!isset($setAddressIds[$addr->Address])):
-                                $setAddressIds[$addr->Address] = 1; ?>
-                <a id="<?php echo $addr->Address ?>"></a>
+                        if (!isset($setAddressIds[$addr->address])):
+                                $setAddressIds[$addr->address] = 1; ?>
+                <a id="<?php echo $addr->address ?>"></a>
                 <?php   endif; ?>
-                <div><span class="value"><?php echo $this->Amount->format($out['Value']) ?> LBC</span> to</div>
-                <div class="address"><a href="/address/<?php echo $addr->Address ?>"><?php echo $addr->Address ?></a>
+                <div><span class="value"><?php echo $this->Amount->format($out->value) ?> LBC</span> to</div>
+                <div class="address"><a href="/address/<?php echo $addr->address ?>"><?php echo $addr->address ?></a>
 
-                <?php if ($out->IsSpent): ?>(<a href="/tx/<?php echo $out->SpendInput->TransactionHash ?>#input-<?php echo $out->SpendInput->Id ?>">spent</a>)<?php else: ?>(unspent)<?php endif; ?>
+                <?php if ($out->is_spent): ?>(<a href="/tx/<?php if(isset($out->spend_input_id)) { echo $out->spend_input_hash; } ?>#input-<?php if(isset($out->spend_input_id)) {echo $out->spend_input_id; } ?>">spent</a>)<?php else: ?>(unspent)<?php endif; ?>
 
                 <?php if (isset($addr->Tag) && strlen(trim($addr->Tag)) > 0): ?>
                 <div class="tag">

@@ -8,8 +8,8 @@ class BlocksTable extends Table {
     public function initialize(array $config) {
         parent::initialize($config);
 
-        $this->primaryKey('Id');
-        $this->table('Blocks');
+        $this->setPrimaryKey('id');
+        $this->setTable('block');
 
         $this->addBehavior('SimpleAudit');
     }

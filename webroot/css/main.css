@@ -81,6 +81,7 @@ border-radius: 0 8px 8px 0 }
 .claims-grid .claim-grid-item .thumbnail .autothumb { display: block; margin: 73px auto 0 auto; text-align: center; font-size: 240%; color: #fff; line-height: 54px }
 .claims-grid .claim-grid-item .tags > div { display: inline-block; padding: 4px 12px; margin-left: 2px }
 .claims-grid .claim-grid-item .tags .nsfw { background: #e53935; text-align: center; color: #fff; position: relative; left: 1px }
+.claims-grid .claim-grid-item .tags .bid-state { background: #551CA1; text-align: center; color: #fff; }
 .claims-grid .claim-grid-item .tags .content-type { background: #880e4f; text-align: center; color: #fff; }
 .claims-grid .claim-grid-item .metadata { padding: 24px; font-size: 90% }
 .claims-grid .claim-grid-item .title { font-size: 120%; height: 25px; line-height: 25px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
