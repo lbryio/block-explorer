@@ -54,7 +54,7 @@
             <div class="label half-width">Confirmations</div>
 
             <div class="value half-width"><?php echo $block->bits ?></div>
-            <div class="value half-width"><?php echo number_format($block->confirmations, 0, '', ',') ?></div>
+            <div class="value half-width"><?php echo $confirmations ?></div>
 
             <div class="clear spacer"></div>
 
