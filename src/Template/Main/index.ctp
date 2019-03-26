@@ -187,14 +187,6 @@
             foreach ($recentClaims as $claim):
                 $idx++;
                 $autoThumbText = $claim->getAutoThumbText();
-                $link = $claim->name;
-                $rawLink = $claim->name;
-                if (isset($claim->publisher)) {
-                    $link = urlencode($claim->publisher) . '/' . $link;
-                    $rawLink = $claim->publisher . '/' . $link;
-                }
-                $link = 'lbry://' . $link;
-                $rawLink = 'lbry://' . $rawLink;
 
                 // content type
                 $ctTag = $claim->getContentTag();
@@ -219,7 +211,7 @@
 
                 <div class="metadata">
                     <div class="title" title="<?php echo $claim->claim_type == 1 ? $claim->name : ((strlen(trim($claim->title)) > 0) ? $claim->title : ''); ?>"><?php echo $claim->claim_type == 1 ? $claim->name : ((strlen(trim($claim->title)) > 0) ? $claim->title : '<em>No Title</em>') ?></div>
-                    <div class="link" title="<?php echo $rawLink ?>"><a href="<?php echo $link ?>"><?php echo $rawLink ?></a></div>
+                    <div class="link" title="<?php echo $claim->getLbryLink() ?>"><a href="<?php echo $claim->getLbryLink() ?>"><?php echo $claim->getLbryLink() ?></a></div>
 
                     <div class="clear"></div>
                     <?php if ($claim->claim_type == 2 && strlen(trim($claim->description)) > 0): ?>

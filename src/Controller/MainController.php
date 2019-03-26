@@ -328,8 +328,11 @@ class MainController extends AppController {
 
             // Get the basic block transaction info
             $txs = $this->Transactions->find()->select(['Transactions.id', 'Transactions.value', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.hash', 'Transactions.version'])->where(['Transactions.block_hash_id' => $block->hash])->toArray();
+            $last_block = $this->Blocks->find()->select(['height'])->order(['height' => 'desc'])->first();
+            $confirmations = $last_block->height - $block->height + 1;
             $this->set('block', $block);
             $this->set('blockTxs', $txs);
+            $this->set('confirmations', $confirmations);
         }
     }
 
@@ -349,7 +352,14 @@ class MainController extends AppController {
         }
 
         $block = $this->Blocks->find()->select(['confirmations', 'height'])->where(['hash' => $tx->block_hash_id])->first();
-        $confirmations = $block->confirmations;
+        $confirmations = 0;
+        if($tx->block_hash_id == 'MEMPOOL') {
+            $confirmations = 0;
+        }
+        else {
+            $last_block = $this->Blocks->find()->select(['height'])->order(['height' => 'desc'])->first();
+            $confirmations = $last_block->height - $block->height + 1;
+        }    
         $inputs = $this->Inputs->find()->where(['transaction_id' => $tx->id])->order(['prevout_n' => 'asc'])->toArray();
         foreach($inputs as $input) {
             $inputAddresses = $this->Addresses->find()->select(['id', 'address'])->where(['id' => $input->input_address_id])->toArray();
