@@ -352,8 +352,14 @@ class MainController extends AppController {
         }
 
         $block = $this->Blocks->find()->select(['confirmations', 'height'])->where(['hash' => $tx->block_hash_id])->first();
-        $last_block = $this->Blocks->find()->select(['height'])->order(['height' => 'desc'])->first();
-        $confirmations = $last_block->height - $block->height + 1;
+        $confirmations = 0;
+        if($tx->block_hash_id == 'MEMPOOL') {
+            $confirmations = 0;
+        }
+        else {
+            $last_block = $this->Blocks->find()->select(['height'])->order(['height' => 'desc'])->first();
+            $confirmations = $last_block->height - $block->height + 1;
+        }    
         $inputs = $this->Inputs->find()->where(['transaction_id' => $tx->id])->order(['prevout_n' => 'asc'])->toArray();
         foreach($inputs as $input) {
             $inputAddresses = $this->Addresses->find()->select(['id', 'address'])->where(['id' => $input->input_address_id])->toArray();
