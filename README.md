@@ -1,6 +1,6 @@
 # LBRY Block Explorer
 
-A simple PHP block explorer for browsing transactions and claims on the [LBRY](https://lbry.io) blockchain. The explorer was developed using CakePHP which is a model-view-controller (MVC) PHP framework.
+A simple PHP block explorer for browsing transactions and claims on the [LBRY](https://lbry.com) blockchain. The explorer was developed using CakePHP which is a model-view-controller (MVC) PHP framework.
 
 ## Installation
 There are some prerequisites that need to be installed before the explorer can be accessed.
@@ -76,7 +76,7 @@ Launch the URL for the configured web server root in a browser.
 
 
 ## Contributing
-Contributions to this project are welcome, encouraged, and compensated. For more details, see https://lbry.io/faq/contributing
+Contributions to this project are welcome, encouraged, and compensated. For more details, see https://lbry.tech/contribute
 
 
 ## License
@@ -88,4 +88,4 @@ We take security seriously. Please contact security@lbry.io regarding any securi
 
 
 ## Contact
-The primary contact for this project is [@akinwale](https://github.com/akinwale) (akinwale@lbry.io)
+The primary contact for this project is [@akinwale](https://github.com/akinwale) (akinwale@lbry.com)
