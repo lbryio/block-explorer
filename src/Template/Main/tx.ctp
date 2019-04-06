@@ -19,7 +19,12 @@
 
 <div class="tx-time">
     <?php 
-        $created_time = (abs($tx->transaction_time - strtotime($tx->created_at)) > 3600) ? $tx->transaction_time : $tx->created_at;
+        $transaction_time = \DateTime::createFromFormat('U', $tx->transaction_time);
+        if($tx->transaction_time == null || strlen(trim($tx->transaction_time)) == 0) {
+            $created_time = $tx->created_at;
+        } else {
+            $created_time = (abs($tx->transaction_time - strtotime($tx->created_at)) > 3600) ? $transaction_time : $tx->created_at;
+        }
     ?>    
     <div class="created-time">
         <h3 title="Represents the time this transaction was created on the explorer">Time Created</h3>
@@ -29,7 +34,7 @@
     <div class="conf-time">
         <h3 title="The time the first confirmation of this transaction happened on the blockchain">Block Time</h3>
         <div><?php echo ($tx->transaction_time == null || strlen(trim($tx->transaction_time)) == 0) ? '<em>Not yet confirmed</em>' :
-            \DateTime::createFromFormat('U', $tx->transaction_time)->format('j M Y H:i:s') . ' UTC' ?>
+            $transaction_time->format('j M Y H:i:s') . ' UTC' ?>
 
             <?php if ($tx->transaction_time > $tx->created_at->getTimestamp()):
                 $diffSeconds = $tx->transaction_time - $tx->created_at->getTimestamp();

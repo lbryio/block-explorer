@@ -44,7 +44,7 @@ $cost = 'Free';
 if (isset($claim->price) && $claim->price > 0) {
     $cost = $this->Amount->formatCurrency($claim->price) . ' LBC';
 } else if (isset($claim->fee) && strtolower($claim->fee_currency) === 'lbc') {
-    $cost = $this->Amount->formatCurrency($claim->fee) . ' LBC';
+    $cost = (float) ($claim->fee) . ' LBC';
 }
 
 $desc = $claim->description;
@@ -66,6 +66,10 @@ if (strlen(trim($desc)) == 0) {
 
 <div class="claims-body">
     <div class="claim-info">
+        <div class="tags">
+            <div class="bid-state"><?php echo $claim->bid_state; ?></div>
+        </div>
+        
         <div data-autothumb="<?php echo $autoThumbText ?>" class="thumbnail <?php echo $a[mt_rand(0, count($a) - 1)] ?>">
             <?php if (!$claim->is_nsfw && strlen(trim($claim->thumbnail_url)) > 0): ?>
                 <img src="<?php echo htmlspecialchars($claim->thumbnail_url) ?>" alt="" />
@@ -101,6 +105,17 @@ if (strlen(trim($desc)) == 0) {
 
             <div class="clear"></div>
             <?php endif; ?>
+            
+            <div class="half-width"><div class="label help-text" title="The quantity of tokens used to back the stake.">Claim bid</div></div>
+            <div class="half-width"><div class="label help-text" title="The sum of the claim bid and all of its active supports.">Effective amount</div></div>
+
+            <div class="value half-width"><?php echo (float) ($claim->claim_bid) . ' LBC'; ?></div>
+            <div class="value half-width"><?php echo (float) ($claim->effective_amount / 100000000) . ' LBC';  ?></div>
+
+            <div class="clear"></div>
+            
+            <div class="label help-text" title="A unique identifier that is used to locate and fetch the content from the data network.">Stream hash</div>
+            <div class="value"><?php echo $claim->sd_hash ?></div>
         </div>
     </div>
 

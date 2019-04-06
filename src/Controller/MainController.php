@@ -169,7 +169,7 @@ class MainController extends AppController {
             $this->set('currentPage', $page);
             $this->set('claims', $claims);
         } else {
-            $claim = $this->Claims->find()->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->where(['Claims.claim_id' => $id])->order(['Claims.created_at' => 'DESC'])->first();
+            $claim = $this->Claims->find()->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->select(['claim_bid' => 'O.value'])->leftJoin(['O' => 'output'], ['Claims.transaction_hash_id = O.transaction_hash AND Claims.vout = O.vout'])->where(['Claims.claim_id' => $id])->order(['Claims.created_at' => 'DESC'])->first();
             if (!$claim) {
                 return $this->redirect('/');
             }
