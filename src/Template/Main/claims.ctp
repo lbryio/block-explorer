@@ -113,17 +113,17 @@ if (strlen(trim($desc)) == 0) {
             <div class="desc"><?php echo str_replace("\n", '<br />', $desc) ?></div>
 
             <div class="details">
-                <div class="label half-width">Author</div>
                 <div class="label half-width">Content Type</div>
+                <div class="label half-width">Language</div>
 
-
-                <div class="value half-width"><?php echo strlen(trim($claim->author)) > 0 ? $claim->author : '<em>Unspecified</em>' ?></div>
                 <div class="value half-width"><?php echo strlen(trim($claim->content_type)) > 0 ? $claim->content_type : '<em>Unspecified</em>' ?></div>
+                <div class="value half-width"><?php echo strlen(trim($claim->language)) > 0 ? ($claim->language == 'en' ? 'English' : '') : '<em>Unspecified</em>' ?></div>
 
                 <!--
                 <div class="label half-width">License</div>
-                -->
+               
                 <div class="label">Language</div>
+                -->
 
                 <!--
                 <div class="value half-width"<?php if(strlen(trim($claim->license)) > 0): ?> title="<?php echo $claim->license ?>"<?php endif; ?>>
@@ -131,8 +131,8 @@ if (strlen(trim($desc)) == 0) {
                     <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
                     <?php if (strlen(trim($claim->LicenseUrl))): ?></a><?php endif; ?>
                 </div>
-                -->
                 <div class="value half-width"><?php echo strlen(trim($claim->language)) > 0 ? ($claim->language == 'en' ? 'English' : '') : '<em>Unspecified</em>' ?></div>
+                -->
             </div>
         <?php endif; ?>
         <a href="<?php echo $claim->getLbryLink() ?>" class="open-lbry-link">Open in LBRY</a>
