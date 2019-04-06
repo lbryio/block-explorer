@@ -18,9 +18,12 @@
 </div>
 
 <div class="tx-time">
+    <?php 
+        $created_time = (abs($tx->transaction_time - strtotime($tx->created_at)) > 3600) ? $tx->transaction_time : $tx->created_at;
+    ?>    
     <div class="created-time">
         <h3 title="Represents the time this transaction was created on the explorer">Time Created</h3>
-        <div><?php echo $tx->created_at->format('j M Y H:i:s') . ' UTC '; ?></div>
+        <div><?php echo $created_time->format('j M Y H:i:s') . ' UTC '; ?></div>
     </div>
 
     <div class="conf-time">
