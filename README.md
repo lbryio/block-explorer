@@ -6,7 +6,6 @@ A simple PHP block explorer for browsing transactions and claims on the [LBRY](h
 There are some prerequisites that need to be installed before the explorer can be accessed.
 * Web server - Apache, caddy or nginx
 * [lbrycrd](https://github.com/lbryio/lbrycrd) with txindex turned on
-* [Python claims decoder](https://github.com/cryptodevorg/lbry-decoder)
 * MariaDB 10.2 or higher
 * Redis Server (optional, only required for the CakePHP redis cache engine, or to run `forevermempool`)
 * PHP 7.2 or higher
