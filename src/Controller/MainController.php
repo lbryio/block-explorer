@@ -136,6 +136,10 @@ class MainController extends AppController {
             $count = $stmt->fetch(\PDO::FETCH_OBJ);
             $numClaims = $count->Total;
 
+            $stmt = $conn->execute('SELECT MAX(id) AS MaxId FROM claim');
+            $res = $stmt->fetch(\PDO::FETCH_OBJ);
+            $maxClaimId = $res->MaxId;
+
             $numPages = ceil($numClaims  / $pageLimit);
             if ($page < 1) {
                 $page = 1;
@@ -144,14 +148,19 @@ class MainController extends AppController {
                 $page = $numPages;
             }
 
-            $offset = ($page - 1) * $pageLimit;
-            $claims = $this->Claims->find()->select($this->Claims)->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->order(['Claims.created_at' => 'DESC'])->offset($offset)->limit($pageLimit)->toArray();
+            $startLimitId = $maxClaimId - ($page * $pageLimit);
+            $endLimitId = $startLimitId + $pageLimit;
+
+            $claims = $this->Claims->find()->select($this->Claims)->
+                select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->
+                where(['Claims.id >' => $startLimitId, 'Claims.id <=' => $endLimitId])
+                order(['Claims.id' => 'DESC'])->toArray();
 
             for ($i = 0; $i < count($claims); $i++) {
                 if ($canConvert && $claims[$i]->fee > 0 && $claims[$i]->fee_currency == 'USD') {
                     $claims[$i]->price = $claims[$i]->fee / $priceInfo->price;
                 }
-                
+
                 if (isset($claims[$i]->Stream)) {
                     $json = json_decode($claims[$i]->Stream->Stream);
                     if (isset($json->metadata->license)) {
@@ -226,7 +235,7 @@ class MainController extends AppController {
         }
 
         $transactions = $this->Transactions->find()->select(['Transactions.id', 'Transactions.hash', 'Transactions.value', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.transaction_time', 'Transactions.created_at'])->order(['Transactions.created_at' => 'desc'])->limit(10)->toArray();
-        
+
         $this->set('blocks', $blocks);
         $this->set('txs', $transactions);
     }
@@ -359,21 +368,21 @@ class MainController extends AppController {
         else {
             $last_block = $this->Blocks->find()->select(['height'])->order(['height' => 'desc'])->first();
             $confirmations = $last_block->height - $block->height + 1;
-        }    
+        }
         $inputs = $this->Inputs->find()->where(['transaction_id' => $tx->id])->order(['prevout_n' => 'asc'])->toArray();
         foreach($inputs as $input) {
             $inputAddresses = $this->Addresses->find()->select(['id', 'address'])->where(['id' => $input->input_address_id])->toArray();
             $input->input_addresses = $inputAddresses;
         }
-        
+
         $outputs = $this->Outputs->find()->select($this->Outputs)->select(['spend_input_hash' => 'I.transaction_hash', 'spend_input_id' => 'I.id'])->where(['Outputs.transaction_id' => $tx->id])->leftJoin(['I' => 'input'], ['I.id = Outputs.spent_by_input_id'])->order(['Outputs.vout' => 'asc'])->toArray();
-        for ($i = 0; $i < count($outputs); $i++) {            
+        for ($i = 0; $i < count($outputs); $i++) {
             $outputs[$i]->IsClaim = (strpos($outputs[$i]->script_pub_key_asm, 'CLAIM') > -1);
             $outputs[$i]->IsSupportClaim = (strpos($outputs[$i]->script_pub_key_asm, 'SUPPORT_CLAIM') > -1);
             $outputs[$i]->IsUpdateClaim = (strpos($outputs[$i]->script_pub_key_asm, 'UPDATE_CLAIM') > -1);
             $claim = $this->Claims->find()->select(['id', 'claim_id', 'claim_address', 'vout', 'transaction_hash_id'])->where(['transaction_hash_id' => $tx->hash, 'vout' => $outputs[$i]->vout])->first();
             $outputs[$i]->Claim = $claim;
-            
+
             $output_address = trim($outputs[$i]->address_list, '[""]');
              if(!$output_address && $claim) {
                 $output_address = $claim->claim_address;
@@ -477,7 +486,7 @@ class MainController extends AppController {
             $canTag = true;
             $transactionAddresses = $this->TransactionAddresses->find()->where(['address_id' => $address->id])->toArray();
             $numTransactions = count($transactionAddresses);
-            
+
             $all = $this->request->query('all');
             if ($all === 'true') {
                 $offset = 0;
@@ -495,7 +504,7 @@ class MainController extends AppController {
 
                 $offset = ($page - 1) * $pageLimit;
             }
-            
+
             $stmt = $conn->execute(sprintf(
                 'SELECT T.id, T.hash, T.input_count, T.output_count, T.block_hash_id, ' .
                 '    TA.debit_amount, TA.credit_amount, ' .
@@ -552,7 +561,7 @@ class MainController extends AppController {
         echo $qrCode->writeString();
         exit(0);
     }
-    
+
     public function apiblocksize($timePeriod = '24h') {
         $this->autoRender = false;
 
@@ -587,7 +596,7 @@ class MainController extends AppController {
             $resultSet[$price->TimePeriod]['AvgUSD'] = (float) $price->AvgUSD;
         }
         */
-        
+
         $conn = ConnectionManager::get('default');
         // get avg block sizes for the time period
         $stmt = $conn->execute("SELECT AVG(block_size) AS AvgBlockSize, DATE_FORMAT(FROM_UNIXTIME(block_time), '$sqlDateFormat') AS TimePeriod " .
@@ -602,7 +611,7 @@ class MainController extends AppController {
 
         return $this->_jsonResponse(['success' => true, 'data' => $resultSet]);
     }
-    
+
     public function apirealtimeblocks() {
         // Load 10 blocks
         $this->autoRender = false;
@@ -616,7 +625,7 @@ class MainController extends AppController {
 
         $this->_jsonResponse(['success' => true, 'blocks' => $blocks]);
     }
-  
+
     public function apirealtimetx() {
         // Load 10 transactions
         $this->autoRender = false;
@@ -625,7 +634,7 @@ class MainController extends AppController {
 
         $this->_jsonResponse(['success' => true, 'txs' => $txs]);
     }
-      
+
      protected function _gettxoutsetinfo() {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $txOutSetInfo = new \stdClass();
@@ -775,12 +784,12 @@ class MainController extends AppController {
         if (!isset($base58address)) {
             return $this->_jsonError('Base58 address not specified.', 400);
         }
-        
+
         $address = $this->Addresses->find()->select(['id', 'balance'])->where(['address' => $base58address])->first();
         if (!$address) {
             return $this->_jsonError('Could not find address.', 400);
         }
-        
+
         return $this->_jsonResponse(['success' => true, ['balance' => ['confirmed' => $address->balance, 'unconfirmed' => 0]]]);
     }
 
@@ -840,20 +849,20 @@ class MainController extends AppController {
 
         $circulating = 0;
         $txoutsetinfo = $this->_gettxoutsetinfo();
-        
+
         $reservedcommunity = ['rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd'];
         $reservedoperational = ['r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL'];
         $reservedinstitutional = ['r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi'];
         $reservedaux = ['bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt', 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2', 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD', 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393', 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH', 'bCrboXVztuSbZzVToCWSsu1pEr2oxKHu9v', 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h'];
         $allAddresses = array_merge($reservedcommunity, $reservedoperational, $reservedinstitutional, $reservedaux);
-        
+
         $reservedtotal = $this->Addresses->find()->select(['id', 'balance' => 'SUM(balance)'])->where(['Addresses.address IN' => $allAddresses])->first();
 
         $circulating = $txoutsetinfo->total_amount - ($reservedtotal->balance);
 
         return $this->_jsonResponse(['success' => true, 'utxosupply' => ['total' => $txoutsetinfo->total_amount, 'circulating' => $circulating]]);
     }
-    
+
     protected function _formatHashRate($value) {
         if ($value === 'N/A') {
             return $value;
