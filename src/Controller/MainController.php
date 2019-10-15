@@ -150,10 +150,13 @@ class MainController extends AppController {
 
             $startLimitId = $maxClaimId - ($page * $pageLimit);
             $endLimitId = $startLimitId + $pageLimit;
+            if ($endLimitId > $maxClaimId) {
+                $endLimitId = $maxClaimId;
+            }
 
             $claims = $this->Claims->find()->select($this->Claims)->
                 select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->
-                where(['Claims.id >' => $startLimitId, 'Claims.id <=' => $endLimitId])
+                where(['Claims.id >' => $startLimitId, 'Claims.id <=' => $endLimitId])->
                 order(['Claims.id' => 'DESC'])->toArray();
 
             for ($i = 0; $i < count($claims); $i++) {
