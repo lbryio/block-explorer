@@ -4,7 +4,7 @@ $cost = '';
 if (isset($claim->price) && $claim->price > 0) {
     $cost = $this->Amount->formatCurrency($claim->price) . ' LBC';
 } else if (isset($claim->fee) && strtolower($claim->fee_currency) === 'lbc') {
-    $cost = $this->Amount->formatCurrency($claim->fee) . ' LBC';
+    $cost = $this->Amount->formatLbryCurrency($claim->fee) . ' LBC';
 }
 $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow'];
 // content type

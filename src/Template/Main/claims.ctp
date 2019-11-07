@@ -44,9 +44,9 @@ $cost = 'Free';
 if (isset($claim->price) && $claim->price > 0) {
     $cost = $this->Amount->formatCurrency($claim->price) . ' LBC';
 } else if (isset($claim->fee) && strtolower($claim->fee_currency) === 'lbc') {
-    $cost = (float) ($claim->fee) . ' LBC';
+    $cost =  $this->Amount->formatLbryCurrency($claim->fee) . ' LBC';
 }
-$effective_amount = $claim->effective_amount / 100000000;
+$effective_amount = $this->Amount->formatLbryCurrency($claim->effective_amount);
 
 $desc = $claim->description;
 if (strlen(trim($desc)) == 0) {
@@ -111,7 +111,7 @@ if (strlen(trim($desc)) == 0) {
             <div class="half-width"><div class="label help-text" title="The sum of the claim bid and all of its active supports.">Effective amount</div></div>
 
             <div class="value half-width"><?php echo (float) ($claim->claim_bid) . ' LBC'; ?></div>
-            <div class="value half-width"><?php echo ($effective_amount < $claim->claim_bid) ? '<em>Synchronizing</em>' : ((float) ($claim->effective_amount / 100000000) . ' LBC');  ?></div>
+            <div class="value half-width"><?php echo ($claim->effective_amount < $claim->claim_bid) ? '<em>Synchronizing</em>' : ($effective_amount . ' LBC');  ?></div>
 
             <div class="clear"></div>
             

@@ -5,6 +5,8 @@ namespace App\View\Helper;
 use Cake\View\Helper;
 
 class AmountHelper extends Helper {
+    const DEWIES_DIVIDER = 100000000;
+    
     public function format($value, $thousandsSeparator = ',') {
         $value = number_format($value, 8, '.', $thousandsSeparator);
         $dotIdx = strpos($value, '.');
@@ -19,6 +21,10 @@ class AmountHelper extends Helper {
         }
 
         return $value;
+    }
+    
+    public function formatLbryCurrency($value, $thousandsSeparator = ",") {
+        return formatCurrency($value / DEWIES_DIVIDER);
     }
 
     public function formatCurrency($value, $thousandsSeparator = ',') {
