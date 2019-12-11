@@ -38,7 +38,7 @@ function buildChartData(claimsData) {
 }
 
 function loadChartData() {
-    var api_url = "https://chainquery.lbry.io/api/sql?query=";
+    var api_url = "https://chainquery.lbry.com/api/sql?query=";
 	var query = "SELECT c1.claim_type, c1.bid_state, c1.effective_amount, c1.transaction_time, o.transaction_time AS 'spent_time' FROM claim c1 LEFT JOIN (SELECT output.claim_id, tx.transaction_time FROM output INNER JOIN input ON input.prevout_hash = output.transaction_hash AND input.prevout_n = output.vout INNER JOIN transaction tx ON tx.id = input.transaction_id) o ON o.claim_id=c1.claim_id AND c1.bid_state='Spent' ORDER BY c1.transaction_time ASC";
     var url = api_url + query;
   var loadProgress = $('.bids-chart-container .load-progress');

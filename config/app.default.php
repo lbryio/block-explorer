@@ -222,7 +222,7 @@ return [
             'className' => 'Cake\Database\Connection',
             'driver' => 'Cake\Database\Driver\Mysql',
             'persistent' => false,
-            'host' => 'chainquery.lbry.io',
+            'host' => 'chainquery.lbry.com',
             /**
              * CakePHP will use the default DB port based on the driver selected
              * MySQL on MAMP uses port 8889, MAMP users will want to uncomment
@@ -257,9 +257,9 @@ return [
              */
             //'init' => ['SET GLOBAL innodb_stats_on_metadata = 0'],
 
-            'url' => env('DATABASE_URL', 'chainquery.lbry.io:3600'),
+            'url' => env('DATABASE_URL', 'chainquery.lbry.com:3600'),
         ],
-        
+
         'localdb' => [ // Local db for price history
             'className' => 'Cake\Database\Connection',
             'driver' => 'Cake\Database\Driver\Mysql',
