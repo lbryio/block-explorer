@@ -30,6 +30,8 @@ class MainController extends AppController {
 
     const tagReceiptAddress = 'bLockNgmfvnnnZw7bM6SPz6hk5BVzhevEp';
 
+    const blockedListUrl = 'https://api.lbry.com/file/list_blocked';
+
     protected $redis;
 
     public function initialize() {
@@ -220,8 +222,23 @@ class MainController extends AppController {
                     }
                 }
             }
+
+            // fetch blocked list
+            $blockedList = json_decode(self::curl_get(self::blockedListUrl));
+            $blockedOutpoints = $blockedList->data->outpoints;
+            $claimIsBlocked = false;
+            foreach ($blockedOutpoints as $outpoint) {
+                // $parts[0] = txid
+                // $parts[1] = vout
+                $parts = explode(':', $outpoint);
+                if ($claim->transaction_hash_id == $parts[0] && $claim->vout == $parts[1]) {
+                    $claimIsBlocked = true;
+                }
+            }
+
             $this->set('claim', $claim);
-            $this->set('moreClaims', $moreClaims);
+            $this->set('claimIsBlocked', $claimIsBlocked);
+            $this->set('moreClaims', $claimIsBlocked ? [] : $moreClaims);
         }
     }
 
