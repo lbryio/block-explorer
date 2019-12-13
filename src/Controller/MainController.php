@@ -1010,14 +1010,14 @@ class MainController extends AppController {
     }
 
     private function _getBlockedList() {
-        $cachedList = Cache::read('blockedList', 'api_requests');
+        $cachedList = Cache::read('list_blocked', 'api_requests');
         if ($cachedList !== false) {
             return $cachedList;
         }
 
         // get the result from the api
         $response = self::curl_get(self::blockedListUrl);
-        Cache::write('blockedList', $response, 'api_requests');
+        Cache::write('list_blocked', $response, 'api_requests');
         return $response;
     }
 }
