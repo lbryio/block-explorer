@@ -7,6 +7,7 @@ use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Serializer\PublicKey\PemPublicKeySerializer;
 use Mdanter\Ecc\Serializer\PublicKey\DerPublicKeySerializer;
 use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
+use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
@@ -156,7 +157,7 @@ class MainController extends AppController {
                 $endLimitId = $maxClaimId;
             }
 
-            $blockedList = json_decode(self::curl_get(self::blockedListUrl));
+            $blockedList = json_decode($this->_getBlockedList());
             $claims = $this->Claims->find()->select($this->Claims)->
                 select(['publisher' => 'C.name', 'publisher_transaction_hash_id' => 'C.transaction_hash_id', 'publisher_vout' => 'C.vout'])->
                 leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->
@@ -237,7 +238,7 @@ class MainController extends AppController {
             }
 
             // fetch blocked list
-            $blockedList = json_decode(self::curl_get(self::blockedListUrl));
+            $blockedList = json_decode($this->_getBlockedList());
             $claimChannel = $this->Claims->find()->select(['transaction_hash_id', 'vout'])->where(['claim_id' => $claim->publisher_id])->first();
             $claimIsBlocked = $this->_isClaimBlocked($claim, $claimChannel, $blockedList);
 
@@ -981,6 +982,11 @@ class MainController extends AppController {
     }
 
     private function _isClaimBlocked($claim, $claimChannel, $blockedList) {
+        if (!$blockedList || !isset($blockedList->data)) {
+            // invalid blockedList response
+            return false;
+        }
+
         $blockedOutpoints = $blockedList->data->outpoints;
         $claimIsBlocked = false;
         foreach ($blockedOutpoints as $outpoint) {
@@ -1001,5 +1007,17 @@ class MainController extends AppController {
         }
 
         return $claimIsBlocked;
+    }
+
+    private function _getBlockedList() {
+        $cachedList = Cache::read('blockedList', 'api_requests');
+        if ($cachedList !== false) {
+            return $cachedList;
+        }
+
+        // get the result from the api
+        $response = self::curl_get(self::blockedListUrl);
+        Cache::write('blockedList', $response, 'api_requests');
+        return $response;
     }
 }
