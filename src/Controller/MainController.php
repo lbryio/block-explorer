@@ -234,6 +234,14 @@ class MainController extends AppController {
                 if ($claim->transaction_hash_id == $parts[0] && $claim->vout == $parts[1]) {
                     $claimIsBlocked = true;
                 }
+
+                // check if the publisher (channel) is blocked
+                // block the channel if that's the case
+                if (isset($claim->publisher) &&
+                    $claim->publisher->transaction_hash_id == $parts[0] &&
+                    $claim->publisher->vout == $parts[1]) {
+                    $claimIsBlocked = true;
+                }
             }
 
             $this->set('claim', $claim);
