@@ -156,8 +156,10 @@ class MainController extends AppController {
                 $endLimitId = $maxClaimId;
             }
 
+            $blockedList = json_decode(self::curl_get(self::blockedListUrl));
             $claims = $this->Claims->find()->select($this->Claims)->
-                select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->
+                select(['publisher' => 'C.name', 'publisher_transaction_hash_id' => 'C.transaction_hash_id', 'publisher_vout' => 'C.vout'])->
+                leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->
                 where(['Claims.id >' => $startLimitId, 'Claims.id <=' => $endLimitId])->
                 order(['Claims.id' => 'DESC'])->toArray();
 
@@ -175,6 +177,17 @@ class MainController extends AppController {
                         $claims[$i]->LicenseUrl = $json->metadata->licenseUrl;
                     }
                 }
+
+                $claimChannel = null;
+                if ($claims[$i]->publisher_transaction_hash_id) {
+                    $claimChannel = new \stdClass();
+                    $claimChannel->transaction_hash_id = $claims[$i]->publisher_transaction_hash_id;
+                    $claimChannel->vout = $claims[$i]->publisher_vout;
+                }
+
+                $blocked = $this->_isClaimBlocked($claims[$i], $claimChannel, $blockedList);
+                $claims[$i]->isBlocked = $blocked;
+                $claims[$i]->thumbnail_url = $blocked ? null : $claims[$i]->thumbnail_url; // don't show the thumbnails too
             }
 
             $this->set('pageLimit', $pageLimit);
@@ -225,24 +238,8 @@ class MainController extends AppController {
 
             // fetch blocked list
             $blockedList = json_decode(self::curl_get(self::blockedListUrl));
-            $blockedOutpoints = $blockedList->data->outpoints;
-            $claimIsBlocked = false;
-            foreach ($blockedOutpoints as $outpoint) {
-                // $parts[0] = txid
-                // $parts[1] = vout
-                $parts = explode(':', $outpoint);
-                if ($claim->transaction_hash_id == $parts[0] && $claim->vout == $parts[1]) {
-                    $claimIsBlocked = true;
-                }
-
-                // check if the publisher (channel) is blocked
-                // block the channel if that's the case
-                if (isset($claim->publisher) &&
-                    $claim->publisher->transaction_hash_id == $parts[0] &&
-                    $claim->publisher->vout == $parts[1]) {
-                    $claimIsBlocked = true;
-                }
-            }
+            $claimChannel = $this->Claims->find()->select(['transaction_hash_id', 'vout'])->where(['claim_id' => $claim->publisher_id])->first();
+            $claimIsBlocked = $this->_isClaimBlocked($claim, $claimChannel, $blockedList);
 
             $this->set('claim', $claim);
             $this->set('claimIsBlocked', $claimIsBlocked);
@@ -981,5 +978,26 @@ class MainController extends AppController {
 
         // Close any open file handle
         return $response;
+    }
+
+    private function _isClaimBlocked($claim, $claimChannel, $blockedList) {
+        $blockedOutpoints = $blockedList->data->outpoints;
+        $claimIsBlocked = false;
+        foreach ($blockedOutpoints as $outpoint) {
+            // $parts[0] = txid
+            // $parts[1] = vout
+            $parts = explode(':', $outpoint);
+            if ($claim->transaction_hash_id == $parts[0] && $claim->vout == $parts[1]) {
+                $claimIsBlocked = true;
+            }
+
+            // check if the publisher (channel) is blocked
+            // block the channel if that's the case
+            if ($claimChannel && $claimChannel->transaction_hash_id == $parts[0] && $claimChannel->vout == $parts[1]) {
+                $claimIsBlocked = true;
+            }
+        }
+
+        return $claimIsBlocked;
     }
 }
