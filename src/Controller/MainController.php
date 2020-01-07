@@ -893,9 +893,8 @@ class MainController extends AppController {
 
         $reservedtotal = $this->Addresses->find()->select(['balance' => 'SUM(balance)'])->where(['Addresses.address IN' => $allAddresses])->first();
 
-        $circulating = $txoutsetinfo->total_amount - ($reservedtotal->balance);
-
-        return $this->_jsonResponse(['success' => true, 'utxosupply' => ['total' => $txoutsetinfo->total_amount, 'circulating' => $circulating]]);
+        $circulating = (isset($txoutsetinfo) ? $txoutsetinfo->total_amount : 0) - ($reservedtotal->balance);
+        return $this->_jsonResponse(['success' => true, 'utxosupply' => ['total' => isset($txoutsetinfo) ? $txoutsetinfo->total_amount : 0, 'circulating' => $circulating]]);
     }
 
     protected function _formatHashRate($value) {
@@ -1010,7 +1009,7 @@ class MainController extends AppController {
         if ($cachedOutsetInfo !== false) {
             $res = json_decode($cachedOutsetInfo);
             if (!isset($res->result)) {
-                return 0;
+                return null;
             }
             return $res->result;
         }
@@ -1020,12 +1019,12 @@ class MainController extends AppController {
             $response = self::curl_json_post(self::$rpcurl, json_encode($req));
             $res = json_decode($res);
             if (!isset($res->result)) {
-                return 0;
+                return null;
             }
             Cache::write('gettxoutsetinfo', $response, 'api_requests');
             return $res->result;
         } catch (\Exception $e) {
-            return 0;
+            return null;
         }
     }
 
