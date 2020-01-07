@@ -661,7 +661,7 @@ class MainController extends AppController {
         $this->_jsonResponse(['success' => true, 'txs' => $txs]);
     }
 
-     protected function _gettxoutsetinfo() {
+    /*protected function _gettxoutsetinfo() {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $txOutSetInfo = new \stdClass();
         $txOutSetInfo->time = $now->format('c');
@@ -684,7 +684,6 @@ class MainController extends AppController {
         }
 
         if ($shouldRefreshSet) {
-
             $req = ['method' => 'gettxoutsetinfo', 'params' => []];
             try {
                 $res = json_decode(self::curl_json_post(self::$rpcurl, json_encode($req)));
@@ -702,7 +701,7 @@ class MainController extends AppController {
         }
 
         return (isset($txOutSetInfo->tosi)) ? $txOutSetInfo->tosi : 'N/A';
-    }
+    }*/
 
     public function apistatus() {
         $this->autoRender = false;
@@ -879,10 +878,20 @@ class MainController extends AppController {
         $reservedcommunity = ['rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd'];
         $reservedoperational = ['r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL'];
         $reservedinstitutional = ['r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi'];
-        $reservedaux = ['bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt', 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2', 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD', 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393', 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH', 'bCrboXVztuSbZzVToCWSsu1pEr2oxKHu9v', 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h'];
+        $reservedaux = [
+            'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt',
+            'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2',
+            'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD',
+            'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz',
+            'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc',
+            'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393',
+            'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH',
+            'bCrboXVztuSbZzVToCWSsu1pEr2oxKHu9v',
+            'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h'
+        ];
         $allAddresses = array_merge($reservedcommunity, $reservedoperational, $reservedinstitutional, $reservedaux);
 
-        $reservedtotal = $this->Addresses->find()->select(['id', 'balance' => 'SUM(balance)'])->where(['Addresses.address IN' => $allAddresses])->first();
+        $reservedtotal = $this->Addresses->find()->select(['balance' => 'SUM(balance)'])->where(['Addresses.address IN' => $allAddresses])->first();
 
         $circulating = $txoutsetinfo->total_amount - ($reservedtotal->balance);
 
@@ -945,19 +954,6 @@ class MainController extends AppController {
         }
     }
 
-    // private function _gettxoutsetinfo() {
-        // $req = ['method' => 'gettxoutsetinfo', 'params' => []];
-        // try {
-            // $res = json_decode(self::curl_json_post(self::$rpcurl, json_encode($req)));
-            // if (!isset($res->result)) {
-                // return 0;
-            // }
-            // return $res->result;
-        // } catch (\Exception $e) {
-            // return 'N/A';
-        // }
-    // }
-
     private static function curl_json_post($url, $data, $headers = []) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -1007,6 +1003,30 @@ class MainController extends AppController {
         }
 
         return $claimIsBlocked;
+    }
+
+    private function _gettxoutsetinfo() {
+        $cachedOutsetInfo = Cache::read('gettxoutsetinfo', 'api_requests');
+        if ($cachedOutsetInfo !== false) {
+            $res = json_decode($cachedOutsetInfo);
+            if (!isset($res->result)) {
+                return 0;
+            }
+            return $res->result;
+        }
+
+        $req = ['method' => 'gettxoutsetinfo', 'params' => []];
+        try {
+            $response = self::curl_json_post(self::$rpcurl, json_encode($req));
+            $res = json_decode($res);
+            if (!isset($res->result)) {
+                return 0;
+            }
+            Cache::write('gettxoutsetinfo', $response, 'api_requests');
+            return $res->result;
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
 
     private function _getBlockedList() {
