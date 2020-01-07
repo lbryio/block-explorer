@@ -7,6 +7,7 @@ use Mdanter\Ecc\Crypto\Signature\Signer;
 use Mdanter\Ecc\Serializer\PublicKey\PemPublicKeySerializer;
 use Mdanter\Ecc\Serializer\PublicKey\DerPublicKeySerializer;
 use Mdanter\Ecc\Serializer\Signature\DerSignatureSerializer;
+use Cake\Cache\Cache;
 use Cake\Core\Configure;
 use Cake\Datasource\ConnectionManager;
 use Cake\Log\Log;
@@ -29,6 +30,8 @@ class MainController extends AppController {
     const blockchainTickerUrl = 'https://blockchain.info/ticker';
 
     const tagReceiptAddress = 'bLockNgmfvnnnZw7bM6SPz6hk5BVzhevEp';
+
+    const blockedListUrl = 'https://api.lbry.com/file/list_blocked';
 
     protected $redis;
 
@@ -154,8 +157,10 @@ class MainController extends AppController {
                 $endLimitId = $maxClaimId;
             }
 
+            $blockedList = json_decode($this->_getBlockedList());
             $claims = $this->Claims->find()->select($this->Claims)->
-                select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->
+                select(['publisher' => 'C.name', 'publisher_transaction_hash_id' => 'C.transaction_hash_id', 'publisher_vout' => 'C.vout'])->
+                leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->
                 where(['Claims.id >' => $startLimitId, 'Claims.id <=' => $endLimitId])->
                 order(['Claims.id' => 'DESC'])->toArray();
 
@@ -173,6 +178,17 @@ class MainController extends AppController {
                         $claims[$i]->LicenseUrl = $json->metadata->licenseUrl;
                     }
                 }
+
+                $claimChannel = null;
+                if ($claims[$i]->publisher_transaction_hash_id) {
+                    $claimChannel = new \stdClass();
+                    $claimChannel->transaction_hash_id = $claims[$i]->publisher_transaction_hash_id;
+                    $claimChannel->vout = $claims[$i]->publisher_vout;
+                }
+
+                $blocked = $this->_isClaimBlocked($claims[$i], $claimChannel, $blockedList);
+                $claims[$i]->isBlocked = $blocked;
+                $claims[$i]->thumbnail_url = $blocked ? null : $claims[$i]->thumbnail_url; // don't show the thumbnails too
             }
 
             $this->set('pageLimit', $pageLimit);
@@ -220,8 +236,15 @@ class MainController extends AppController {
                     }
                 }
             }
+
+            // fetch blocked list
+            $blockedList = json_decode($this->_getBlockedList());
+            $claimChannel = $this->Claims->find()->select(['transaction_hash_id', 'vout'])->where(['claim_id' => $claim->publisher_id])->first();
+            $claimIsBlocked = $this->_isClaimBlocked($claim, $claimChannel, $blockedList);
+
             $this->set('claim', $claim);
-            $this->set('moreClaims', $moreClaims);
+            $this->set('claimIsBlocked', $claimIsBlocked);
+            $this->set('moreClaims', $claimIsBlocked ? [] : $moreClaims);
         }
     }
 
@@ -955,6 +978,46 @@ class MainController extends AppController {
         }
 
         // Close any open file handle
+        return $response;
+    }
+
+    private function _isClaimBlocked($claim, $claimChannel, $blockedList) {
+        if (!$blockedList || !isset($blockedList->data)) {
+            // invalid blockedList response
+            return false;
+        }
+
+        $blockedOutpoints = $blockedList->data->outpoints;
+        $claimIsBlocked = false;
+        foreach ($blockedOutpoints as $outpoint) {
+            // $parts[0] = txid
+            // $parts[1] = vout
+            $parts = explode(':', $outpoint);
+            if ($claim->transaction_hash_id == $parts[0] && $claim->vout == $parts[1]) {
+                $claimIsBlocked = true;
+                break;
+            }
+
+            // check if the publisher (channel) is blocked
+            // block the channel if that's the case
+            if ($claimChannel && $claimChannel->transaction_hash_id == $parts[0] && $claimChannel->vout == $parts[1]) {
+                $claimIsBlocked = true;
+                break;
+            }
+        }
+
+        return $claimIsBlocked;
+    }
+
+    private function _getBlockedList() {
+        $cachedList = Cache::read('list_blocked', 'api_requests');
+        if ($cachedList !== false) {
+            return $cachedList;
+        }
+
+        // get the result from the api
+        $response = self::curl_get(self::blockedListUrl);
+        Cache::write('list_blocked', $response, 'api_requests');
         return $response;
     }
 }

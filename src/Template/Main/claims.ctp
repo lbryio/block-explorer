@@ -65,6 +65,15 @@ if (strlen(trim($desc)) == 0) {
 </div>
 
 <div class="claims-body">
+    <?php if ($claimIsBlocked): ?>
+
+    <div class="blocked-claim-info">
+        <div class="content">
+            In response to a complaint we received under the US Digital Millennium Copyright Act, we have blocked access to this content from our applications. For more information, please refer to <a href="https://lbry.com/faq/dmca" target="_blank">DMCA takedown requests</a>.
+        </div>
+    </div>
+
+    <?php else: ?>
     <div class="claim-info">
         <div data-autothumb="<?php echo $autoThumbText ?>" class="thumbnail <?php echo $a[mt_rand(0, count($a) - 1)] ?>">
             <?php if (!$claim->is_nsfw && strlen(trim($claim->thumbnail_url)) > 0): ?>
@@ -140,6 +149,7 @@ if (strlen(trim($desc)) == 0) {
 
     <div class="clear"></div>
 
+    <?php endif; ?>
 
     <?php if (count($moreClaims) > 0): ?>
 
@@ -155,7 +165,7 @@ if (strlen(trim($desc)) == 0) {
                 $row++;
             }
             echo $this->element('claimbox', array('claim' => $claim, 'idx' => $idx, 'last_row' => $last_row));
-            $idx++; 
+            $idx++;
             endforeach; ?>
         <div class="clear"></div>
     </div>
