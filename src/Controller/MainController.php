@@ -19,7 +19,7 @@ use Endroid\QrCode\Response\QrCodeResponse;
 
 class MainController extends AppController {
 
-    public static $rpcurl;
+    protected $rpcurl;
 
     const lbcPriceKey = 'lbc.price';
 
@@ -37,7 +37,7 @@ class MainController extends AppController {
 
     public function initialize() {
         parent::initialize();
-        self::$rpcurl = Configure::read('Lbry.RpcUrl');
+        $this->rpcurl = Configure::read('Lbry.RpcUrl');
         $this->redis = new \Predis\Client(Configure::read('Redis.Url'));
         try {
             $this->redis->info('mem');
@@ -943,7 +943,7 @@ class MainController extends AppController {
     private function _gethashrate() {
         $req = ['method' => 'getnetworkhashps', 'params' => []];
         try {
-            $res = json_decode(self::curl_json_post(self::$rpcurl, json_encode($req)));
+            $res = json_decode(self::curl_json_post($this->rpcurl, json_encode($req)));
             if (!isset($res->result)) {
                 return 0;
             }
@@ -1008,16 +1008,15 @@ class MainController extends AppController {
         $cachedOutsetInfo = Cache::read('gettxoutsetinfo', 'api_requests');
         if ($cachedOutsetInfo !== false) {
             $res = json_decode($cachedOutsetInfo);
-            if (!isset($res->result)) {
-                return null;
+            if (isset($res->result)) {
+                return $res->result;
             }
-            return $res->result;
         }
 
         $req = ['method' => 'gettxoutsetinfo', 'params' => []];
         try {
-            $response = self::curl_json_post(self::$rpcurl, json_encode($req));
-            $res = json_decode($res);
+            $response = self::curl_json_post($this->rpcurl, json_encode($req));
+            $res = json_decode($response);
             if (!isset($res->result)) {
                 return null;
             }

@@ -226,5 +226,4 @@ if (Configure::read('debug')) {
     Application::addPlugin('DebugKit', ['bootstrap' => true]);
 }
 
-Configure::load('lbry','lbry.default');
-
+Configure::load('lbry', 'default');
