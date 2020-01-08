@@ -875,9 +875,9 @@ class MainController extends AppController {
         $circulating = 0;
         $txoutsetinfo = $this->_gettxoutsetinfo();
 
-        $reservedcommunity = ['rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd'];
-        $reservedoperational = ['r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL'];
-        $reservedinstitutional = ['r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi'];
+        $reservedcommunity = ['rEqocTgdPdoD8NEbrECTUPfpquJ4zPVCJ8'];
+        $reservedoperational = ['r7hj61jdbGXcsccxw8UmEFCReZoCWLRr7t'];
+        $reservedinstitutional = ['rKaAUDxr24hHNNTQuNtRvNt8SGYJMdLXo3'];
         $reservedaux = [
             'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt',
             'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2',
