@@ -1,20 +1,35 @@
+os: linux
+dist: xenial
 language: php
-
-dist: trusty
-
-sudo: false
 
 php: 7.2
 
+services:
+  - docker
+
+cache:
+  directories:
+  - $HOME/.composer/cache/files
+
+env:
+  - DATABASE_URL=lbry:lbry@tcp(localhost:15500)/chainquery
+  - DATABASE_TEST_URL=lbry:lbry@tcp(localhost:15500)/chainquery
+
 before_script:
-  - if [[ $PHPCS = 1 ]]; then composer require cakephp/cakephp-codesniffer:~2.1; fi
-  - if [[ $PHPCS != 1 ]]; then composer install; fi
-  - if [[ $PHPCS != 1 ]]; then composer require phpunit/phpunit:"^5.7|^6.0"; fi
-  - if [[ $PHPCS != 1 ]]; then composer run-script post-install-cmd --no-interaction; fi
+  - composer require cakephp/cakephp-codesniffer:~2.1
+  - composer install
+  - composer require phpunit/phpunit:"^5.7|^6.0"
+  - composer run-script post-install-cmd --no-interaction
+  - echo 'lbrycrdurl="rpc://lbry:lbry@lbrycrd:29245"'          >  chainqueryconfig.toml
+  - echo 'mysqldsn="lbry:lbry@tcp(mysql:3306)/chainquery"'     >> chainqueryconfig.toml
+  - echo 'apimysqldsn="lbry:lbry@tcp(mysql:3306)/chainquery"'  >> chainqueryconfig.toml
+  - echo 'blockchainname="lbrycrd_regtest"'                    >> chainqueryconfig.toml
+  - docker-compose up -d
+  - sleep 5
 
 script:
-  - if [[ $PHPCS != 1 ]]; then vendor/bin/phpunit; fi
-  - if [[ $PHPCS = 1 ]]; then vendor/bin/phpcs -p --extensions=php --standard=vendor/cakephp/cakephp-codesniffer/CakePHP ./src ./tests ./config ./webroot; fi
+  - vendor/bin/phpunit
+  - vendor/bin/phpcs -p --extensions=php --standard=vendor/cakephp/cakephp-codesniffer/CakePHP ./src ./tests ./config ./webroot
 
 notifications:
   email: false

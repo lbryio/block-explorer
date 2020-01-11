@@ -1,0 +1,47 @@
+version: "3.5"
+services:
+  #############
+  ## Lbrycrd ##
+  #############
+  lbrycrd:
+    image: lbry/lbrycrd:v0.17.3.2-deprecatedrpc
+    restart: "no"
+    ports:
+      - "15201:29246"
+      - "15200:29245"
+    expose:
+      - "29246"
+      - "29245"
+    ## host volumes for persistent data such as wallet private keys.
+    volumes:
+      - "./persist:/data"
+    environment:
+      - RUN_MODE=regtest
+  ###########
+  ## MySQL ##
+  ###########
+  mysql:
+    image: mysql/mysql-server:5.7.27
+    restart: "no"
+    ports:
+      - "15500:3306"
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_DATABASE=chainquery
+      - MYSQL_USER=lbry
+      - MYSQL_PASSWORD=lbry
+      - MYSQL_LOG_CONSOLE=true
+  ################
+  ## Chainquery ##
+  ################
+  chainquery:
+    image: lbry/chainquery:v2.0.8
+    restart: "no"
+    ports:
+      - 6300:6300
+    depends_on:
+      - lbrycrd
+      - mysql
+    volumes:
+      - ./chainqueryconfig.toml:/etc/lbry/chainqueryconfig.toml
+    entrypoint: wait-for-it -t 0 lbrycrd:29245 -- wait-for-it -t 0 mysql:3306 -- start
