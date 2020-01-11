@@ -7,11 +7,11 @@ services:
 
 cache:
   directories:
-  - $HOME/.composer/cache/files
+    - $HOME/.composer/cache/files
 
 env:
-  - DATABASE_URL="lbry:lbry@tcp(localhost:15500)/chainquery"
-  - DATABASE_TEST_URL="lbry:lbry@tcp(localhost:15500)/chainquery"
+  - DATABASE_URL=mysql://lbry:lbry@localhost:15500/chainquery
+  - DATABASE_TEST_URL=mysql://lbry:lbry@localhost:15500/chainquery
 
 before_script:
   - composer require cakephp/cakephp-codesniffer:~2.1
