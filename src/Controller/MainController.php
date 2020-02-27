@@ -451,7 +451,7 @@ class MainController extends AppController {
             }
         }
 
-        $lbryAddresses = ['rFLUohPG4tP3gZHYoyhvADCtrDMiaYb7Qd', 'r9PGXsejVJb9ZfMf3QVdDEJCzxkd9JLxzL', 'r9srwX7DEN7Mex3a8oR1mKSqQmLBizoJvi', 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt', 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2', 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD', 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz', 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393', 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH', 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc'];
+        $lbryAddresses = ['rEqocTgdPdoD8NEbrECTUPfpquJ4zPVCJ8', 'rKaAUDxr24hHNNTQuNtRvNt8SGYJMdLXo3', 'r7hj61jdbGXcsccxw8UmEFCReZoCWLRr7t', 'bRo4FEeqqxY7nWFANsZsuKEWByEgkvz8Qt', 'bU2XUzckfpdEuQNemKvhPT1gexQ3GG3SC2', 'bay3VA6YTQBL4WLobbG7CthmoGeUKXuXkD', 'bLPbiXBp6Vr3NSnsHzDsLNzoy5o36re9Cz', 'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393', 'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH', 'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h', 'bMvUBo1h5WS46ThHtmfmXftz3z33VHL7wc', 'bX6napXtY2nVTBRc8PwULBuGWn2i3SCtrN'];
         $totalBalance = 0;
         $maxBalance = 0;
         $minBalance = 0;
@@ -887,7 +887,8 @@ class MainController extends AppController {
             'bVUrbCK8hcZ5XWti7b9eNxKEBxzc1rr393',
             'bZja2VyhAC84a9hMwT8dwTU6rDRXowrjxH',
             'bCrboXVztuSbZzVToCWSsu1pEr2oxKHu9v',
-            'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h'
+            'bMgqQqYfwzWWYBk5o5dBMXtCndVAoeqy6h',
+            'bX6napXtY2nVTBRc8PwULBuGWn2i3SCtrN'
         ];
         $allAddresses = array_merge($reservedcommunity, $reservedoperational, $reservedinstitutional, $reservedaux);
 
