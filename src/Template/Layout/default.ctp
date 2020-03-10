@@ -17,7 +17,7 @@
     <script>try{Typekit.load({ async: true });}catch(e){}</script>
 
     <!-- Analytics -->
-    <?php if ($_SERVER['HTTP_HOST'] === 'explorer.lbry.io'): ?>
+    <?php if ($_SERVER['HTTP_HOST'] === 'explorer.lbry.com'): ?>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="//www.googletagmanager.com/gtag/js?id=UA-60403362-1"></script>
     <script>
