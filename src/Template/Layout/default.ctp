@@ -57,7 +57,7 @@
     <?php echo $this->fetch('content') ?>
     <footer>
         <div class="content">
-            <a href="https://lbry.io">LBRY</a>
+            <a href="https://lbry.com">LBRY</a>
 
             <div class="page-time">Page took <?php echo round((microtime(true) - TIME_START) * 1000, 0) ?>ms</div>
         </div>
