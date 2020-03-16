@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bfdd477b9edc64f5c9f04b61d9bb6ae2",
+    "content-hash": "fcd3128079150fce9ed481f1769e120d",
     "packages": [
         {
             "name": "aura/intl",
@@ -103,16 +103,16 @@
         },
         {
             "name": "cakephp/cakephp",
-            "version": "3.7.1",
+            "version": "3.7.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cakephp/cakephp.git",
-                "reference": "1f6fd21ca27ffc88fa88506a400b94a809e29254"
+                "reference": "b0aeff37f78e6cca7ed35bc0e49dedd6cf5fb3d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cakephp/cakephp/zipball/1f6fd21ca27ffc88fa88506a400b94a809e29254",
-                "reference": "1f6fd21ca27ffc88fa88506a400b94a809e29254",
+                "url": "https://api.github.com/repos/cakephp/cakephp/zipball/b0aeff37f78e6cca7ed35bc0e49dedd6cf5fb3d6",
+                "reference": "b0aeff37f78e6cca7ed35bc0e49dedd6cf5fb3d6",
                 "shasum": ""
             },
             "require": {
@@ -145,6 +145,7 @@
             },
             "require-dev": {
                 "cakephp/cakephp-codesniffer": "^3.0",
+                "cakephp/chronos": "^1.2.1",
                 "phpunit/phpunit": "^5.7.14|^6.0"
             },
             "suggest": {
@@ -187,7 +188,7 @@
                 "rapid-development",
                 "validation"
             ],
-            "time": "2018-12-18T02:39:37+00:00"
+            "time": "2019-04-24T01:30:19+00:00"
         },
         {
             "name": "cakephp/chronos",
@@ -2120,6 +2121,7 @@
                 "psr",
                 "psr-7"
             ],
+            "abandoned": "laminas/laminas-diactoros",
             "time": "2019-08-06T17:53:53+00:00"
         }
     ],
