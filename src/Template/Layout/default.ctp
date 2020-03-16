@@ -17,7 +17,7 @@
     <script>try{Typekit.load({ async: true });}catch(e){}</script>
 
     <!-- Analytics -->
-    <?php if ($_SERVER['HTTP_HOST'] === 'explorer.lbry.io'): ?>
+    <?php if ($_SERVER['HTTP_HOST'] === 'explorer.lbry.com'): ?>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="//www.googletagmanager.com/gtag/js?id=UA-60403362-1"></script>
     <script>
@@ -57,7 +57,7 @@
     <?php echo $this->fetch('content') ?>
     <footer>
         <div class="content">
-            <a href="https://lbry.io">LBRY</a>
+            <a href="https://lbry.com">LBRY</a>
 
             <div class="page-time">Page took <?php echo round((microtime(true) - TIME_START) * 1000, 0) ?>ms</div>
         </div>
