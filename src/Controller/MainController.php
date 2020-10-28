@@ -227,8 +227,6 @@ class MainController extends AppController {
                 if (isset($claim->publisher) && $claim->publisher_id !== 'f2cf43b86b9d70175dc22dbb9ff7806241d90780') { // prevent ORDER BY for this particular claim
                     $moreClaimsQuery = $moreClaimsQuery->order(['Claims.fee' => 'DESC', 'RAND()' => 'DESC']);
                     $moreClaims = $moreClaimsQuery->toArray();
-                } else {
-                    $moreClaims = [];
                 }
                 for ($i = 0; $i < count($moreClaims); $i++) {
                     if ($canConvert && $moreClaims[$i]->fee > 0 && $moreClaims[$i]->fee_currency == 'USD') {
