@@ -223,7 +223,7 @@ class MainController extends AppController {
                     'claim_id', 'bid_state', 'fee', 'fee_currency', 'is_nsfw', 'claim_type', 'name',
                     'title', 'description', 'content_type', 'language', 'author', 'license', 'content_type'
                 ])->select(['publisher' => 'C.name'])->leftJoin(['C' => 'claim'], ['C.claim_id = Claims.publisher_id'])->where(['Claims.claim_type' => 1, 'Claims.id <>' => $claim->id, 'Claims.publisher_id' => isset($claim->publisher) ? $claim->publisher_id : $claim->claim_id])->limit(9);
-                if (isset($claim->publisher) && $claim->publisher->claim_id !== 'f2cf43b86b9d70175dc22dbb9ff7806241d90780') { // prevent ORDER BY for this particular claim
+                if (isset($claim->publisher) && $claim->publisher_id !== 'f2cf43b86b9d70175dc22dbb9ff7806241d90780') { // prevent ORDER BY for this particular claim
                     $moreClaimsQuery = $moreClaimsQuery->order(['Claims.fee' => 'DESC', 'RAND()' => 'DESC']);
                 }
                 $moreClaims = $moreClaimsQuery->toArray();
