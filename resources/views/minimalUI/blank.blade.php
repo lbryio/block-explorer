@@ -10,7 +10,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
     <meta name="description" content="Check LBRY.com">
     <meta name="msapplication-tap-highlight" content="no">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!--
     =========================================================
     * ArchitectUI HTML Theme Dashboard - v1.0.0
