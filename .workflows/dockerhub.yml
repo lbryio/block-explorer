@@ -1,7 +1,7 @@
 name: Publish Docker image
 on:
-  release:
-    types: [published]
+  branches:
+    - master
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
@@ -14,5 +14,5 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: my-docker-hub-namespace/my-docker-hub-repository
+          repository: lbry/block-explorer
           tag_with_ref: true
