@@ -18,4 +18,4 @@ RUN chown -R www-data:www-data /var/www
 RUN php ./artisan optimize
 
 EXPOSE 9000
-CMD ["php-fpm"]
+ENTRYPOINT ["./entrypoint.sh"]
