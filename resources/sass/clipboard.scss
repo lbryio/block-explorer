@@ -1,0 +1,26 @@
+#collapseLink {
+    &.collapsed {
+        .card-arrow-less {
+            display: none;
+        }
+        .card-arrow-more {
+            display: block;
+        }
+        .card-btn-arrow {
+            transform: rotate(-180deg);
+        }
+    }
+    & .card-arrow-less {
+        display: block;
+    }
+    & .card-arrow-more {
+        display: none;
+    }
+}
+
+.clipboard-button {
+    cursor: pointer;
+    & .clipboard-button-icon {
+        color: lightgrey;
+    }
+}

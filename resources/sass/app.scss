@@ -1,0 +1,21 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+@import 'collapse';
+@import 'clipboard';
+@import 'transaction';
+@import 'claim_box';
+
+.price-box {
+    background-color: rgba(119,131,143,.05);
+    font-weight: 500;
+    letter-spacing: .5px;
+    font-size: .7rem;
+    padding: .3rem .5rem;
+}
