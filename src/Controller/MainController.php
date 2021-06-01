@@ -78,7 +78,7 @@ class MainController extends AppController {
                 if (isset($blckjson->USD)) {
                     $lbcPrice = $onelbc * $blckjson->USD->buy;
                     if ($lbcPrice > 0) {
-                        $priceInfo->price = number_format($lbcPrice, 2, '.', '');
+                        $priceInfo->price = number_format($lbcPrice, 3, '.', '');
                         $priceInfo->time = $now->format('c');
                         if ($this->redis) {
                             $this->redis->set(self::lbcPriceKey, json_encode($priceInfo));
