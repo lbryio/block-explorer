@@ -133,7 +133,7 @@ class MainController extends AppController {
             $conn = ConnectionManager::get('default');
             $stmt = $conn->execute('SELECT COUNT(id) AS Total FROM claim');
             $count = $stmt->fetch(\PDO::FETCH_OBJ);
-            $numClaims = $count->Total;
+            $numClaims = 20000000;
 
             $stmt = $conn->execute('SELECT MAX(id) AS MaxId FROM claim');
             $res = $stmt->fetch(\PDO::FETCH_OBJ);

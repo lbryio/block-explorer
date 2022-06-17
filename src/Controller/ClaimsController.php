@@ -32,9 +32,9 @@ class ClaimsController extends AppController {
         }
 
         $conn = ConnectionManager::get('default');
-        $stmt = $conn->execute('SELECT COUNT(Id) AS Total FROM Claims WHERE ThumbnailUrl IS NOT NULL AND LENGTH(TRIM(ThumbnailUrl)) > 0');
-        $count = $stmt->fetch(\PDO::FETCH_OBJ);
-        $numClaims = $count->Total;
+//        $stmt = $conn->execute('SELECT COUNT(Id) AS Total FROM Claims WHERE ThumbnailUrl IS NOT NULL AND LENGTH(TRIM(ThumbnailUrl)) > 0');
+//        $count = $stmt->fetch(\PDO::FETCH_OBJ);
+        $numClaims = 23000000;
 
         if ($beforeId < 0) {
             $beforeId = 0;
