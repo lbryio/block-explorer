@@ -136,9 +136,7 @@ if (strlen(trim($desc)) == 0) {
 
                 <!--
                 <div class="value half-width"<?php if(strlen(trim($claim->license)) > 0): ?> title="<?php echo $claim->license ?>"<?php endif; ?>>
-                    <?php if (strlen(trim($claim->license_url)) > 0): ?><a href="<?php echo $claim->LicenseUrl ?>" rel="nofollow" target="_blank"><?php endif; ?>
                     <?php echo strlen(trim($claim->License)) > 0 ? $claim->License : '<em>Unspecified</em>' ?>
-                    <?php if (strlen(trim($claim->LicenseUrl))): ?></a><?php endif; ?>
                 </div>
                 -->
                 <div class="value half-width"><?php echo strlen(trim($claim->language)) > 0 ? ($claim->language == 'en' ? 'English' : '') : '<em>Unspecified</em>' ?></div>
