@@ -131,8 +131,8 @@ class MainController extends AppController {
             $page = intval($this->request->query('page'));
 
             $conn = ConnectionManager::get('default');
-            $stmt = $conn->execute('SELECT COUNT(id) AS Total FROM claim');
-            $count = $stmt->fetch(\PDO::FETCH_OBJ);
+//            $stmt = $conn->execute('SELECT COUNT(id) AS Total FROM claim');
+//            $count = $stmt->fetch(\PDO::FETCH_OBJ);
             $numClaims = 20000000;
 
             $stmt = $conn->execute('SELECT MAX(id) AS MaxId FROM claim');
