@@ -327,7 +327,7 @@ class MainController extends AppController {
             $page = intval($this->request->query('page'));
 
             $conn = ConnectionManager::get('default');
-            $stmt = $conn->execute('SELECT COUNT(id) AS Total FROM block');
+            $stmt = $conn->execute('SELECT height AS Total FROM block oder by id desc limit 1');
             $count = $stmt->fetch(\PDO::FETCH_OBJ);
             $numBlocks = $count->Total;
 
