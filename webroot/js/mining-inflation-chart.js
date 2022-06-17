@@ -97,7 +97,7 @@ function buildChartData(blockData) {
 }
 
 function loadChartData() {
-	var api_url = "https://chainquery.lbry.com/api/sql?query=";
+	var api_url = "https://chainquery.odysee.tv/api/sql?query=";
 	var query = "SELECT height, block_time FROM block WHERE confirmations > 0 ORDER BY height";
 	var url = api_url + query;
   var loadProgress = $('.mining-inflation-chart-container .load-progress');

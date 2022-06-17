@@ -31,7 +31,7 @@ class MainController extends AppController {
 
     const tagReceiptAddress = 'bLockNgmfvnnnZw7bM6SPz6hk5BVzhevEp';
 
-    const blockedListUrl = 'https://api.lbry.com/file/list_blocked';
+    const blockedListUrl = 'https://api.odysee.com/file/list_blocked';
 
     protected $redis;
 
