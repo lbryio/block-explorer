@@ -25,7 +25,7 @@ class MainController extends AppController {
 
     const txOutSetInfo = 'lbrcrd.tosi';
 
-    const bittrexMarketUrl = 'https://bittrex.com/api/v1.1/public/getticker?market=BTC-LBC';
+    const bittrexMarketUrl = 'https://api.bittrex.com/v3/markets/LBC-BTC/ticker';
 
     const blockchainTickerUrl = 'https://blockchain.info/ticker';
 
@@ -72,13 +72,13 @@ class MainController extends AppController {
             $btrxjson = json_decode(self::curl_get(self::bittrexMarketUrl));
             $blckjson = json_decode(self::curl_get(self::blockchainTickerUrl));
 
-            if ($btrxjson->success) {
-                $onelbc = $btrxjson->result->Bid;
+            if ($btrxjson) {
+                $onelbc = $btrxjson->bidRate;
                 $lbcPrice = 0;
                 if (isset($blckjson->USD)) {
                     $lbcPrice = $onelbc * $blckjson->USD->buy;
                     if ($lbcPrice > 0) {
-                        $priceInfo->price = number_format($lbcPrice, 2, '.', '');
+                        $priceInfo->price = number_format($lbcPrice, 3, '.', '');
                         $priceInfo->time = $now->format('c');
                         if ($this->redis) {
                             $this->redis->set(self::lbcPriceKey, json_encode($priceInfo));
@@ -99,11 +99,7 @@ class MainController extends AppController {
         $lbcUsdPrice = $this->_getLatestPrice();
         $this->set('lbcUsdPrice', $lbcUsdPrice);
 
-        $blocks = $this->Blocks->find()->select(['chainwork', 'confirmations', 'difficulty', 'hash', 'height', 'transaction_hashes', 'block_time', 'block_size'])->order(['height' => 'desc'])->limit(6)->toArray();
-        for ($i = 0; $i < count($blocks); $i++) {
-            $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
-            $blocks[$i]->transaction_count = count($tx_hashes);
-        }
+        $blocks = $this->Blocks->find()->select(['chainwork', 'confirmations', 'difficulty', 'hash', 'height', 'block_time', 'block_size','tx_count'])->order(['height' => 'desc'])->limit(6)->toArray();
         // hash rate
         $hashRate = $this->_formatHashRate($this->_gethashrate());
 
@@ -262,11 +258,7 @@ class MainController extends AppController {
         $this->loadModel('Outputs');
 
         // load 10 blocks and transactions
-        $blocks = $this->Blocks->find()->select(['height', 'block_time', 'transaction_hashes'])->order(['height' => 'desc'])->limit(10)->toArray();
-        for ($i = 0; $i < count($blocks); $i++) {
-            $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
-            $blocks[$i]->transaction_count = count($tx_hashes);
-        }
+        $blocks = $this->Blocks->find()->select(['height', 'block_time', 'tx_count'])->order(['height' => 'desc'])->limit(10)->toArray();
 
         $transactions = $this->Transactions->find()->select(['Transactions.id', 'Transactions.hash', 'Transactions.value', 'Transactions.input_count', 'Transactions.output_count', 'Transactions.transaction_time', 'Transactions.created_at'])->order(['Transactions.created_at' => 'desc'])->limit(10)->toArray();
 
@@ -350,7 +342,7 @@ class MainController extends AppController {
             $offset = ($page - 1) * $pageLimit;
             $currentBlock = $this->Blocks->find()->select(['height'])->order(['height' => 'DESC'])->first();
             $blocks = $this->Blocks->find()->select(
-                ['height', 'difficulty', 'transaction_hashes', 'block_size', 'nonce', 'block_time']
+                ['height', 'difficulty', 'block_size', 'nonce', 'block_time','tx_count']
             )->offset($offset)->limit($pageLimit)->order(['height' => 'DESC'])->toArray();
             $this->set('currentBlock', $currentBlock);
             $this->set('blocks', $blocks);
@@ -650,12 +642,7 @@ class MainController extends AppController {
         // Load 10 blocks
         $this->autoRender = false;
         $this->loadModel('Blocks');
-        $blocks = $this->Blocks->find()->select(['Height' => 'height', 'BlockTime' => 'block_time', 'transaction_hashes'])->order(['Height' => 'desc'])->limit(10)->toArray();
-        for ($i = 0; $i < count($blocks); $i++) {
-            $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
-            $blocks[$i]->TransactionCount = count($tx_hashes);
-            unset($blocks[$i]->transaction_hashes);
-        }
+        $blocks = $this->Blocks->find()->select(['Height' => 'height', 'BlockTime' => 'block_time', 'TransactionCount'=>'tx_count'])->order(['Height' => 'desc'])->limit(10)->toArray();
 
         $this->_jsonResponse(['success' => true, 'blocks' => $blocks]);
     }
@@ -737,12 +724,9 @@ class MainController extends AppController {
     public function apirecentblocks() {
         $this->autoRender = false;
         $this->loadModel('Blocks');
-        $blocks = $this->Blocks->find()->select(['Difficulty' => 'difficulty', 'Hash' => 'hash', 'Height' => 'height', 'transaction_hashes', 'BlockTime' => 'block_time', 'BlockSize' => 'block_size'])->order(['Height' => 'desc'])->limit(6)->toArray();
+        $blocks = $this->Blocks->find()->select(['Difficulty' => 'difficulty', 'Hash' => 'hash', 'Height' => 'height', 'BlockTime' => 'block_time', 'BlockSize' => 'block_size', 'TransactionCount' => 'tx_count'])->order(['Height' => 'desc'])->limit(6)->toArray();
         for ($i = 0; $i < count($blocks); $i++) {
-            $tx_hashes = preg_split('#,#', $blocks[$i]->transaction_hashes);
-            $blocks[$i]->TransactionCount = count($tx_hashes);
             $blocks[$i]->Difficulty = number_format($blocks[$i]->Difficulty, 2, '.', '');
-            unset($blocks[$i]->transaction_hashes);
         }
         return $this->_jsonResponse(['success' => true, 'blocks' => $blocks]);
     }

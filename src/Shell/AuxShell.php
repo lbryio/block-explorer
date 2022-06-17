@@ -13,7 +13,7 @@ class AuxShell extends Shell {
 
     public static $rpcurl;
 
-    const bittrex = 'https://bittrex.com/api/v1.1/public/getticker?market=BTC-LBC';
+    const bittrex = 'https://api.bittrex.com/v3/markets/LBC-BTC/ticker';
 
     const blockchainticker = 'https://blockchain.info/ticker';
 
@@ -150,13 +150,13 @@ class AuxShell extends Shell {
             $btrxjson = json_decode(self::curl_get(self::bittrex));
             $blckjson = json_decode(self::curl_get(self::blockchainticker));
 
-            if ($btrxjson->success) {
-                $btc = $btrxjson->result->Bid;
+            if ($btrxjson) {
+                $btc = $btrxjson->bidRate;
                 $usd = 0;
                 if (isset($blckjson->USD)) {
                     $usd = $btc * $blckjson->USD->buy;
                     $priceInfo = new \stdClass();
-                    $priceInfo->price = number_format($usd, 2, '.', '');
+                    $priceInfo->price = number_format($usd, 3, '.', '');
                     $priceInfo->time = $now->format('c');
                     if ($redis) {
                         $redis->set(self::lbcpricekey, json_encode($priceInfo));

@@ -171,7 +171,7 @@
                         <td><a href="/blocks/<?php echo $block->height ?>"><?php echo $block->height ?></a></td>
                         <td><?php echo \Carbon\Carbon::createFromTimestamp($block->block_time)->diffForHumans(); ?></td>
                         <td class="right"><?php echo round($block->block_size / 1024, 2) . 'KB' ?></td>
-                        <td class="right"><?php echo $block->transaction_count ?></td>
+                        <td class="right"><?php echo $block->tx_count ?></td>
                         <td class="right"><?php echo number_format($block->difficulty, 2, '.', '') ?></td>
                         <td class="last-cell"><?php echo DateTime::createFromFormat('U', $block->block_time)->format('d M Y H:i:s') . ' UTC' ?></td>
                     </tr>
@@ -183,7 +183,7 @@
         <div class="recent-claims">
             <h3>Recent Claims</h3>
             <a class="claim-explorer-link" href="/claims">Claims Explorer</a>
-            <?php $idx = 0; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow']; 
+            <?php $idx = 0; $a = ['purple', 'orange', 'blue', 'teal', 'green', 'yellow'];
             foreach ($recentClaims as $claim):
                 $idx++;
                 $autoThumbText = $claim->getAutoThumbText();

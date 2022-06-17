@@ -131,7 +131,7 @@
                 <tr data-height="<?php echo $block->height ?>" data-time="<?php echo $block->block_time ?>">
                     <td><a href="/blocks/<?php echo $block->height ?>" target="_blank"><?php echo $block->height ?></a></td>
                     <td><?php echo \Carbon\Carbon::createFromTimestamp($block->block_time)->diffForHumans(); ?></td>
-                    <td class="right"><?php echo $block->transaction_count ?></td>
+                    <td class="right"><?php echo $block->tx_count ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

@@ -2,17 +2,22 @@
 
 A simple PHP block explorer for browsing transactions and claims on the [LBRY](https://lbry.com) blockchain. The explorer was developed using CakePHP which is a model-view-controller (MVC) PHP framework.
 
-## Installation
+## Requirements
 There are some prerequisites that need to be installed before the explorer can be accessed.
 * Web server - Apache, caddy or nginx
 * [lbrycrd](https://github.com/lbryio/lbrycrd) with txindex turned on
 * MariaDB 10.2 or higher
 * Redis Server (optional, only required for the CakePHP redis cache engine, or to run `forevermempool`)
-* PHP 7.2 or higher
+* PHP 7.4 or higher
   * php-fpm
   * [igbinary extension](https://github.com/igbinary/igbinary)
   * [phpredis extension](https://github.com/phpredis/phpredis)
 * composer (PHP package manager)
+
+on ubuntu you may use this to install php requirements
+```bash
+sudo apt install php7.4-gmp php7.4-intl php7.4-mbstring php7.4-mysql php7.4-bcmath php7.4-gd
+```
 
 ### Installation steps
 * Clone the Github repository. `git clone https://github.com/lbryio/block-explorer`
