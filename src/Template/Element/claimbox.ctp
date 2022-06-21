@@ -29,7 +29,7 @@ $ctTag = $claim->getContentTag();
 
     <div data-autothumb="<?php echo $autoThumbText ?>" class="thumbnail <?php echo $a[mt_rand(0, count($a) - 1)] ?>">
         <?php if (!$claim->is_nsfw && strlen(trim($claim->thumbnail_url)) > 0): ?>
-            <img src="<?php echo htmlspecialchars('https://thumbnails.odycdn.com/optimize/s:0:104/quality:85/plain/'.$claim->thumbnail_url) ?>" alt="" />
+            <img src="<?php echo htmlspecialchars('https://thumbnails.odycdn.com/optimize/s:1280:720/quality:85/plain/'.$claim->thumbnail_url) ?>" alt="" />
         <?php else: ?>
             <div class="autothumb"><?php echo $autoThumbText ?></div>
         <?php endif; ?>
