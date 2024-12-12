@@ -31,7 +31,7 @@ class MainController extends AppController {
 
     const tagReceiptAddress = 'bLockNgmfvnnnZw7bM6SPz6hk5BVzhevEp';
 
-    const blockedListUrl = 'https://api.odysee.com/file/list_blocked';
+    const blockedListUrl = 'https://api.odysee.com/file/list_blocked?with_claim_id=true';
 
     protected $redis;
 
@@ -976,19 +976,19 @@ class MainController extends AppController {
         }
 
         $blockedOutpoints = $blockedList->data->outpoints;
+        $blockedClaims = $blockedList->data;
         $claimIsBlocked = false;
-        foreach ($blockedOutpoints as $outpoint) {
+        foreach ($blockedClaims as $blockedClaim) {
             // $parts[0] = txid
             // $parts[1] = vout
-            $parts = explode(':', $outpoint);
-            if ($claim->transaction_hash_id == $parts[0] && $claim->vout == $parts[1]) {
+            if ($claim->claim_id == $blockedClaim->claim_id) {
                 $claimIsBlocked = true;
                 break;
             }
 
             // check if the publisher (channel) is blocked
             // block the channel if that's the case
-            if ($claimChannel && $claimChannel->transaction_hash_id == $parts[0] && $claimChannel->vout == $parts[1]) {
+            if ($claimChannel && $claimChannel->claim_id == $blockedClaim->claim_id) {
                 $claimIsBlocked = true;
                 break;
             }
