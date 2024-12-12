@@ -5,13 +5,13 @@
     "type": "project",
     "license": "MIT",
     "require": {
-        "php": ">=5.6",
-        "cakephp/cakephp": "4.4.10",
+        "php": ">=7.4",
+        "cakephp/cakephp": "3.7.7",
         "mobiledetect/mobiledetectlib": "2.*",
-        "cakephp/migrations": "^3.0",
+        "cakephp/migrations": "~1.0",
         "psr/simple-cache": "^1.0.0",
         "cakephp/plugin-installer": "~1.0",
-        "mdanter/ecc": "1.0.0.0",
+        "mdanter/ecc": "^0.5.0",
         "nesbot/carbon": "~1.18",
         "predis/predis": "^1.1.1",
         "endroid/qr-code": "^3.5"
