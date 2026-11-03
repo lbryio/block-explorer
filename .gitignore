@@ -1,0 +1,6 @@
+/var/
+/explorer
+.env
+*.cnf
+__pycache__/
+/dist/

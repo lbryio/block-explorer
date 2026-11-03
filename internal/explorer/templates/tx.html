@@ -1,0 +1,150 @@
+
+
+{{define "script"}}
+<script type="text/javascript">
+    $(document).ready(function() {
+        if (location.hash && (location.hash.indexOf('input-') > -1 || location.hash.indexOf('output-') > -1)) {
+            $(location.hash).addClass('highlighted');
+        }
+    });
+</script>
+{{end}}{{define "css"}}{{end}}{{define "content"}}
+
+{{template "header" .}}
+
+<div class="tx-head">
+    <h3>LBRY Transaction</h3>
+    <h4>{{.Tx.hash}}</h4>
+</div>
+
+<div class="tx-time">
+    <div class="created-time">
+        <h3 title="Represents the time this transaction was created on the explorer">Time Created</h3>
+        <div>{{date .Tx.created_at "2 Jan 2006 15:04:05"}} UTC </div>
+    </div>
+
+    <div class="conf-time">
+        <h3 title="The time the first confirmation of this transaction happened on the blockchain">Block Time</h3>
+        <div>{{if not (trim .Tx.transaction_time)}}<em>Not yet confirmed</em>{{else}}{{date .Tx.transaction_time "2 Jan 2006 15:04:05"}} UTC{{end}}
+
+            {{confirmationDelay .Tx}}
+        </div>
+    </div>
+
+    <div class="clear"></div>
+</div>
+
+<div class="tx-summary">
+    <div class="box p25">
+        <div class="title">Amount (LBC)</div>
+        <div class="value">{{amount .Tx.value ","}}</div>
+    </div>
+
+    <div class="box p15">
+        <div class="title">Block Height</div>
+        {{if not (trim .Tx.block_hash_id)}}
+        <div class="value" title="Unconfirmed">Unconf.</div>
+        {{else}}
+        <div class="value" title="{{.Tx.block_hash_id}}"><a href="/blocks/{{.Block.height}}">{{.Block.height}}</a></div>
+        {{end}}
+    </div>
+
+    <div class="box p15">
+        <div class="title">Confirmations</div>
+        <div class="value">{{.Confirmations}}</div>
+    </div>
+
+    <div class="box p15">
+        <div class="title">Size (bytes)</div>
+        <div class="value">{{grouped .Tx.transaction_size 0}}</div>
+    </div>
+
+    <div class="box p15">
+        <div class="title">Inputs</div>
+        <div class="value">{{.Tx.input_count}}</div>
+    </div>
+
+    <div class="box p15 last">
+        <div class="title">Outputs</div>
+        <div class="value">{{.Tx.output_count}}</div>
+    </div>
+
+    <div class="clear"></div>
+</div>
+
+<div class="tx-details">
+    <h3>Details</h3>
+    <div class="tx-details-layout">
+        <div class="inputs">
+            <div class="subtitle">{{.Tx.input_count}} input{{if ne (num .Tx.input_count) 1.0}}s{{end}}</div>
+
+            {{range $in := .Inputs}}
+            <div id="input-{{$in.Row.id}}" class="input {{if $in.Source}}is-source{{end}}">
+                {{if truth $in.Row.is_coinbase}}
+                    <div>Block Reward (New Coins)</div>
+                {{else}}
+                    {{if not (trim $in.Row.value)}}
+                    <div>Incomplete data</div>
+                    {{else}}{{if $in.Anchor}}
+                    <a id="{{$in.Address.address}}"></a>
+                    {{end}}
+                    <div><span class="value">{{amount $in.Row.value ","}} LBC</span> from</div>
+                    <div class="address"><a href="/address/{{$in.Address.address}}">{{$in.Address.address}}</a>
+                    (<a class="output-link" href="/tx/{{$in.Row.prevout_hash}}#output-{{$in.Row.prevout_n}}">output</a>)
+                    
+                    {{if trim $in.Address.Tag}}
+                    <div class="tag">
+                        {{if trim $in.Address.TagUrl}}<a href="{{safeURL $in.Address.TagUrl}}" target="_blank" rel="nofollow">{{$in.Address.Tag}}</a>{{else}}{{$in.Address.Tag}}{{end}}
+                    </div>
+                    {{end}}
+                    </div>
+                    {{end}}
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+
+        <div class="divider">
+            <img src="/img/right-arrow.png" alt="" />
+        </div>
+
+        <div class="outputs">
+            <div class="subtitle">{{.Tx.output_count}} output{{if ne (num .Tx.output_count) 1.0}}s{{end}}
+
+            {{if gt (num .Fee) 0.0}}
+            <span class="fee"><span class="label">Fee</span> <span class="value">{{amount .Fee ","}} LBC</span></span>
+            {{end}}
+            </div>
+
+            {{range $out := .Outputs}}
+            <div id="output-{{$out.Row.vout}}" class="output {{if $out.Source}}is-source{{end}}">
+                <div class="labels">
+                    {{if and $out.Row.Claim (or $out.Row.IsClaim $out.Row.IsSupportClaim $out.Row.IsUpdateClaim)}}<a class="view-claim" href="/claims/{{$out.Row.Claim.claim_id}}">View</a>{{end}}
+                    {{if $out.Row.IsSupportClaim}}<div class="support">SUPPORT</div>{{end}}
+                    {{if $out.Row.IsUpdateClaim}}<div class="update">UPDATE</div>{{end}}
+                    {{if $out.Row.IsClaim}}<div class="claim">CLAIM</div>{{end}}
+                </div>
+
+                {{if not (trim $out.Row.value)}}
+                <div>Incomplete data</div>
+                {{else}}{{if $out.Anchor}}
+                <a id="{{$out.Address.address}}"></a>
+                {{end}}
+                <div><span class="value">{{amount $out.Row.value ","}} LBC</span> to</div>
+                <div class="address"><a href="/address/{{$out.Address.address}}">{{$out.Address.address}}</a>
+
+                {{if truth $out.Row.is_spent}}(<a href="/tx/{{if $out.Row.spend_input_id}}{{$out.Row.spend_input_hash}}{{end}}#input-{{if $out.Row.spend_input_id}}{{$out.Row.spend_input_id}}{{end}}">spent</a>){{else}}(unspent){{end}}
+
+                {{if trim $out.Address.Tag}}
+                <div class="tag">
+                    {{if trim $out.Address.TagUrl}}<a href="{{safeURL $out.Address.TagUrl}}" target="_blank" rel="nofollow">{{$out.Address.Tag}}</a>{{else}}{{$out.Address.Tag}}{{end}}
+                </div>
+                {{end}}
+                </div>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+    </div>
+</div>
+{{end}}

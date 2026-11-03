@@ -1,0 +1,140 @@
+{{define "script"}}<script type="text/javascript">
+    var resizeCards = function() {
+        var claimInfo = $('.claim-info');
+        var claimMtdt = $('.claim-metadata');
+        if (claimMtdt.outerHeight() < claimInfo.outerHeight()) {
+            claimMtdt.outerHeight(claimInfo.outerHeight());
+        } else if (claimInfo.outerHeight() < claimMtdt.outerHeight()) {
+            claimInfo.outerHeight(claimMtdt.outerHeight());
+        }
+    };
+
+    window.onload = function() {
+        resizeCards();
+    };
+
+    $(document).ready(function() {
+        resizeCards();
+
+        $('.claim-grid-item img,.claim-info img').on('error', function() {
+            var img = $(this);
+            var parent = img.parent();
+            var text = parent.attr('data-autothumb');
+            img.remove();
+            parent.append(
+                $('<div></div>').attr({'class': 'autothumb' }).text(text)
+            );
+        });
+
+        $(document).on('click', '.claim-grid-item', function() {
+            var id = $(this).attr('data-id');
+            location.href = '/claims/' + id;
+        });
+    });
+</script>
+{{end}}{{define "css"}}{{end}}{{define "content"}}{{template "header" .}}{{$claim := .Claim}}<div class="claims-head">
+    <h3><a href="/claims">LBRY Claims</a> &bull; {{$claim.name}}</h3>
+    <h4>{{$claim.claim_id}}</h4>
+</div>
+
+<div class="claims-body">
+    {{if .ClaimIsBlocked}}
+
+    <div class="blocked-claim-info">
+        <div class="content">
+            In response to a complaint we received under the US Digital Millennium Copyright Act, we have blocked access to this content from our applications. For more information, please refer to <a href="https://lbry.com/faq/dmca" target="_blank">DMCA takedown requests</a>.
+        </div>
+    </div>
+
+    {{else}}
+    <div class="claim-info">
+        <div data-autothumb="{{autoThumb $claim}}" class="thumbnail {{thumbColor}}">
+            {{if showThumbnail $claim}}
+                <img src="{{thumbnail $claim.thumbnail_url}}" alt="" />
+            {{else}}
+                <div class="autothumb">{{autoThumb $claim}}</div>
+            {{end}}
+        </div>
+
+        <div class="content">
+            {{if eq (num $claim.claim_type) 1.0}}
+            <div class="label">Published By</div>
+            <div class="value">
+                {{if isset $claim "publisher"}}
+                    <a {{publisherHref $claim.publisher}}>{{$claim.publisher}}</a>
+                {{else}}
+                    <em>Anonymous</em>
+                {{end}}
+            </div>
+            {{end}}
+
+            <div class="label">Created On</div>
+            <div class="value">{{claimDate $claim}} UTC</div>
+
+            <div class="label">Transaction ID</div>
+            <div class="value"><a href="/tx/{{$claim.transaction_hash_id}}#output-{{$claim.vout}}">{{$claim.transaction_hash_id}}</a></div>
+
+            {{if eq (num $claim.claim_type) 1.0}}
+            <div class="label half-width">Cost</div>
+            <div class="label half-width">Safe for Work</div>
+
+            <div class="value half-width">{{if claimCost $claim}}{{claimCost $claim}}{{else}}Free{{end}}</div>
+            <div class="value half-width">{{if truth $claim.is_nsfw}}No{{else}}Yes{{end}}</div>
+
+            <div class="clear"></div>
+            {{end}}
+        </div>
+    </div>
+
+    <div class="claim-metadata">
+        {{if eq (num $claim.claim_type) 2.0}}
+            <div class="title">Identity Claim</div>
+            <div class="desc">This is an identity claim.</div>
+        {{else}}
+            <div class="title">{{$claim.title}}</div>
+            <div class="desc">{{description $claim.description}}</div>
+
+            <div class="details">
+                <div class="label half-width">Author</div>
+                <div class="label half-width">Content Type</div>
+
+
+                <div class="value half-width">{{if trim $claim.author}}{{$claim.author}}{{else}}<em>Unspecified</em>{{end}}</div>
+                <div class="value half-width">{{if trim $claim.content_type}}{{$claim.content_type}}{{else}}<em>Unspecified</em>{{end}}</div>
+
+                <!--
+                <div class="label half-width">License</div>
+                -->
+                <div class="label">Language</div>
+
+                <!--
+                <div class="value half-width"{{if trim $claim.license}} title="{{$claim.license}}"{{end}}>
+                    {{if trim $claim.License}}{{$claim.License}}{{else}}<em>Unspecified</em>{{end}}
+                </div>
+                -->
+                <div class="value half-width">{{if trim $claim.language}}{{if eq $claim.language "en"}}English{{end}}{{else}}<em>Unspecified</em>{{end}}</div>
+            </div>
+        {{end}}
+        <a {{lbryHref $claim}} class="open-lbry-link">Open in LBRY</a>
+    </div>
+
+    <div class="clear"></div>
+
+    {{end}}
+
+    {{if .MoreClaims}}
+
+    <div class="more-claims">
+        <h4>{{if isset $claim "publisher"}}More from the publisher{{else}}Published by this identity{{end}}</h4>
+
+        <div class="claims-grid">
+        {{range .Cards}}{{template "claimbox" .}}{{end}}
+        <div class="clear"></div>
+    </div>
+    </div>
+
+    {{end}}
+
+</div>
+
+{{end}}

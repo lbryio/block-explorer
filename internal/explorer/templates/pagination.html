@@ -1,0 +1,25 @@
+{{define "pagination"}}{{with .Pagination}}{{if .Visible}}
+    <div class="pagination">
+        <div class="prev">
+            &nbsp;
+            {{if .Previous}}<a href="?page={{.Previous}}">Previous</a>{{end}}
+        </div>
+        <div class="pages">
+            {{if .StartEllipsis}}<div class="page-number"><a href="?page=1">1</a></div>
+                <div class="page-number">...</div>
+{{end}}
+            {{range .Pages}}<div class="page-number">
+                {{if eq $.Pagination.Current .}}{{.}}{{else}}<a href="?page={{.}}">{{.}}</a>{{end}}
+            </div>
+{{end}}
+            {{if .EndEllipsis}}<div class="page-number">...</div>
+                <div class="page-number"><a href="?page={{.Last}}">{{.Last}}</a></div>
+{{end}}
+        </div>
+        <div class="next">
+            &nbsp;
+            {{if .Next}}<a href="?page={{.Next}}">Next</a>{{end}}
+        </div>
+        <div class="clear"></div>
+    </div>
+{{end}}{{end}}{{end}}

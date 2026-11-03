@@ -1,0 +1,86 @@
+{{define "script"}}{{end}}{{define "css"}}{{end}}{{define "content"}}
+
+{{template "header" .}}
+
+<div class="address-head">
+    <h3>LBRY Address</h3>
+    <h4>{{$.Address.address}}</h4>
+    {{if trim .Address.Tag}}
+        {{if trim .Address.TagUrl}}<a href="{{safeURL .Address.TagUrl}}" target="_blank" rel="nofollow">{{$.Address.Tag}}</a>{{else}}{{.Address.Tag}}{{end}}
+    {{end}}
+</div>
+
+<div class="address-subhead">
+    <div class="address-qr">
+        <img src="/qr/lbry%3A{{$.Address.address}}" alt="lbry:{{$.Address.address}}" />
+    </div>
+
+    <div class="address-summary">
+        <div class="box">
+            <div class="title">Balance (LBC)</div>
+            <div class="value">{{amount .BalanceAmount ","}}</div>
+        </div>
+
+        <div class="box">
+            <div class="title">Received (LBC)</div>
+            <div class="value">{{amount .TotalReceived ","}}</div>
+        </div>
+
+        <div class="box last">
+            <div class="title">Sent (LBC)</div>
+            <div class="value">{{amount .TotalSent ","}}</div>
+        </div>
+
+        <div class="clear"></div>
+    </div>
+
+    <div class="clear"></div>
+</div>
+
+<div class="recent-transactions">
+    <h3>Transactions</h3>
+    <div class="results-meta">
+        {{if gt .NumRecords 0}}
+        Showing {{grouped .Begin 0}} - {{grouped .End 0}} of {{grouped .NumRecords 0}} transaction{{if ne .NumRecords 1}}s{{end}}
+        {{end}}
+    </div>
+
+    <table class="table tx-table">
+        <thead>
+            <tr>
+                <th class="w125 left">Height</th>
+                <th class="w250 left">Transaction Hash</th>
+                <th class="left">Timestamp</th>
+                <th class="w125 right">Confirmations</th>
+                <th class="w80 right">Inputs</th>
+                <th class="w80 right">Outputs</th>
+                <th class="w225 right">Amount</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {{if not .RecentTxs}}
+            <tr>
+                <td class="nodata" colspan="7">There are no recent transactions to display for this wallet.</td>
+            </tr>
+            {{end}}
+
+            {{range $tx := .RecentTxs}}
+            <tr>
+                <td class="w125">{{if eq $tx.height nil}}<em>Unconfirmed</em>{{else}}<a href="/blocks/{{$tx.height}}">{{$tx.height}}</a>{{end}}</td>
+                <td class="w250"><div><a href="/tx/{{$tx.hash}}?address={{$.Address.address}}#{{$.Address.address}}">{{$tx.hash}}</a></div></td>
+                <td>{{date $tx.transaction_time "02 Jan 2006 15:04:05"}} UTC</td>
+                <td class="right">{{grouped $tx.confirmations 0}}</td>
+                <td class="right">{{$tx.input_count}}</td>
+                <td class="right">{{$tx.output_count}}</td>
+                <td class="right {{txClass $tx}}">
+                    {{grouped (difference $tx.credit_amount $tx.debit_amount) 8}} LBC
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
+
+{{template "pagination" .}}
+{{end}}

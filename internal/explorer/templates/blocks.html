@@ -1,0 +1,63 @@
+{{define "script"}}<script type="text/javascript" src="/amcharts/amcharts.js"></script>
+<script type="text/javascript" src="/amcharts/serial.js"></script>
+<script type="text/javascript" src="/amcharts/plugins/export/export.min.js"></script>
+<script type="text/javascript" src="/js/block-size-chart.js"></script>
+{{end}}{{define "content"}}{{template "header" .}}
+
+<div class="block-head">
+    <h3>LBRY Blocks</h3>
+</div>
+
+<div class="block-size-chart-container">
+    <div class="load-progress inc"></div>
+    <h3>Block Size Chart</h3>
+    <div class="block-size-data-links">
+        <a href="#" title="24 hours" data-period="24h">24h</a>
+        <a href="#" title="72 hours" data-period="72h">72h</a>
+        <a href="#" title="1 week" data-period="168h">1w</a>
+        <a href="#" title="30 days" data-period="30d">30d</a>
+        <a href="#" title="90 days" data-period="90d">90d</a>
+        <a href="#" title="1 year" data-period="1y">1y</a>
+    </div>
+    <div id="block-size-chart" class="chart"></div>
+    <div id="chart-export" class="btn-chart-export"></div>
+</div>
+
+<div class="all-blocks">
+    <h3>All Blocks</h3>
+    <div class="results-meta">
+        {{if gt .NumRecords 0}}
+        Showing {{grouped .Begin 0}} - {{grouped .End 0}} of {{grouped .NumRecords 0}} block{{if ne .NumRecords 1}}s{{end}}
+        {{end}}
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="w100">Height</th>
+                <th class="w150 left pad-left">Difficulty</th>
+                <th class="w100 right">Confirmations</th>
+                <th class="w100 right">TX Count</th>
+                <th class="w100 right">Block Size</th>
+                <th class="w100 right pad-left">Nonce</th>
+                <th class="w150 left pad-left">Block Time</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {{range $block := .Blocks}}
+            <tr>
+                <td class="right"><a href="/blocks/{{$block.height}}">{{$block.height}}</a></td>
+                <td class="pad-left">{{fixed $block.difficulty 8}}</td>
+                <td class="right">{{grouped (add (sub $.Highest.height $block.height) 1) 0}}</td>
+                <td class="right">{{$block.tx_count}}</td>
+                <td class="right">{{kb $block.block_size}}</td>
+                <td class="right pad-left">{{$block.nonce}}</td>
+                <td class="pad-left">{{date $block.block_time "02 Jan 2006 15:04:05"}} UTC</td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
+
+{{template "pagination" .}}
+{{end}}{{define "css"}}<link rel="stylesheet" href="/amcharts/plugins/export/export.css">{{end}}

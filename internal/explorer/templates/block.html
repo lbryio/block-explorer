@@ -1,0 +1,125 @@
+{{define "content"}}{{template "header" .}}
+
+
+    
+
+    
+
+    <div class="block-head">
+        <h3>LBRY Block {{.Block.height}}</h3>
+        <h4>{{.Block.hash}}</h4>
+    </div>
+
+    <div class="block-nav">
+        {{if gt (num .Block.height) 0.0}}
+        <a class="btn btn-prev" href="/blocks/{{sub .Block.height 1}}">&laquo; Previous Block</a>
+        {{end}}
+
+        <a class="btn btn-next" href="/blocks/{{add .Block.height 1}}">Next Block &raquo;</a>
+
+        <div class="clear"></div>
+    </div>
+
+    <div class="block-info">
+        <div class="block-summary">
+            <h3>Overview</h3>
+
+            <div class="label half-width">Block Size (bytes)</div>
+            <div class="label half-width">Block Time</div>
+
+            <div class="value half-width">{{grouped .Block.block_size 0}}</div>
+            <div class="value half-width">{{date .Block.block_time "2 Jan 2006 15:04:05"}} UTC</div>
+
+            <div class="clear spacer"></div>
+
+            <div class="label half-width">Bits</div>
+            <div class="label half-width">Confirmations</div>
+
+            <div class="value half-width">{{.Block.bits}}</div>
+            <div class="value half-width">{{.Confirmations}}</div>
+
+            <div class="clear spacer"></div>
+
+            <div class="label half-width">Difficulty</div>
+            <div class="label half-width">Nonce</div>
+
+            <div class="value half-width">{{amount .Block.difficulty ""}}</div>
+            <div class="value half-width">{{.Block.nonce}}</div>
+
+            <div class="clear spacer"></div>
+
+            <div class="label">Chainwork</div> <div class="value">{{.Block.chainwork}}</div>
+
+            <div class="spacer"></div>
+
+            <div class="label">MerkleRoot</div> <div class="value">{{.Block.merkle_root}}</div>
+
+            <div class="spacer"></div>
+
+            <div class="label">NameClaimRoot</div> <div class="value">{{.Block.name_claim_root}}</div>
+
+            <!--
+            <div class="spacer"></div>
+
+            <div class="label">Target</div> <div class="value">{{.Block.Target}}</div>
+            -->
+
+            <div class="spacer"></div>
+
+            <div class="label">Version</div> <div class="value">{{.Block.version}}</div>
+        </div>
+
+        <div class="block-transactions">
+            <h3>{{len .Txs}} Transaction{{if ne (len .Txs) 1}}s{{end}}</h3>
+
+            <div class="transactions-list">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Hash</th>
+                            <th class="w100 right">Inputs</th>
+                            <th class="w100 right">Outputs</th>
+                            <th class="w200 right">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{if not .Txs}}
+                        <tr>
+                            <td class="nodata" colspan="4">There are no transactions to display at this time.</td>
+                        </tr>
+                        {{end}}
+
+                        {{range $tx := .Txs}}
+                        <tr>
+                            <td class="w300"><div><a href="/tx/{{$tx.hash}}">{{$tx.hash}}</a></div></td>
+                            <td class="right">{{$tx.input_count}}</td>
+                            <td class="right">{{$tx.output_count}}</td>
+                            <td class="right"><div title="{{text $tx.value}} LBC">{{currency $tx.value}} LBC</div></td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+{{end}}{{define "script"}}
+    <script type="text/javascript">
+        var resizeCards = function() {
+            var bSummary = $('.block-summary');
+            var bTransactions = $('.block-transactions');
+            if (bTransactions.outerHeight() < bSummary.outerHeight()) {
+                bTransactions.outerHeight(bSummary.outerHeight());
+            }
+        };
+
+        $(document).ready(function() {
+            resizeCards();
+        });
+
+        window.onload = function() {
+            resizeCards();
+        };
+    </script>
+    {{end}}{{define "css"}}{{end}}

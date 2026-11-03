@@ -1,0 +1,446 @@
+{
+    "rounds": [
+        {
+            "value": 1.005,
+            "places": 0,
+            "expected": "1"
+        },
+        {
+            "value": 1.005,
+            "places": 2,
+            "expected": "1.01"
+        },
+        {
+            "value": 1.005,
+            "places": 5,
+            "expected": "1.00500"
+        },
+        {
+            "value": 1.005,
+            "places": 8,
+            "expected": "1.00500000"
+        },
+        {
+            "value": 1.0049999999999997,
+            "places": 0,
+            "expected": "1"
+        },
+        {
+            "value": 1.0049999999999997,
+            "places": 2,
+            "expected": "1.00"
+        },
+        {
+            "value": 1.0049999999999997,
+            "places": 5,
+            "expected": "1.00500"
+        },
+        {
+            "value": 1.0049999999999997,
+            "places": 8,
+            "expected": "1.00500000"
+        },
+        {
+            "value": 2.675,
+            "places": 0,
+            "expected": "3"
+        },
+        {
+            "value": 2.675,
+            "places": 2,
+            "expected": "2.68"
+        },
+        {
+            "value": 2.675,
+            "places": 5,
+            "expected": "2.67500"
+        },
+        {
+            "value": 2.675,
+            "places": 8,
+            "expected": "2.67500000"
+        },
+        {
+            "value": -1.005,
+            "places": 0,
+            "expected": "-1"
+        },
+        {
+            "value": -1.005,
+            "places": 2,
+            "expected": "-1.01"
+        },
+        {
+            "value": -1.005,
+            "places": 5,
+            "expected": "-1.00500"
+        },
+        {
+            "value": -1.005,
+            "places": 8,
+            "expected": "-1.00500000"
+        },
+        {
+            "value": -0,
+            "places": 0,
+            "expected": "0"
+        },
+        {
+            "value": -0,
+            "places": 2,
+            "expected": "0.00"
+        },
+        {
+            "value": -0,
+            "places": 5,
+            "expected": "0.00000"
+        },
+        {
+            "value": -0,
+            "places": 8,
+            "expected": "0.00000000"
+        },
+        {
+            "value": -1.0e-9,
+            "places": 0,
+            "expected": "0"
+        },
+        {
+            "value": -1.0e-9,
+            "places": 2,
+            "expected": "0.00"
+        },
+        {
+            "value": -1.0e-9,
+            "places": 5,
+            "expected": "0.00000"
+        },
+        {
+            "value": -1.0e-9,
+            "places": 8,
+            "expected": "0.00000000"
+        },
+        {
+            "value": 0.285,
+            "places": 0,
+            "expected": "0"
+        },
+        {
+            "value": 0.285,
+            "places": 2,
+            "expected": "0.29"
+        },
+        {
+            "value": 0.285,
+            "places": 5,
+            "expected": "0.28500"
+        },
+        {
+            "value": 0.285,
+            "places": 8,
+            "expected": "0.28500000"
+        },
+        {
+            "value": 1234567890.1234,
+            "places": 0,
+            "expected": "1234567890"
+        },
+        {
+            "value": 1234567890.1234,
+            "places": 2,
+            "expected": "1234567890.12"
+        },
+        {
+            "value": 1234567890.1234,
+            "places": 5,
+            "expected": "1234567890.12340"
+        },
+        {
+            "value": 1234567890.1234,
+            "places": 8,
+            "expected": "1234567890.12339997"
+        }
+    ],
+    "json": [
+        {
+            "value": 1.0e-5,
+            "encoded": "1.0e-5"
+        },
+        {
+            "value": 0.0001,
+            "encoded": "0.0001"
+        },
+        {
+            "value": 1.0e-7,
+            "encoded": "1.0e-7"
+        },
+        {
+            "value": 10000000000000000,
+            "encoded": "10000000000000000"
+        },
+        {
+            "value": 1.0e+17,
+            "encoded": "1.0e+17"
+        },
+        {
+            "value": 1.0e+20,
+            "encoded": "1.0e+20"
+        },
+        {
+            "value": 1.0e+21,
+            "encoded": "1.0e+21"
+        },
+        {
+            "value": -0,
+            "encoded": "-0"
+        },
+        {
+            "value": 1.2345678901234567,
+            "encoded": "1.2345678901234567"
+        },
+        {
+            "value": 9223372036854775807,
+            "encoded": "9223372036854775807"
+        }
+    ],
+    "now": 1793620800,
+    "dates": [
+        {
+            "timestamp": 1793620800,
+            "ago": "just now",
+            "human": "0 seconds ago"
+        },
+        {
+            "timestamp": 1793620799,
+            "ago": "1 second ago",
+            "human": "1 second ago"
+        },
+        {
+            "timestamp": 1793620798,
+            "ago": "2 seconds ago",
+            "human": "2 seconds ago"
+        },
+        {
+            "timestamp": 1793620741,
+            "ago": "59 seconds ago",
+            "human": "59 seconds ago"
+        },
+        {
+            "timestamp": 1793620740,
+            "ago": "1 minute ago",
+            "human": "1 minute ago"
+        },
+        {
+            "timestamp": 1793620739,
+            "ago": "1 minute ago",
+            "human": "1 minute ago"
+        },
+        {
+            "timestamp": 1793617201,
+            "ago": "59 minutes ago",
+            "human": "59 minutes ago"
+        },
+        {
+            "timestamp": 1793617200,
+            "ago": "1 hour ago",
+            "human": "1 hour ago"
+        },
+        {
+            "timestamp": 1793617199,
+            "ago": "1 hour ago",
+            "human": "1 hour ago"
+        },
+        {
+            "timestamp": 1793534401,
+            "ago": "23 hours, 59 minutes ago",
+            "human": "23 hours ago"
+        },
+        {
+            "timestamp": 1793534400,
+            "ago": "1 day ago",
+            "human": "1 day ago"
+        },
+        {
+            "timestamp": 1793016001,
+            "ago": "6 days, 23 hours ago",
+            "human": "6 days ago"
+        },
+        {
+            "timestamp": 1793016000,
+            "ago": "1 week ago",
+            "human": "1 week ago"
+        },
+        {
+            "timestamp": 1790942400,
+            "ago": "on 10\/2\/26",
+            "human": "1 month ago"
+        },
+        {
+            "timestamp": 1761998400,
+            "ago": "on 11\/1\/25",
+            "human": "1 year ago"
+        },
+        {
+            "timestamp": 1793620801,
+            "ago": "1 second",
+            "human": "1 second from now"
+        },
+        {
+            "timestamp": 1793620860,
+            "ago": "1 minute",
+            "human": "1 minute from now"
+        },
+        {
+            "timestamp": 1793624401,
+            "ago": "1 hour",
+            "human": "1 hour from now"
+        },
+        {
+            "timestamp": 1793534339,
+            "ago": "1 day ago",
+            "human": "1 day ago"
+        },
+        {
+            "timestamp": 1793530739,
+            "ago": "1 day, 1 hour ago",
+            "human": "1 day ago"
+        },
+        {
+            "timestamp": 1793447939,
+            "ago": "2 days ago",
+            "human": "2 days ago"
+        },
+        {
+            "timestamp": 1791120800,
+            "ago": "4 weeks, 1 day ago",
+            "human": "4 weeks ago"
+        },
+        {
+            "timestamp": 1793707261,
+            "ago": "1 day",
+            "human": "1 day from now"
+        },
+        {
+            "timestamp": 1796299200,
+            "ago": "on 12\/3\/26",
+            "human": "1 month from now"
+        },
+        {
+            "timestamp": 1788540800,
+            "ago": "on 9\/4\/26",
+            "human": "1 month ago"
+        },
+        {
+            "timestamp": 1785844800,
+            "ago": "on 8\/4\/26",
+            "human": "2 months ago"
+        },
+        {
+            "timestamp": 1778620800,
+            "ago": "on 5\/12\/26",
+            "human": "5 months ago"
+        },
+        {
+            "timestamp": 1730548800,
+            "ago": "on 11\/2\/24",
+            "human": "2 years ago"
+        },
+        {
+            "timestamp": 1856692800,
+            "ago": "on 11\/1\/28",
+            "human": "1 year from now"
+        }
+    ],
+    "amounts": [
+        {
+            "value": -0,
+            "amount": "0",
+            "plain": "0",
+            "currency": "0.00"
+        },
+        {
+            "value": -1.0e-9,
+            "amount": "0",
+            "plain": "0",
+            "currency": "-1"
+        },
+        {
+            "value": -1.0e-8,
+            "amount": "-0.00000001",
+            "plain": "-0.00000001",
+            "currency": "-1"
+        },
+        {
+            "value": 1.005,
+            "amount": "1.005",
+            "plain": "1.005",
+            "currency": "1.00"
+        },
+        {
+            "value": 2.675,
+            "amount": "2.675",
+            "plain": "2.675",
+            "currency": "2.67"
+        },
+        {
+            "value": 0,
+            "amount": "0",
+            "plain": "0",
+            "currency": "0.00"
+        },
+        {
+            "value": 1,
+            "amount": "1",
+            "plain": "1",
+            "currency": "1.00"
+        },
+        {
+            "value": 1.01,
+            "amount": "1.01",
+            "plain": "1.01",
+            "currency": "1.01"
+        },
+        {
+            "value": 1234.567891235,
+            "amount": "1,234.56789124",
+            "plain": "1234.56789124",
+            "currency": "1,234.56"
+        },
+        {
+            "value": 5.0e-9,
+            "amount": "0.00000001",
+            "plain": "0.00000001",
+            "currency": "5"
+        },
+        {
+            "value": -1.234,
+            "amount": "-1.234",
+            "plain": "-1.234",
+            "currency": "-1.23"
+        },
+        {
+            "value": 1234567890.1234,
+            "amount": "1,234,567,890.12339997",
+            "plain": "1234567890.12339997",
+            "currency": "1,234,567,890.12"
+        },
+        {
+            "value": "1.0",
+            "amount": "1",
+            "plain": "1",
+            "currency": "1"
+        },
+        {
+            "value": "1.230",
+            "amount": "1.23",
+            "plain": "1.23",
+            "currency": "1.23"
+        },
+        {
+            "value": "123.00000001",
+            "amount": "123.00000001",
+            "plain": "123.00000001",
+            "currency": "123.00"
+        }
+    ]
+}

@@ -1,0 +1,458 @@
+[
+  {
+    "path": "/",
+    "method": "GET",
+    "action": "index",
+    "args": []
+  },
+  {
+    "path": "/",
+    "method": "POST",
+    "action": "index",
+    "args": []
+  },
+  {
+    "path": "/",
+    "method": "HEAD",
+    "action": "index",
+    "args": []
+  },
+  {
+    "path": "/api/v1/status",
+    "method": "GET",
+    "action": "apistatus",
+    "args": []
+  },
+  {
+    "path": "/api/v1/status",
+    "method": "POST",
+    "action": "apistatus",
+    "args": []
+  },
+  {
+    "path": "/api/v1/status",
+    "method": "HEAD",
+    "action": "apistatus",
+    "args": []
+  },
+  {
+    "path": "/api/v1/status/",
+    "method": "GET",
+    "action": "apistatus",
+    "args": []
+  },
+  {
+    "path": "/api/v1/status/",
+    "method": "POST",
+    "action": "apistatus",
+    "args": []
+  },
+  {
+    "path": "/api/v1/status/",
+    "method": "HEAD",
+    "action": "apistatus",
+    "args": []
+  },
+  {
+    "path": "/api/v1/status/extra",
+    "method": "GET",
+    "action": "index",
+    "args": [
+      "api",
+      "v1",
+      "status",
+      "extra"
+    ]
+  },
+  {
+    "path": "/api/v1/status/extra",
+    "method": "POST",
+    "action": "index",
+    "args": [
+      "api",
+      "v1",
+      "status",
+      "extra"
+    ]
+  },
+  {
+    "path": "/api/v1/status/extra",
+    "method": "HEAD",
+    "action": "index",
+    "args": [
+      "api",
+      "v1",
+      "status",
+      "extra"
+    ]
+  },
+  {
+    "path": "/blocks",
+    "method": "GET",
+    "action": "blocks",
+    "args": []
+  },
+  {
+    "path": "/blocks",
+    "method": "POST",
+    "action": "blocks",
+    "args": []
+  },
+  {
+    "path": "/blocks",
+    "method": "HEAD",
+    "action": "blocks",
+    "args": []
+  },
+  {
+    "path": "/blocks/",
+    "method": "GET",
+    "action": "blocks",
+    "args": []
+  },
+  {
+    "path": "/blocks/",
+    "method": "POST",
+    "action": "blocks",
+    "args": []
+  },
+  {
+    "path": "/blocks/",
+    "method": "HEAD",
+    "action": "blocks",
+    "args": []
+  },
+  {
+    "path": "/blocks/1/extra",
+    "method": "GET",
+    "action": "blocks",
+    "args": [
+      "1",
+      "extra"
+    ]
+  },
+  {
+    "path": "/blocks/1/extra",
+    "method": "POST",
+    "action": "blocks",
+    "args": [
+      "1",
+      "extra"
+    ]
+  },
+  {
+    "path": "/blocks/1/extra",
+    "method": "HEAD",
+    "action": "blocks",
+    "args": [
+      "1",
+      "extra"
+    ]
+  },
+  {
+    "path": "/blocks/%31",
+    "method": "GET",
+    "action": "blocks",
+    "args": [
+      "1"
+    ]
+  },
+  {
+    "path": "/blocks/%31",
+    "method": "POST",
+    "action": "blocks",
+    "args": [
+      "1"
+    ]
+  },
+  {
+    "path": "/blocks/%31",
+    "method": "HEAD",
+    "action": "blocks",
+    "args": [
+      "1"
+    ]
+  },
+  {
+    "path": "/blocks//",
+    "method": "GET",
+    "action": "blocks",
+    "args": []
+  },
+  {
+    "path": "/blocks//",
+    "method": "POST",
+    "action": "blocks",
+    "args": []
+  },
+  {
+    "path": "/blocks//",
+    "method": "HEAD",
+    "action": "blocks",
+    "args": []
+  },
+  {
+    "path": "/qr/lbry%3A%2F%2Fhello",
+    "method": "GET",
+    "action": "qr",
+    "args": [
+      "lbry://hello"
+    ]
+  },
+  {
+    "path": "/qr/lbry%3A%2F%2Fhello",
+    "method": "POST",
+    "action": "qr",
+    "args": [
+      "lbry://hello"
+    ]
+  },
+  {
+    "path": "/qr/lbry%3A%2F%2Fhello",
+    "method": "HEAD",
+    "action": "qr",
+    "args": [
+      "lbry://hello"
+    ]
+  },
+  {
+    "path": "/qr/lbry://hello",
+    "method": "GET",
+    "action": "qr",
+    "args": [
+      "lbry:",
+      "hello"
+    ]
+  },
+  {
+    "path": "/qr/lbry://hello",
+    "method": "POST",
+    "action": "qr",
+    "args": [
+      "lbry:",
+      "hello"
+    ]
+  },
+  {
+    "path": "/qr/lbry://hello",
+    "method": "HEAD",
+    "action": "qr",
+    "args": [
+      "lbry:",
+      "hello"
+    ]
+  },
+  {
+    "path": "/api/v1/address/abc!/balance",
+    "method": "GET",
+    "action": "index",
+    "args": [
+      "api",
+      "v1",
+      "address",
+      "abc!",
+      "balance"
+    ]
+  },
+  {
+    "path": "/api/v1/address/abc!/balance",
+    "method": "POST",
+    "action": "index",
+    "args": [
+      "api",
+      "v1",
+      "address",
+      "abc!",
+      "balance"
+    ]
+  },
+  {
+    "path": "/api/v1/address/abc!/balance",
+    "method": "HEAD",
+    "action": "index",
+    "args": [
+      "api",
+      "v1",
+      "address",
+      "abc!",
+      "balance"
+    ]
+  },
+  {
+    "path": "/api/v1/address//balance",
+    "method": "GET",
+    "action": "index",
+    "args": [
+      "api",
+      "v1",
+      "address",
+      "balance"
+    ]
+  },
+  {
+    "path": "/api/v1/address//balance",
+    "method": "POST",
+    "action": "index",
+    "args": [
+      "api",
+      "v1",
+      "address",
+      "balance"
+    ]
+  },
+  {
+    "path": "/api/v1/address//balance",
+    "method": "HEAD",
+    "action": "index",
+    "args": [
+      "api",
+      "v1",
+      "address",
+      "balance"
+    ]
+  },
+  {
+    "path": "/api/v1/charts/blocksize/2h",
+    "method": "GET",
+    "action": "apiblocksize",
+    "args": [
+      "2h"
+    ]
+  },
+  {
+    "path": "/api/v1/charts/blocksize/2h",
+    "method": "POST",
+    "action": "apiblocksize",
+    "args": [
+      "2h"
+    ]
+  },
+  {
+    "path": "/api/v1/charts/blocksize/2h",
+    "method": "HEAD",
+    "action": "apiblocksize",
+    "args": [
+      "2h"
+    ]
+  },
+  {
+    "path": "/realtime/",
+    "method": "GET",
+    "action": "realtime",
+    "args": []
+  },
+  {
+    "path": "/realtime/",
+    "method": "POST",
+    "action": "realtime",
+    "args": []
+  },
+  {
+    "path": "/realtime/",
+    "method": "HEAD",
+    "action": "realtime",
+    "args": []
+  },
+  {
+    "path": "/find/",
+    "method": "GET",
+    "action": "find",
+    "args": []
+  },
+  {
+    "path": "/find/",
+    "method": "POST",
+    "action": "find",
+    "args": []
+  },
+  {
+    "path": "/find/",
+    "method": "HEAD",
+    "action": "find",
+    "args": []
+  },
+  {
+    "path": "/stats/",
+    "method": "GET",
+    "action": "stats",
+    "args": []
+  },
+  {
+    "path": "/stats/",
+    "method": "POST",
+    "action": "stats",
+    "args": []
+  },
+  {
+    "path": "/stats/",
+    "method": "HEAD",
+    "action": "stats",
+    "args": []
+  },
+  {
+    "path": "/tx/%2F",
+    "method": "GET",
+    "action": "tx",
+    "args": [
+      "/"
+    ]
+  },
+  {
+    "path": "/tx/%2F",
+    "method": "POST",
+    "action": "tx",
+    "args": [
+      "/"
+    ]
+  },
+  {
+    "path": "/tx/%2F",
+    "method": "HEAD",
+    "action": "tx",
+    "args": [
+      "/"
+    ]
+  },
+  {
+    "path": "//stats",
+    "method": "GET",
+    "action": "stats",
+    "args": []
+  },
+  {
+    "path": "//stats",
+    "method": "POST",
+    "action": "stats",
+    "args": []
+  },
+  {
+    "path": "//stats",
+    "method": "HEAD",
+    "action": "stats",
+    "args": []
+  },
+  {
+    "path": "/claims/0",
+    "method": "GET",
+    "action": "claims",
+    "args": [
+      "0"
+    ]
+  },
+  {
+    "path": "/claims/0",
+    "method": "POST",
+    "action": "claims",
+    "args": [
+      "0"
+    ]
+  },
+  {
+    "path": "/claims/0",
+    "method": "HEAD",
+    "action": "claims",
+    "args": [
+      "0"
+    ]
+  }
+]

@@ -1,0 +1,161 @@
+{
+    "queries": [
+        {
+            "raw": "q=one&q=two",
+            "q": "two",
+            "page": 0
+        },
+        {
+            "raw": "q[]=hello",
+            "q": "Array",
+            "page": 0
+        },
+        {
+            "raw": "q=abc%ZZ",
+            "q": "abc%ZZ",
+            "page": 0
+        },
+        {
+            "raw": "q=%2B%20x",
+            "q": "+ x",
+            "page": 0
+        },
+        {
+            "raw": "page=9007199254740993",
+            "q": "",
+            "page": 9007199254740993
+        },
+        {
+            "raw": "page=9223372036854775807",
+            "q": "",
+            "page": 9223372036854775807
+        },
+        {
+            "raw": "page=9223372036854775808",
+            "q": "",
+            "page": 9223372036854775807
+        },
+        {
+            "raw": "page=-9223372036854775809",
+            "q": "",
+            "page": -9223372036854775808
+        },
+        {
+            "raw": "page=1e3",
+            "q": "",
+            "page": 1000
+        },
+        {
+            "raw": "page[]=2",
+            "q": "",
+            "page": 1
+        },
+        {
+            "raw": "page=3&page[x]=2",
+            "q": "",
+            "page": 1
+        },
+        {
+            "raw": "page[x]=2&page=3",
+            "q": "",
+            "page": 3
+        },
+        {
+            "raw": "page[broken=2",
+            "q": "",
+            "page": 0
+        }
+    ],
+    "blocked": [
+        {
+            "claim": "blocked",
+            "publisher": null,
+            "body": "{\"data\":[{\"claim_id\":12},{\"claim_id\":\"blocked\"}]}",
+            "expected": true
+        },
+        {
+            "claim": "blocked",
+            "publisher": null,
+            "body": "{\"data\":[null,\"bad\",{}, {\"claim_id\":\"blocked\"}]}",
+            "expected": true
+        },
+        {
+            "claim": "blocked",
+            "publisher": null,
+            "body": "{\"data\":[{\"claim_id\":true}]}",
+            "expected": true
+        },
+        {
+            "claim": "blocked",
+            "publisher": null,
+            "body": "{\"data\":[{\"claim_id\":false}]}",
+            "expected": false
+        },
+        {
+            "claim": "",
+            "publisher": null,
+            "body": "{\"data\":[{}]}",
+            "expected": true
+        },
+        {
+            "claim": "0000000000000000000000000000000000000001",
+            "publisher": null,
+            "body": "{\"data\":[{\"claim_id\":1}]}",
+            "expected": true
+        },
+        {
+            "claim": "0000000000000000000000000000000000000001",
+            "publisher": null,
+            "body": "{\"data\":[{\"claim_id\":\"1\"}]}",
+            "expected": true
+        },
+        {
+            "claim": "not-blocked",
+            "publisher": "publisher",
+            "body": "{\"data\":[{\"claim_id\":\"publisher\"}]}",
+            "expected": true
+        },
+        {
+            "claim": "not-blocked",
+            "publisher": "0",
+            "body": "{\"data\":[{\"claim_id\":\"0\"}]}",
+            "expected": false
+        },
+        {
+            "claim": "blocked",
+            "publisher": null,
+            "body": "{\"data\":{\"0\":{\"claim_id\":\"blocked\"}}}",
+            "expected": false
+        },
+        {
+            "claim": "blocked",
+            "publisher": null,
+            "body": "not JSON",
+            "expected": false
+        },
+        {
+            "claim": "blocked",
+            "publisher": null,
+            "body": "{\"Data\":[{\"claim_id\":\"blocked\"}]}",
+            "expected": false
+        },
+        {
+            "claim": "blocked",
+            "publisher": null,
+            "body": "{\"data\":[{\"claim_id\":\"\\u0000true\"}]}",
+            "expected": false
+        },
+        {
+            "claim": "blocked",
+            "publisher": null,
+            "body": "{\"data\":[{\"claim_id\":\"blocked\",\"junk\":\"\\ud800\"}]}",
+            "expected": false
+        },
+        {
+            "claim": "blocked",
+            "publisher": null,
+            "body_base64": "eyJkYXRhIjpbeyJjbGFpbV9pZCI6ImJsb2NrZWQiLCJqdW5rIjoi\/yJ9XX0=",
+            "expected": false
+        }
+    ]
+}
